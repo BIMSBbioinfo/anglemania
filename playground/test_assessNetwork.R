@@ -286,7 +286,6 @@ for (idx in names(diag(conm_summed))[1:4]) {
 ### from the connectivity graph
 ### Alternatively, build an integration order from hclust based
 ### on angle conservation matrix
-
 built.int.ordr <- function(ordr_source, from = "graph") {
   if (from == "graph") {
     ##
@@ -334,4 +333,8 @@ l_int_ordr$hclust <- built.int.ordr(hclust_m, from = "hclust")
 
 
 
-##
+
+
+## Update 26.09.2023
+### Summarise the integration process and proceed to hiearachical integration
+

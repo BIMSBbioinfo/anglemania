@@ -35,8 +35,8 @@ approximate.angles <- function(x_df_ang, #nolint
     modality = NA,
     mu = NA,
     sigma = NA,
-    estimated_D = NA,
-    critical_D = NA,
+    estimated_d = NA,
+    critical_d = NA,
     alpha = NA,
     p_value = NA,
     s_dims = NA,
@@ -75,7 +75,7 @@ fit.gaussian <- function(l_approx) { #nolint
 ## -----------------------------------------------------------------------------
 ## -----------------------------------------------------------------------------
 test.gof.Ks <- function(l_approx, #nolint
-                        alpha = 0.05,
+                        alpha = 0.01,
                         mt_nsims = 6000,
                         seed = 42) {
   ##
@@ -179,4 +179,21 @@ get.analytical.extremes <- function(l_approx, #nolint
   l_approx$critical_angles <- crit_vals
   ##
   return(l_approx)
+}
+## -----------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
+## merge angle statistics
+extract.angle.stats <- function(l_processed) {
+  purrr::map2_dfr(
+    l_processed[["l_angles"]],
+    names(l_processed[["l_angles"]]),
+    ~ cbind(
+      tibble(
+        sample = .y,
+        crit_sharp = .x$critical_angles[1],
+        crit_blunt = .x$critical_angles[2]
+      ),
+      .x$statistics
+    )
+  )
 }

@@ -3,7 +3,7 @@ factorise <- function(x_mat, #nolint
                       n_threads,
                       path_to_write_angles) {
   ## ---
-  message(paste0("Input matrix with ", dim(x_mat)[1], " features"))
+  #message(paste0("Input matrix with ", dim(x_mat)[1], " features"))
   if (is.null(rownames(x_mat))) {
     stop("Input matrix lacks rownames. Stopping")
   }
@@ -46,7 +46,6 @@ factorise <- function(x_mat, #nolint
     stop("Extrema is too thin, consider taking a larger margin")
   }
   ## ---
-  message("Assessing flippity...")
   l_flippity <- flippitise(x_mat, x_df_ang, l_angles)
   if (!is.na(path_to_write_angles) & is.character(path_to_write_angles)) {
     message("Writing tables with angles to compute integration metric...")

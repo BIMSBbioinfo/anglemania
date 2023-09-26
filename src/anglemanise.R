@@ -1,4 +1,4 @@
-anglemanise <- function(list_x_mats, #nolint
+anglemanise <- function(seurat_list, #nolint
                         extrema = 0.001,
                         n_threads = 16,
                         path_to_write_angles = ".") {
@@ -25,6 +25,13 @@ anglemanise <- function(list_x_mats, #nolint
   if (!dir.exists(path_to_write_angles)) {
     dir.create(path_to_write_angles, recursive = TRUE)
   }
+  ## - extract expression matrices
+  list_x_mats <- purrr::map(
+    seurat_list,
+    function(ss) {
+      ss@assays$RNA@scale.data
+    }
+  )
   ##
   if (is.null(names(list_x_mats))) {
     names(list_x_mats) <- paste0("X", seq_along(list_x_mats))
@@ -59,6 +66,11 @@ anglemanise <- function(list_x_mats, #nolint
     ##
     invisible(gc())
   }
+  ## Implement parallel --- heavy memory load, but potential big speed-up
+  ### using future
+
+
+
   ##
   return(l_added)
 }

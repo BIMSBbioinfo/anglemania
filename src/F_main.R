@@ -3,7 +3,31 @@
 
 ## -----------------------------------------------------------------------------
 ## -----------------------------------------------------------------------------
-
+## import seurat list from RDS and prepare a list of expmats from it
+import.sl <- function(object = NULL, path_dat = NULL, min_mcells = 15) { #nolint
+  if (is.null(object) && is.null(path_dat)) {
+    stop("Empty input...\nProvide either Seurat list or path to .rds")
+  }
+  sl <- readr::read_rds(path_dat)
+  # remove unrepresentative datasets
+  ds_keep <- purrr::map_dbl(names(sl),
+    ~ length(sl[[.x]]$seacell_id)
+  ) > min_mcells
+  sl <- sl[ds_keep]
+  # normalise & scale expression matrix
+  sl <- lapply(sl, FUN = NormalizeData)
+  sl <- lapply(sl, FUN = ScaleData)
+  # return pre-processed list
+  return(sl)
+  # make a list of normalies, scaled exp mats.
+  l_mats <- purrr::map(
+    sl,
+    function(ss) {
+      ss@assays$RNA@scale.data
+    }
+  )
+  return(l_mats)
+}
 ## -----------------------------------------------------------------------------
 ## -----------------------------------------------------------------------------
 write.angles <- function(l_flippity, #nolint
