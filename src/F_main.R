@@ -73,9 +73,9 @@ extract.integration.features <- function(l_cumfact, #nolint
 ## -----------------------------------------------------------------------------
 ## -----------------------------------------------------------------------------
 ## for now, just use CCA and Vedran's settings with Seurat
-integrate.by.features <- function(suerat_list, features_to_integrate) {
+integrate.by.features <- function(seurat_list, features_to_integrate, int_order = NULL) {
   anchors = FindIntegrationAnchors(
-    object.list = suerat_list, 
+    object.list = seurat_list, 
     anchor.features = features_to_integrate, 
     verbose = FALSE,
     dims = 1:10,
@@ -84,11 +84,12 @@ integrate.by.features <- function(suerat_list, features_to_integrate) {
     k.score   = 10,
     reduction = "cca"
   )
-  features_intersect = Reduce(function(x,y) intersect(x,y), lapply(suerat_list, rownames))
+  features_intersect = Reduce(function(x,y) intersect(x,y), lapply(seurat_list, rownames))
   seurat_combined = IntegrateData(
     anchorset = anchors,
     k.weight = 10, 
     features.to.integrate = features_intersect,
+    sample.tree = int_order,
     verbose = T
   )
   DefaultAssay(seurat_combined) = "integrated"

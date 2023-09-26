@@ -35,13 +35,12 @@ l_processed <- anglemanise(l_mats,
                            path_to_write_angles = "./tmp")
 toc()
 
-
-# Extract features from angles
+# Extract features from angles ---- obsolete
 tic()
 l_features <- extract.integration.features(L_processed, cutoff = NULL)
 toc()
+
 # Integrate the dataset
 tic()
-seu_combined_test <- integrate.by.features(workdat_f.l,
-                                           purrr::reduce(L_features, union))
+seu_combined_test <- integrate.by.features(workdat_f_l, )
 toc()

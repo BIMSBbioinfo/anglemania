@@ -6,6 +6,8 @@
 
 ## libraries ---- temporary
 library(tidyverse)
+library(tidygraph)
+library(ggraph)
 library(janitor)
 library(tictoc)
 library(data.table)
@@ -19,7 +21,7 @@ handlers(global = TRUE)
 handlers("progress")
 ##
 library(Rcpp)
-sourceCpp("./src/dist2mat.cpp") 
+sourceCpp("./src/dist2mat.cpp")
 
 ##
 setDTthreads(16)

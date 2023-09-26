@@ -12,9 +12,7 @@ ringgraph <- create_ring(12) #works
 # iterate over the recorded matrices and assemble a
 # graph from conserved gene pairs. Use conservation factor as weight
 
-
 ##
-
 
 # I must create a custom adding function that records edges
 # between nodes to a file.
@@ -22,13 +20,11 @@ addmats <- function() {
 
 }
 
-
 ## Approach #2 -- build a graph from recorded tables
 
 buildnet <- function(l_processed) {
 
 }
-
 
 #### melt and filter the matrix with conserved angles
 fact_sharp <- l_processed$x_sharp
@@ -152,12 +148,6 @@ ohm_blunt <- assemble.onehotmat(l_cons_nodes$blunt)
 ## of critical angles down to the sample with the lowest.
 # Our rationale is that the largest number of critical angles ensues
 # the biggest connectivity to other samples.
-tst_tib <- tibble(
-  shcsums = colSums(ohm_sharp[, 2:14]),
-  blcsums = colSums(ohm_blunt[, 2:14])
-)
-ggplot(data = tst_tib) + geom_point(aes(x = shcsums, y = blcsums), size = 2)
-
 assemble.conmat <- function(ohm) { #nolint
   idcs <- colnames(ohm[, 2:dim(ohm)[2]])
   ## arrange descending by the total of critical angles
@@ -190,7 +180,7 @@ hclust.conmat <- function(conm) { #nolint
   hclust(as.dist(1 - apply(conm, 2, function(x) x / diag(conm))))
 }
 
-(l_conm$sharp + l_conm$blunt) %>% hclust.conmat() %>% plot()
+conm_summed %>% hclust.conmat() %>% plot()
 
 # -----------------------------------------------------------------------
 ## and about graph?
@@ -221,28 +211,127 @@ conm.to.tgrph <- function(conm) {
   )
 }
 
+## build up a graph and add some metadata to it
+samps_n <- purrr::map_dbl(l_mats, ~ dim(.x)[2])
+j_dmeta <- read_csv("./auxiliary/jansky_donor_meta.csv", skip = 1)
+##
 tgrph_summed <- conm.to.tgrph(conm_summed)
-library(tidygraph)
-library(ggraph)
+tgrph_summed <- tgrph_summed %>% 
+  left_join(
+    ., 
+    tibble(
+      name = names(samps_n),
+      n = unname(samps_n)
+    ),
+    by = "name"
+  ) %>%
+  left_join(
+    .,
+    j_dmeta %>% dplyr::select(name = `Donor ID`, clst = `Clinical subtype`),
+    by = "name"
+  )
+
 ggraph(tgrph_summed, layout = 'lgl') +
   geom_edge_link(
     aes(
       color = weight,
       width = weight
     )
-   ) + 
+   ) +
   ggraph::scale_edge_width_continuous(
     breaks = seq(0, 1, by = 0.1),
     range = c(1, 3)
   ) +
   ggraph::scale_edge_colour_gradientn(colors = viridis::inferno(n = 20)) +
-  geom_node_point(size = 8) + 
-  geom_node_label(aes(label = name), repel = TRUE) +
-  theme(legend.position = 'bottom')
+  geom_node_point(aes(fill = clst), size = 8, shape = 21) +
+  geom_node_label(aes(label = paste0(name, "\n", n)), repel = TRUE) +
+  guides(edge_width = "none") +
+  theme(legend.position = "bottom")
 
 
 ## Conclusion
 # Graphs and hclust trees provide a great visualisation for the connectivity
-# between the datasets, yet it still doesn't solve the problem with 
+# between the datasets, yet it still doesn't solve the problem with
 # angle selection
 save.image(file = "./snapshots/ENV_test_assessNetwork.RData")
+load(file = "./snapshots/ENV_test_assessNetwork.RData")
+
+
+## huinya ebanaya
+### how intersection would affect gene set size?
+ohm_init <- ohm_summed
+tmp <- str_split_fixed(ohm_init$edge, "_", 2)
+n_gns <- length(union(tmp[, 1], tmp[, 2]))
+for (idx in names(diag(conm_summed))) {
+    ohm_init <- ohm_init[ohm_init[[idx]] > 0, ]
+    tmp <- str_split_fixed(ohm_init$edge, "_", 2)
+    n_genes = length(union(tmp[, 1], tmp[, 2]))
+    n_gns <- c(n_gns, n_genes)
+}
+
+### intersection cuts the data set drastically
+ohm_init <- ohm_summed
+##
+l_ifts <- list()
+tmp <- str_split_fixed(ohm_init$edge, "_", 2)
+l_ifts$all <- union(tmp[, 1], tmp[, 2])
+for (idx in names(diag(conm_summed))[1:4]) {
+    ohm_init <- ohm_init[ohm_init[[idx]] > 0, ]
+    tmp <- str_split_fixed(ohm_init$edge, "_", 2)
+    l_ifts[[idx]] = union(tmp[, 1], tmp[, 2])
+}
+
+## Prepare a custom integration order
+### instead of an hclust, build an integration order matrix
+### from the connectivity graph
+### Alternatively, build an integration order from hclust based
+### on angle conservation matrix
+
+built.int.ordr <- function(ordr_source, from = "graph") {
+  if (from == "graph") {
+    ##
+    ordr_source %>%
+    activate(edges) %>%
+    data.frame() -> tmp
+    purrr::map_dbl(
+      1:13,
+      ~ sum(tmp[tmp$from == .x | tmp$to == .x, ]$weight)
+    ) -> int_order
+    names(int_order) <- ordr_source %>%
+      activate(nodes) %>%
+      data.frame() %>%
+      pull(name)
+    int_order <- int_order[order(int_order, decreasing = TRUE)]
+  } else if(from == "hclust") {
+    int_order <- ordr_source$order
+    names(int_order) <- ordr_source$labels[int_order]
+  }
+  ##
+  for (int_step in 1:(length(int_order) - 2)) {
+    ##
+    if (int_step == 1) {
+      binder <- rbind(
+        c(-int_step, -(int_step + 1)),
+        c(int_step, -(int_step + 2))
+      )
+    } else {
+      ##
+      binder <- rbind(
+        binder,
+        c(int_step, -(int_step + 2))
+      )
+    }
+  }
+  l_out <- list()
+  l_out$int_matrix <- binder
+  l_out$sample_order <- names(int_order)
+  return(l_out)
+}
+
+l_int_ordr <- list()
+l_int_ordr$graph <- built.int.ordr(tgrph_summed, from = "graph")
+l_int_ordr$hclust <- built.int.ordr(hclust_m, from = "hclust")
+
+
+
+##
