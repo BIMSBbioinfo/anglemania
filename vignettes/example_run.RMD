@@ -1,0 +1,94 @@
+---
+title: "Example run of anglemana"
+author: "Artem Baranovskii"
+date: "15th November 2023"
+output: html_document
+---
+
+# anglemana
+
+This simple tutorial will give out a basic idea how to use current anglemana functionality and where to go from there.
+
+## Getting the data
+
+In the current state, anglemana takes as an input [SEACell](https://www.nature.com/articles/s41587-023-01716-9) pre-processed scRNA-seq datasets. If one needs an elaboration on the pre-processing, refer to VF.
+For the test run, the data can be downloaded with the provided ``bash`` script ``get_data.sh``. In this example, we will download **Janksy** dataset:
+```{bash}
+mkdir ./data
+./inst/scripts/get_data.sh -d Janksy -o ./data
+```
+
+## Importing the data
+
+The datasets are stored in .rds format and the name is preceeded by a "SL_" suffix.
+Now that the data is downlaoded, we import it into R using ``import.sl()`` function:
+```{R}
+dataset <- "Jansky"
+sl <- import.sl(path_dat = paste0("./data/SL_", dataset, ".rds"))
+```
+``import.sl()`` also takes care of normalising and scaling.
+
+## Executing the *anglemana*
+
+It is time to anglemanise the dataset and extract the conserved angles:
+```{R}
+l_processed <- anglemanise(
+    sl,
+    extrema = 0.005,
+    n_threads = 16,
+    path_to_write_angles = "./tmp" # important data on angles will be written to this directory
+)
+```
+
+## Exploring the angles
+
+Now that the results are there, we can do some exploratory analysis on angles. First, we assemble lists of conserved angles (nodes):
+```{R}
+l_cons_nodes <- assemble.cons.nodes(l_processed, c("sharp", "blunt"))
+names(l_cons_nodes)
+```
+
+With this information at hand, we can now construct one-encoded matrices of conserved angles across the samples in the dataset:
+```{R}
+l_ohm <- list()
+l_ohm$sharp <- assemble.onehotmat(l_cons_nodes$sharp)
+l_ohm$blunt <- assemble.onehotmat(l_cons_nodes$blunt)
+```
+
+Simialrly, to have a more birdseye view on the connectivity between samples, we can construct an affinity matrix for conserved *sharp*, *blunt*, or summed up angles:
+```{R}
+l_conm <- list()
+l_conm$sharp <- assemble.conmat(ohm_sharp)
+l_conm$blunt <- assemble.conmat(ohm_blunt)
+conm_summed <- (l_conm$sharp + l_conm$blunt)
+```
+
+We can visualise the structure using hclust:
+```{R}
+hclust.conmat <- function(conm) { #nolint
+  hclust(as.dist(1 - apply(conm, 2, function(x) x / diag(conm))))
+}
+conm_summed %>% hclust.conmat() %>% plot()
+```
+
+## Integration (in development)
+
+Currently, the simplest way to go would be to extract integration features by setting a brute cutoff on the level of conservation (number of datasets where the same relationship between two genes is detected):
+```{R}
+l_ifts <- extract.integration.features(l_processed[[1]], cutoff = 7)
+seu_intgr <- integrate.by.features(sl, purrr::reduce(l_ifts, union)) # possible to provide custom integration order
+```
+Alternatively, this can be done by fitting a Poisson model using it as a background to automatically select a statistically-justified cutoff (set ``cutoff = NULL``). However, the basis for the application of Poisson model for this scenario is currently lacking.
+
+Now, that the integration is complete, we can visualise the results using simple helper functions:
+```{R}
+glist <- read_rds("./auxiliary/Glist_EMT.RDS") # a comprehensive set of genes representative of EMT
+seu_intgr <- AddModuleScore(seu_intgr, glist, name = 'module', seed = 42)
+ptab <- get.plottab(seu_intgr, "module1", "umap")
+
+ggplot(data = .x, aes(x = UMAP_1, y = UMAP_2)) + 
+  geom_point(aes(color = module1), size = 2.5, alpha = 0.75) + 
+  scale_colour_gradientn(name = "EMT score", colours = viridis::viridis(100)) + 
+  labs(title = dataset) +
+  theme_minimal()
+```

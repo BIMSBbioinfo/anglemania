@@ -179,7 +179,6 @@ conm_summed <- (l_conm$sharp + l_conm$blunt)
 hclust.conmat <- function(conm) { #nolint
   hclust(as.dist(1 - apply(conm, 2, function(x) x / diag(conm))))
 }
-
 conm_summed %>% hclust.conmat() %>% plot()
 
 # -----------------------------------------------------------------------
@@ -210,7 +209,6 @@ conm.to.tgrph <- function(conm) {
     directed = FALSE
   )
 }
-
 ## build up a graph and add some metadata to it
 samps_n <- purrr::map_dbl(l_mats, ~ dim(.x)[2])
 j_dmeta <- read_csv("./auxiliary/jansky_donor_meta.csv", skip = 1)

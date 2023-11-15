@@ -1,5 +1,6 @@
 /tmp
 /data
 /results
+/playground
 /snapshots
-auxiliary/jansky_donor_meta.csv
+/deprecated

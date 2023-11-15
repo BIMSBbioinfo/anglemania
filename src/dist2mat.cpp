@@ -50,6 +50,5 @@ NumericMatrix dist2mat(NumericVector& x, int bf) {
 
   /* add row names and column names */
   A.attr("dimnames") = List::create(x.attr("Labels"), x.attr("Labels"));
-
   return A;
   }
