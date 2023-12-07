@@ -15,3 +15,7 @@ Other datasets need to be tested. An improvement over the *status quo* is expect
 
 Currently, all used functions are documented and ready to be roxygenised. Technically, the package can be built and tested as soon as the latter is done.
 
+
+## Ideas
+
+Following [google doc](https://docs.google.com/document/d/10TEWmnfBOlW7SGFl70eb_26Z-kTeOK-bcNg6WgZJMsk/edit?usp=sharing)
