@@ -1,7 +1,7 @@
 <img src="800px-Tissot_The_Gathering_of_the_Manna_(color).jpg" align="left" alt="logo" width="300" style = "border: none; float: center ;">
 
-# anglemana
-The repository carries the development version of the conceived "anglemana" R package alongside the ongoing tasks and obstacles. 
+# anglemania
+The repository carries the development version of the conceived "anglemania" R package alongside the ongoing tasks and obstacles. 
 
 ## Introduction
 The goal of this project is to develop a new approach to the integration of scRNA-seq (and, potentially, others sc-omics?) from **similar** biological entities.
