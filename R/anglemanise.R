@@ -15,7 +15,7 @@
 #'
 #' @import Matrix
 #' @importFrom purrr map
-#' @importFrom anglemana factorise
+##' @importFrom anglemania factorise
 #' @param seural_list seurat list.
 #' @param extrema double. Fraction of the angles
 #'   to be cut from both sides of an approximated angle
@@ -31,7 +31,7 @@
 #'   angles statistics and paths to the values of critical
 #'   angles.
 #' @seealso https://arxiv.org/abs/1306.0256
-#' @export
+#' @export anglemanise
 anglemanise <- function(seurat_list, #nolint
                         extrema = 0.001,
                         n_threads = 16,
@@ -77,7 +77,7 @@ anglemanise <- function(seurat_list, #nolint
     message(paste0("Starting matrix ", x_name))
     Sys.sleep(1)
     p(message = sprintf("Processing %s", names(list_x_mats)[mat_ind]))
-    x <- anglemana::factorise(list_x_mats[[x_name]],
+    x <- anglemania::factorise(list_x_mats[[x_name]],
                               extrema,
                               n_threads,
                               path_to_write_angles)

@@ -5,19 +5,19 @@
 #' sharp/blunt angles.
 #'
 #' @importFrom purrr map
-#' @importFrom anglemana assemble.cons.nodes
+##' @importFrom anglemania assemble_cons_nodes
 #' @param l_processed list. An output from the **anglemanise** function.
 #' @return list. List with unique gene features and conserved angles
 #' between genes.
-#' @export
+#' @export featurise
 featurise <- function(l_processed) {
-  cons_nodes <- assemble.cons.nodes(
+  cons_nodes <- assemble_cons_nodes(
     l_processed,
     c("blunt", "sharp")
   )
   l_ufts <- purrr::map(
     cons_nodes,
-    ~ count.unqiue.features(.x$conserved)
+    ~ count_unqiue_features(.x$conserved)
   )
   ##
   out <- list()

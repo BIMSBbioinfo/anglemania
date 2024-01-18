@@ -1,7 +1,7 @@
 #' Estimate critical angles
 #'
 #' @description
-#' A wrapper around functions that estimate critical angles
+#' A wrapper around functions that estimate_critical_angles
 #' and their levels of signficance from an approximated
 #' distribution of angles.
 #'
@@ -15,8 +15,8 @@
 #' angles are extracted from the fitted gaussian.
 #'
 #' @importFrom magrittr %>%
-#' @importFrom anglemana approximate.angles fit.gaussian test.gof.Ks
-#' @importFrom anglemana estimate.MOAV get.analytical.extremes
+##' @importFrom anglemania approximate_angles fit_gaussian test_gof_Ks
+##' @importFrom anglemania estimate_MOAV get_analytical_extremes
 #' @param x_df_ang data.table. A long data.table with three columns:
 #'   x - name of a gene in row, y - name of a gene in column,
 #'   angle - an angle between x and y.
@@ -27,7 +27,7 @@
 #'   distribution.
 #' @return list. Records on parameters of the gaussian,
 #' goodness of fit, and critical angles.
-#' @export
+#' @export flippitise
 flippitise <- function(x_mat, #nolint
                        x_df_ang,
                        l_angles) {

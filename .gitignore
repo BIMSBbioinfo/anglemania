@@ -4,3 +4,7 @@
 /playground
 /snapshots
 /deprecated
+cleanup*
+test.snapshots
+*Jansky*
+jansky*

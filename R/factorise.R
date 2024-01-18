@@ -11,8 +11,8 @@
 #' and records angles passing the critical threshold into
 #' a sparse matrix.
 #'
-#' @importFrom anglemana extract.angles melt.to.df
-#' @importFrom anglemana estimate.critical.angles filter.angles write.angles
+##' @importFrom anglemania extract_angles melt_to_df
+##' @importFrom anglemania estimate_critical_angles filter_angles write_angles
 #' @param x_mat Matrix. Contains normalised and scaled gene
 #'   expression.
 #' @param extrema double. Fraction of the angles
@@ -28,7 +28,7 @@
 #'   between genes. Third and fourth elements are lists
 #'   with angles statistics and paths to the values of
 #'   critical mangles.
-#' @export
+#' @export factorise
 factorise <- function(x_mat, #nolint
                       extrema,
                       n_threads,
@@ -39,13 +39,13 @@ factorise <- function(x_mat, #nolint
   s_names <- colnames(x_mat)
   s_dims <- length(s_names)
   message("Computing cosine distances...")
-  x_mat_ang <- extract.angles(x_mat, n_threads = n_threads)
+  x_mat_ang <- extract_angles(x_mat, n_threads = n_threads)
   invisible(gc())
   message("Melting to data table...")
-  x_df_ang <- melt.to.df(x_mat_ang)
+  x_df_ang <- melt_to_df(x_mat_ang)
   invisible(gc())
   message("Estimating critical angles...")
-  l_angles <- estimate.critical.angles(x_df_ang, s_dims = s_dims, extrema)
+  l_angles <- estimate_critical_angles(x_df_ang, s_dims = s_dims, extrema)
   if (
     any(
       l_angles$critical_angles <= 0
@@ -70,10 +70,10 @@ factorise <- function(x_mat, #nolint
     )
     stop("Extrema is too thin, consider taking a larger margin")
   }
-  l_flippity <- filter.angles(x_df_ang, l_angles)
+  l_flippity <- filter_angles(x_df_ang, l_angles)
   if (!is.na(path_to_write_angles) & is.character(path_to_write_angles)) {
     message("Writing tables with angles to compute integration metric...")
-    l_df_ang_md5 <- write.angles(l_flippity, path_to_write_angles)
+    l_df_ang_md5 <- write_angles(l_flippity, path_to_write_angles)
   }
   message("Factorising angle matrices...")
   x_mat_angfact_sharp <- ifelse(x_mat_ang <= l_angles$critical_angles[1], 1, 0)
