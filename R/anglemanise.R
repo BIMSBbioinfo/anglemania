@@ -13,10 +13,9 @@
 #' the seurat list. It approximates the angle distribution
 #' for each sample and extracts values of critical angles.
 #'
-#' @import Matrix
+#' @importFrom Matrix Matrix
 #' @importFrom purrr map
-##' @importFrom anglemania factorise
-#' @param seural_list seurat list.
+#' @param seurat_list seurat list.
 #' @param extrema double. Fraction of the angles
 #'   to be cut from both sides of an approximated angle
 #'   distribution.
@@ -36,18 +35,19 @@ anglemanise <- function(seurat_list, #nolint
                         extrema = 0.001,
                         n_threads = 16,
                         path_to_write_angles = ".") {
-  if (is.numeric(extrema)) {
-    if (length(extrema) > 1) {
-      if (length(extrema) > 2) {
-        stop(paste0("extrema should be numeric of length either 1 or 2"))
-      }
-      extrema <- extrema
-    } else {
-      extrema <- c(extrema, 1 - extrema)
-    }
-  } else {
+  # Validate inputs
+  stopifnot(is.list(seurat_list),
+            is.numeric(n_threads),
+            n_threads > 0,
+            is.character(path_to_write_angles))
+  
+  if (length(extrema) > 2) {
     stop("extrema should be numeric of length either 1 or 2")
   }
+  if (length(extrema) == 1) {
+    extrema <- c(extrema, 1 - extrema)
+  }
+
   if (!dir.exists(path_to_write_angles)) {
     dir.create(path_to_write_angles, recursive = TRUE)
   }
@@ -77,7 +77,7 @@ anglemanise <- function(seurat_list, #nolint
     message(paste0("Starting matrix ", x_name))
     Sys.sleep(1)
     p(message = sprintf("Processing %s", names(list_x_mats)[mat_ind]))
-    x <- anglemania::factorise(list_x_mats[[x_name]],
+    x <- factorise(list_x_mats[[x_name]],
                               extrema,
                               n_threads,
                               path_to_write_angles)

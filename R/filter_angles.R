@@ -8,7 +8,7 @@
 #' of **data.table** package to filter insgificant entries from
 #' an angle data.table.
 #'
-#' @import data.table
+#' @importFrom data.table as.data.table
 #' @param x_df_ang data.table. A long data.table with three columns:
 #'   x - name of a gene in row, y - name of a gene in column,
 #'   angle - an angle between x and y.
@@ -20,13 +20,13 @@
 filter_angles <- function(x_df_ang, #nolint
                           l_angles) {
   ## filter angular data.table by critical angles
-  df_ang_sharp <- as.data.table(
+  df_ang_sharp <- data.table::as.data.table(
     x_df_ang[angle <= l_angles$critical_angles[1]]
     )
   df_ang_sharp <- df_ang_sharp[, edge := paste0(x, "_", y)]
   df_ang_sharp <- df_ang_sharp[, .(edge, angle)]
   #---
-  df_ang_blunt <- as.data.table(
+  df_ang_blunt <- data.table::as.data.table(
     x_df_ang[angle >= l_angles$critical_angles[2]]
   )
   df_ang_blunt <- df_ang_blunt[, edge := paste0(x, "_", y)]

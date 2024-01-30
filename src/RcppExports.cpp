@@ -13,7 +13,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // dist2mat
 NumericMatrix dist2mat(NumericVector& x, int bf);
-RcppExport SEXP _anglemana_dist2mat(SEXP xSEXP, SEXP bfSEXP) {
+RcppExport SEXP _anglemania_dist2mat(SEXP xSEXP, SEXP bfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -25,11 +25,11 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_anglemana_dist2mat", (DL_FUNC) &_anglemana_dist2mat, 2},
+    {"_anglemania_dist2mat", (DL_FUNC) &_anglemania_dist2mat, 2},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_anglemana(DllInfo *dll) {
+RcppExport void R_init_anglemania(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

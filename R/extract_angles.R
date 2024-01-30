@@ -10,7 +10,7 @@
 #' between vectors of gene expression. Since **parallelDist**´s#
 #' outputs a dist object, an Rcpp functions is used to convert it
 #' back to matrix.
-#'
+#' @importFrom parallelDist parDist
 #' @param x_mat matrix. Contains normalised and scaled gene
 #'   expression, where rows are genes and columns are samples.
 #' @param n_threads integer. Number of cores to use for

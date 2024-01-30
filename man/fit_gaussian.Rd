@@ -7,7 +7,7 @@
 fit_gaussian(l_approx)
 }
 \arguments{
-\item{l_approx}{list. An output from the \strong{approxinate.angles} function.}
+\item{l_approx}{list. An output from the \strong{approximate.angles} function.}
 }
 \value{
 list. List with multiple entries, one of which contains

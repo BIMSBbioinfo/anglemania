@@ -7,7 +7,7 @@
 test_gof_Ks(l_approx, alpha = 0.01, mt_nsims = 6000, seed = 42)
 }
 \arguments{
-\item{l_approx}{list. An output from the \strong{approxinate.angles} function.}
+\item{l_approx}{list. An output from the \strong{approximate_angles} function.}
 
 \item{alpha}{double. Significance level for the goodness of fit.}
 

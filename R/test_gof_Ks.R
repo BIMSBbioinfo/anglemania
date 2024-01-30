@@ -8,8 +8,7 @@
 #' the simulation background distribution of D. One-sided p-value is
 #' computed against a provided alpha.
 #'
-##' @importFrom anglemania montecarlo_Dstat
-#' @param l_approx list. An output from the **approxinate.angles** function.
+#' @param l_approx list. An output from the **approximate_angles** function.
 #' @param alpha double. Significance level for the goodness of fit.
 #' @param mt_nsims integer. The number of simulated distributions.
 #' @param seed integer. Random seed. Important for reproducibility

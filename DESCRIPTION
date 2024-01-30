@@ -1,15 +1,16 @@
-Package: anglemana
+Package: anglemania
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
-License: MIT + file LICENSE  # Replace with your actual license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports:
-    Rcpp (>= 1.0.0),
+    readr,
+    janitor,
     Matrix,
     Seurat,
     data.table,
@@ -19,12 +20,14 @@ Imports:
     progressr,
     purrr,
     stringr,
-    tidyr
+    tidyr,
+    parallelDist
 LinkingTo: 
     Rcpp,
     RcppArmadillo
 Suggests:
-    testthat,
+    testthat (>= 3.0.0),
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Config/testthat/edition: 3

@@ -8,3 +8,13 @@ cleanup*
 test.snapshots
 *Jansky*
 jansky*
+.Rproj.user
+.Renviron
+.Rprofile
+explore_function_scape.R
+functions_graph.svg
+fun_details*
+prepare*
+external_packages.tsv*
+.Rhistory
+/renv

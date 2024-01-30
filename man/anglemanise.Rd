@@ -13,6 +13,8 @@ anglemanise(
 )
 }
 \arguments{
+\item{seurat_list}{seurat list.}
+
 \item{extrema}{double. Fraction of the angles
 to be cut from both sides of an approximated angle
 distribution.}
@@ -23,8 +25,6 @@ the computation of the cosine distances.}
 \item{path_to_write_angles}{string. A path, under which
 a temporary directory will be created to record values
 of critical angles for each sample.}
-
-\item{seural_list}{seurat list.}
 }
 \value{
 list. First two elements are sparse matrices

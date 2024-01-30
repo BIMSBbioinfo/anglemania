@@ -6,7 +6,7 @@
 #'
 #' @param l_processed list. An output from the **anglemanise** function.
 #' @param samp_id character vector. Samples name or names to look for.
-#' @param angle_type  character vector. Specifies which type of angles to
+#' @param angle_type character vector. Specifies which type of angles to
 #'   look for. Can be "sharp", "blunt", or both.
 #' @return character vector. Vector of paths to the files where critical
 #' angles were recorded.

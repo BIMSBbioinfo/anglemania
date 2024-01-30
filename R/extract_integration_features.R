@@ -6,12 +6,15 @@
 #' Here, we use the Poisson distribution to provide some sort of background
 #' to the selection of the cutoff for the number of the intersected samples.
 #'
-#' @import data.table
+#' @importFrom data.table as.data.table melt
 #' @import tidyr
 #' @import dplyr
 #' @importFrom magrittr %>%
 #' @param l_cumfact list. First element of the output from the
 #'   **anglemanise** function.
+#' @param cutoff integer. Number of datasets where the same relationship
+#'  between two genes is detected. Currently the simplest way to extract 
+#'  integration: setting a brute cutoff on the level of conservation
 #' @return list. Two elements contain character vector with gene names
 #' corresponding to sharp and blutn angles.
 #' @export extract_integration_features

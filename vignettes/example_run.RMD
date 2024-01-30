@@ -2,12 +2,20 @@
 title: "Example run of anglemana"
 author: "Artem Baranovskii"
 date: "15th November 2023"
-output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{Example run of anglemana}
 ---
 
 # anglemana
 
 This simple tutorial will give out a basic idea how to use current anglemana functionality and where to go from there.
+```{r}
+library(Seurat)
+library(anglemania)
+library(tidyr)
+```
 
 ## Getting the data
 
@@ -75,20 +83,20 @@ conm_summed %>% hclust.conmat() %>% plot()
 
 Currently, the simplest way to go would be to extract integration features by setting a brute cutoff on the level of conservation (number of datasets where the same relationship between two genes is detected):
 ```{R}
-l_ifts <- extract.integration.features(l_processed[[1]], cutoff = 7)
+l_ifts <- extract.integration.features(l_processed, cutoff = 7)
 seu_intgr <- integrate.by.features(sl, purrr::reduce(l_ifts, union)) # possible to provide custom integration order
 ```
 Alternatively, this can be done by fitting a Poisson model using it as a background to automatically select a statistically-justified cutoff (set ``cutoff = NULL``). However, the basis for the application of Poisson model for this scenario is currently lacking.
 
 Now, that the integration is complete, we can visualise the results using simple helper functions:
 ```{R}
-glist <- read_rds("./auxiliary/Glist_EMT.RDS") # a comprehensive set of genes representative of EMT
-seu_intgr <- AddModuleScore(seu_intgr, glist, name = 'module', seed = 42)
-ptab <- get.plottab(seu_intgr, "module1", "umap")
-
-ggplot(data = .x, aes(x = UMAP_1, y = UMAP_2)) + 
-  geom_point(aes(color = module1), size = 2.5, alpha = 0.75) + 
-  scale_colour_gradientn(name = "EMT score", colours = viridis::viridis(100)) + 
-  labs(title = dataset) +
-  theme_minimal()
+# glist <- read_rds("./auxiliary/Glist_EMT.RDS") # a comprehensive set of genes representative of EMT
+# seu_intgr <- AddModuleScore(seu_intgr, glist, name = 'module', seed = 42)
+# ptab <- get.plottab(seu_intgr, "module1", "umap")
+# 
+# ggplot(data = .x, aes(x = UMAP_1, y = UMAP_2)) + 
+#   geom_point(aes(color = module1), size = 2.5, alpha = 0.75) + 
+#   scale_colour_gradientn(name = "EMT score", colours = viridis::viridis(100)) + 
+#   labs(title = dataset) +
+#   theme_minimal()
 ```

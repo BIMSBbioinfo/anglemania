@@ -15,8 +15,6 @@
 #' angles are extracted from the fitted gaussian.
 #'
 #' @importFrom magrittr %>%
-##' @importFrom anglemania approximate_angles fit_gaussian test_gof_Ks
-##' @importFrom anglemania estimate_MOAV get_analytical_extremes
 #' @param x_df_ang data.table. A long data.table with three columns:
 #'   x - name of a gene in row, y - name of a gene in column,
 #'   angle - an angle between x and y.

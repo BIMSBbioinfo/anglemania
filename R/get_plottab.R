@@ -7,18 +7,18 @@
 #' @import Seurat
 #' @importFrom magrittr %>%
 #' @importFrom dplyr select all_of
-#' @param seu_obj seurat object.
+#' @param seurat_object seurat object.
 #' @param var character vector. A vector of varaibles in meta.data slot
 #'   to append.
 #' @param reduction character. Name of the reduction method to pull
 #'   embeddings from.
 #' @return data.frame.
 #' @export get_plottab
-get_plottab <- function(seu_obj, #nolint
+get_plottab <- function(seurat_object, #nolint
                         var,
                         reduction) {
   cbind(
-    seu_obj@meta.data %>% dplyr::select(orig.ident, dplyr::all_of(var)),
-    seu_obj@reductions[[reduction]]@cell.embeddings
+    seurat_object@meta.data %>% dplyr::select(orig.ident, dplyr::all_of(var)),
+    seurat_object@reductions[[reduction]]@cell.embeddings
   )
 }

@@ -4,10 +4,9 @@
 #' Extract unique gene features per dataset with significant
 #' sharp/blunt angles.
 #'
-#' @import data.table
+#' @importFrom data.table as.data.table fread
 #' @import progressr
 #' @importFrom purrr map
-##' @importFrom anglemania melt_to_df get_critangs_paths
 #' @param l_processed list. An output from the **anglemanise** function.
 #' @param angle_type character vector. Specifies which type of angles to
 #'   assemble. Can be "sharp", "blunt", or both.
@@ -24,7 +23,7 @@ assemble_cons_nodes <- function(l_processed, angle_type, fringe = 3) { #nolint
     function(angle) {
       message(paste0("Starting ", angle))
       cons_edges <- l_processed[[paste0("x_", angle)]]
-      cons_edges <- anglemania::melt_to_df(cons_edges)
+      cons_edges <- melt_to_df(cons_edges)
       cons_edges <- cons_edges[order(-angle)]
       cons_edges <- cons_edges[angle >= fringe]
       cons_edges <- data.table::as.data.table(cons_edges)
@@ -38,7 +37,7 @@ assemble_cons_nodes <- function(l_processed, angle_type, fringe = 3) { #nolint
         nodes,
         function(node) {
           p(message = sprintf("Processing %s", node))
-          critangs_paths <- anglemania::get_critangs_paths(l_processed,
+          critangs_paths <- get_critangs_paths(l_processed,
                                                           node,
                                                           angle)
           dt_cons_samp <- data.table::fread(file = critangs_paths, drop = 2)

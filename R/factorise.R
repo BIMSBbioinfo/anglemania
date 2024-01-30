@@ -11,8 +11,6 @@
 #' and records angles passing the critical threshold into
 #' a sparse matrix.
 #'
-##' @importFrom anglemania extract_angles melt_to_df
-##' @importFrom anglemania estimate_critical_angles filter_angles write_angles
 #' @param x_mat Matrix. Contains normalised and scaled gene
 #'   expression.
 #' @param extrema double. Fraction of the angles

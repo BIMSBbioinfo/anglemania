@@ -4,10 +4,10 @@
 \alias{get_plottab}
 \title{Construct a plottiugn table from a seurat object}
 \usage{
-get_plottab(seu_obj, var, reduction)
+get_plottab(seurat_object, var, reduction)
 }
 \arguments{
-\item{seu_obj}{seurat object.}
+\item{seurat_object}{seurat object.}
 
 \item{var}{character vector. A vector of varaibles in meta.data slot
 to append.}

@@ -9,12 +9,14 @@
 #' the simulation background distribution of D. One-sided p-value is
 #' computed agaisnt a provided alpha.
 #'
-##' @importFrom anglemania montecarlo_Dstat
 #' @importFrom purrr map2_dfr
-#' @param l_approx list. An output from the **approxinate.angles** function.
-#' @param alpha double. Significance level for the goodness of fit.
-#' @param mt_nsims integer. Number of simulated Ds.
-#' @param seed integer. Random seed. Important for reproducibility
+#' @param l_approx list. An output from the **approximate_angles** function.
+#' @param extrema double. Fraction of the angles
+#'   to be cut from both sides of an approximated angle
+#'   distribution.
+# @param alpha double. Significance level for the goodness of fit.
+# @param mt_nsims integer. Number of simulated Ds.
+# @param seed integer. Random seed. Important for reproducibility
 #'   of the background simulation.
 #' @return list. List with multiple entries, one of which contains
 #' an approxiamted distribution and details of the gaussian fit.

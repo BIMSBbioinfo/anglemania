@@ -5,7 +5,6 @@
 #' sharp/blunt angles.
 #'
 #' @importFrom purrr map
-##' @importFrom anglemania assemble_cons_nodes
 #' @param l_processed list. An output from the **anglemanise** function.
 #' @return list. List with unique gene features and conserved angles
 #' between genes.

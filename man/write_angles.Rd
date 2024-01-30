@@ -4,13 +4,13 @@
 \alias{write_angles}
 \title{Write angles as tab-delimted tables}
 \usage{
-write_angles(l_critical, path_to_write.angles)
+write_angles(l_critical, path_to_write_angles)
 }
 \arguments{
 \item{l_critical}{list. List with two elements: data.tables with sharp
 and blunt significant angles.}
 
-\item{path_to_write.angles}{string. Path to a directory to write tables.}
+\item{path_to_write_angles}{string. Path to a directory to write tables.}
 }
 \value{
 list. List with md5-sums correspondign to the two written tables.

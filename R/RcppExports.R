@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 dist2mat <- function(x, bf) {
-    .Call(`_anglemania_dist2mat`, x, bf)
+    .Call('_anglemania_dist2mat', PACKAGE = 'anglemania', x, bf)
 }
 

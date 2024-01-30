@@ -8,7 +8,7 @@
 #' of **data.table** pacckage to melt a square angle matrix into
 #' a long data.frame.
 #'
-#' @import data.table
+#' @importFrom data.table as.data.table melt
 #' @param x_mat_ang matrix. Contains angles between the
 #' vectors of gene expression between genes.
 #' @return data.table. A long data.table with three columns:

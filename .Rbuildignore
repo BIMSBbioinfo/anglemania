@@ -1,0 +1,13 @@
+^renv$
+^renv\.lock$
+^.*\.Rproj$
+^\.Rproj\.user$
+^cleanup
+\.jpg$
+^anglemania\.Rproj$
+.Rprofile
+explore_function_scape.R
+functions_graph.svg
+R/flippitise.R
+^vignettes$
+^LICENSE\.md$

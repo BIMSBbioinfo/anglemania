@@ -7,13 +7,11 @@
 get_analytical_extremes(l_approx, extrema)
 }
 \arguments{
-\item{l_approx}{list. An output from the \strong{approxinate.angles} function.}
+\item{l_approx}{list. An output from the \strong{approximate_angles} function.}
 
-\item{alpha}{double. Significance level for the goodness of fit.}
-
-\item{mt_nsims}{integer. Number of simulated Ds.}
-
-\item{seed}{integer. Random seed. Important for reproducibility
+\item{extrema}{double. Fraction of the angles
+to be cut from both sides of an approximated angle
+distribution.
 of the background simulation.}
 }
 \value{

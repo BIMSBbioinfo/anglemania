@@ -6,7 +6,6 @@
 #' 0, where 1 means that the significant angle between the pair of genes in
 #' a row is present in this sample and 0 means not.
 #'
-#' @import data.table
 #' @importFrom magrittr %>%
 #' @importFrom purrr map2 reduce
 #' @importFrom stringr str_detect

@@ -2,21 +2,19 @@
 #'
 #' @description
 #' A wrapper around functions that estimate_critical_angles
-#' and their levels of signficance from an approximated
+#' and their levels of significance from an approximated
 #' distribution of angles.
 #'
 #' @details
 #' First, the angle distribution is approximated by quantile
-#' splitting providid by the user. Then the gaussian is fit by
+#' splitting provided by the user. Then the gaussian is fit by
 #' quantile transformation. Goodness of fit is tested by
 #' Kolmogorov-Smirnov test. Measure of additional variance is
-#' estiated fron the data by integrating the difference between
+#' estimated from the data by integrating the difference between
 #' the fitted gaussian and theoretical distribution. Critical
 #' angles are extracted from the fitted gaussian.
 #'
 #' @importFrom magrittr %>%
-##' @importFrom anglemania approximate_angles fit_gaussian test_gof_Ks
-##' @importFrom anglemania estimate_MOAV get_analytical_extremes
 #' @param x_df_ang data.table. A long data.table with three columns:
 #'   x - name of a gene in row, y - name of a gene in column,
 #'   angle - an angle between x and y.

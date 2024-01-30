@@ -5,7 +5,6 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom purrr map
-##' @importFrom anglemania assemble_cons_nodes
 #' @param conserved_nodes list. An output from the **assemble_cons_nodes**
 #'   function.
 #' @return list. First element is a list where each entry carries a

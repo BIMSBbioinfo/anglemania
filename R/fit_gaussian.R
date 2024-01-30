@@ -8,7 +8,7 @@
 #' Fitting is done using non-linear minimization from the **stats** package.
 #'
 #' @importFrom tidyr tibble
-#' @param l_approx list. An output from the **approxinate.angles** function.
+#' @param l_approx list. An output from the **approximate.angles** function.
 #' @return list. List with multiple entries, one of which contains
 #' an approxiamted distribution and details of the gaussian fit.
 #' Others contains NAs to be filled by subsequent functions.

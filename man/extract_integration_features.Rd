@@ -9,6 +9,10 @@ extract_integration_features(l_cumfact, cutoff = NULL)
 \arguments{
 \item{l_cumfact}{list. First element of the output from the
 \strong{anglemanise} function.}
+
+\item{cutoff}{integer. Number of datasets where the same relationship
+between two genes is detected. Currently the simplest way to extract
+integration: setting a brute cutoff on the level of conservation}
 }
 \value{
 list. Two elements contain character vector with gene names
