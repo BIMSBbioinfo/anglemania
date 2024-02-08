@@ -4,7 +4,7 @@
 \alias{assemble_cons_nodes}
 \title{Assebmle gene pairs with conserved angles}
 \usage{
-assemble_cons_nodes(l_processed, angle_type, fringe = 3)
+assemble_cons_nodes(l_processed, angle_type = c("sharp", "blunt"), fringe = 3)
 }
 \arguments{
 \item{l_processed}{list. An output from the \strong{anglemanise} function.}

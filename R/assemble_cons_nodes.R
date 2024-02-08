@@ -4,8 +4,7 @@
 #' Extract unique gene features per dataset with significant
 #' sharp/blunt angles.
 #'
-#' @importFrom data.table as.data.table fread
-#' @import progressr
+#' @importFrom data.table as.data.table fread setkey
 #' @importFrom purrr map
 #' @param l_processed list. An output from the **anglemanise** function.
 #' @param angle_type character vector. Specifies which type of angles to
@@ -17,7 +16,9 @@
 #' significant angles per sample and an entry recording conserved angles
 #' and their conservation level.
 #' @export assemble_cons_nodes
-assemble_cons_nodes <- function(l_processed, angle_type, fringe = 3) { #nolint
+assemble_cons_nodes <- function(l_processed,
+                                angle_type = c("sharp", "blunt"),
+                                fringe = 3) { #nolint
   purrr::map(
     angle_type,
     function(angle) {
@@ -32,17 +33,22 @@ assemble_cons_nodes <- function(l_processed, angle_type, fringe = 3) { #nolint
       colnames(cons_edges) <- c("edge", "importance")
       ####
       nodes <- names(l_processed$data_info)
-      p <- progressr::progressor(along = nodes)
+
+      p <- list(name = "Extracting critical angles",
+                clear = FALSE)
       purrr::map(
         nodes,
         function(node) {
-          p(message = sprintf("Processing %s", node))
           critangs_paths <- get_critangs_paths(l_processed,
                                                           node,
                                                           angle)
           dt_cons_samp <- data.table::fread(file = critangs_paths, drop = 2)
+          # data.table::setkey(dt_cons_samp, edge)
+          # data.table::setkey(cons_edges, edge)
+          # dt_cons_samp <- dt_cons_samp[cons_edges, nomatch = NULL]        
           dt_cons_samp <- dt_cons_samp[edge %chin% cons_edges$edge]
-        }
+          },
+        .progress = p
       ) -> l_nodes_samp
       names(l_nodes_samp) <- nodes
       l_nodes_samp <- c(l_nodes_samp, conserved = list(cons_edges))

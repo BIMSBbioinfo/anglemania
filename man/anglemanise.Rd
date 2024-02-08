@@ -13,7 +13,7 @@ anglemanise(
 )
 }
 \arguments{
-\item{seurat_list}{seurat list.}
+\item{seurat_list}{seurat list of seurat objects with scaled data.}
 
 \item{extrema}{double. Fraction of the angles
 to be cut from both sides of an approximated angle
@@ -42,8 +42,8 @@ the angle records per sample.
 \details{
 This is the main function of the package. It calculates
 angles between all genes across all samples provided in
-the seurat list. It approximates the angle distribution
-for each sample and extracts values of critical angles.
+the Seurat list. It approximates the angle distribution
+for each sample and extracts values of critical angles. Data needs to be scaled.
 }
 \seealso{
 https://arxiv.org/abs/1306.0256

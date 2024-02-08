@@ -4,22 +4,26 @@
 \alias{import_sl}
 \title{Read in Seacells from a .RDS file}
 \usage{
-import_sl(path_dat = NULL, min_mcells = 15)
+import_sl(seurat_list, min_mcells = 6)
 }
 \arguments{
-\item{path_dat}{string. Must be a path to an existing
-.RDS file with a SeuratList of samples.}
+\item{seurat_list}{Seurat list.}
 
 \item{min_mcells}{integer. Minimal number of Metacells
-ppresent in a sample. If less, a sample is discarded.
-Defaulit is 15.}
+present in a sample. If less, a sample is discarded.
+Defaulit is 6. Integration using Seurat CCA seemingly
+doesn't work with <6 cells.}
 }
 \value{
 Seurat list.
 }
 \description{
-import_sl returns a Seurat list with normalised and
-scaled expression matrices.
+import_sl takes a list of Seurat objects, checks if the conditions for
+anglemanise are correct.
+Briefly, it checks
+a) if all objects have more than 'mcells'. Discard those samples with less.
+b) a layer with scaled data. If not, it performs SCTransform (using glampoi)
+returns a list of corrected Seurat objects
 }
 \details{
 This function doesn't assess if the read object is a

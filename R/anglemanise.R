@@ -10,12 +10,13 @@
 #' @details
 #' This is the main function of the package. It calculates
 #' angles between all genes across all samples provided in
-#' the seurat list. It approximates the angle distribution
-#' for each sample and extracts values of critical angles.
+#' the Seurat list. It approximates the angle distribution
+#' for each sample and extracts values of critical angles. Data needs to be scaled.
 #'
 #' @importFrom Matrix Matrix
 #' @importFrom purrr map
-#' @param seurat_list seurat list.
+#' @importFrom SeuratObject LayerData
+#' @param seurat_list seurat list of seurat objects with scaled data.
 #' @param extrema double. Fraction of the angles
 #'   to be cut from both sides of an approximated angle
 #'   distribution.
@@ -35,15 +36,26 @@ anglemanise <- function(seurat_list, #nolint
                         extrema = 0.001,
                         n_threads = 16,
                         path_to_write_angles = ".") {
-  # Validate inputs
-  stopifnot(is.list(seurat_list),
-            is.numeric(n_threads),
-            n_threads > 0,
-            is.character(path_to_write_angles))
   
+  ############## Validate inputs ###########################
+  
+  if (!is.list(seurat_list) || any(sapply(seurat_list, function(x) attr(class(x), "package") != "SeuratObject"))) {
+    stop("seurat_list needs to be a list of Seurat objects")
+  }
+  if (!is.integer(n_threads) || n_threads < 1) {
+    stop("n_threads has to be a positve integer")
+  }
+  if (!is.character(path_to_write_angles)) {
+    stop("path_to_write_angles has to be a string")
+  }
   if (length(extrema) > 2) {
     stop("extrema should be numeric of length either 1 or 2")
   }
+  ##  check if scale.data is present and SCTransform is necessary
+  if (!all(sapply(seurat_list, function(x) "scale.data" %in% SeuratObject::Layers(x)))){
+    stop("scaled data is not present in all samples. \nPlease run import_sl on the Seurat list")
+  }
+  
   if (length(extrema) == 1) {
     extrema <- c(extrema, 1 - extrema)
   }
@@ -51,10 +63,16 @@ anglemanise <- function(seurat_list, #nolint
   if (!dir.exists(path_to_write_angles)) {
     dir.create(path_to_write_angles, recursive = TRUE)
   }
+  
+  ## intersect genes ==> matrix addition only works on matrices of same dimension
+  intersect_genes <- Reduce(intersect, lapply(seurat_list, rownames))
+  seurat_list <- lapply(seurat_list, function(x) subset(x, features = intersect_genes))
+  
+  ## get scaled data matrices
   list_x_mats <- purrr::map(
     seurat_list,
     function(ss) {
-      ss@assays$RNA@scale.data
+      SeuratObject::LayerData(ss, layer = "scale.data")
     }
   )
   message(
