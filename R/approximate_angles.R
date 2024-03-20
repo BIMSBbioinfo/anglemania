@@ -8,7 +8,7 @@
 #' from a minimal splitting unit provided by the user.
 #'
 #' @importFrom tidyr tibble
-#' @param x_df_ang data.table. A long data.table with three columns:
+#' @param x_mat_ang data.table. A long data.table with three columns: ###########
 #'   x - name of a gene in row, y - name of a gene in column,
 #'   angle - an angle between x and y.
 #' @param quantile_split double. minimal splitting unit to
@@ -16,7 +16,7 @@
 #' @return list. List with multiple entries, one of which contains
 #' an approxiamted distribution. Others contains NAs to be filled by
 #' subsequent functions.
-approximate_angles <- function(x_df_ang, #nolint
+approximate_angles <- function(x_mat_ang, #nolint
                                quantile_split) {
   ##
   if (quantile_split <= 0) {
@@ -24,8 +24,9 @@ approximate_angles <- function(x_df_ang, #nolint
   }
   angles_dist <- tidyr::tibble(
     angle = unname(
-      quantile(x_df_ang$angle,
-        seq(0, 1, by = quantile_split)
+      quantile(x_mat_ang,
+        seq(0, 1, by = quantile_split),
+        na.rm = TRUE
       )
     ),
     prob = seq(0, 1, by = quantile_split)

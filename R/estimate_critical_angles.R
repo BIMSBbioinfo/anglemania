@@ -15,7 +15,7 @@
 #' angles are extracted from the fitted gaussian.
 #'
 #' @importFrom magrittr %>%
-#' @param x_df_ang data.table. A long data.table with three columns:
+#' @param x_mat_ang data.table. A long data.table with three columns: ########
 #'   x - name of a gene in row, y - name of a gene in column,
 #'   angle - an angle between x and y.
 #' @param s_dims integer. Number of samples in the input gene
@@ -26,12 +26,12 @@
 #' @return list. Records on parameters of the gaussian,
 #' goodness of fit, and critical angles.
 #' @export estimate_critical_angles
-estimate_critical_angles <- function(x_df_ang, #nolint
+estimate_critical_angles <- function(x_mat_ang, #nolint
                                      s_dims,
                                      extrema) {
   quantile_split <- min(extrema)
   ##
-  out <- approximate_angles(x_df_ang, quantile_split) %>%
+  out <- approximate_angles(x_mat_ang, quantile_split) %>%
     fit_gaussian(.) %>%
     test_gof_Ks(.) %>%
     estimate_MOAV(., s_dims) %>%

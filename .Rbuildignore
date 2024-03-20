@@ -11,3 +11,4 @@ functions_graph.svg
 R/flippitise.R
 ^vignettes$
 ^LICENSE\.md$
+^\.github$

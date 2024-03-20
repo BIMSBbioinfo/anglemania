@@ -42,8 +42,8 @@ anglemanise <- function(seurat_list, #nolint
   if (!is.list(seurat_list) || any(sapply(seurat_list, function(x) attr(class(x), "package") != "SeuratObject"))) {
     stop("seurat_list needs to be a list of Seurat objects")
   }
-  if (!is.integer(n_threads) || n_threads < 1) {
-    stop("n_threads has to be a positve integer")
+  if (!is.numeric(n_threads) || n_threads < 1) {
+    stop("n_threads has to be a positive integer")
   }
   if (!is.character(path_to_write_angles)) {
     stop("path_to_write_angles has to be a string")
@@ -100,12 +100,23 @@ anglemanise <- function(seurat_list, #nolint
                               n_threads,
                               path_to_write_angles)
     message(paste0("Adding ", x_name))
+    # rows_sharp <- rownames(x[["x_sharp"]])
+    # cols_sharp <- colnames(x[["x_sharp"]])
+    # rows_blunt <- rownames(x[["x_blunt"]])
+    # cols_blunt <- colnames(x[["x_blunt"]])
+    # l_added[["x_sharp"]] <- matrixAddition(l_added[["x_sharp"]], x[["x_sharp"]])
+    # l_added[["x_blunt"]] <- matrixAddition(l_added[["x_blunt"]], x[["x_blunt"]])
     l_added[["x_sharp"]] <- l_added[["x_sharp"]] + x[["x_sharp"]]
     l_added[["x_blunt"]] <- l_added[["x_blunt"]] + x[["x_blunt"]]
     l_added[["l_angles"]][[x_name]] <- x[["l_angles"]]
     l_added[["data_info"]][[x_name]] <- x[["data_info"]]
+    # rownames(l_added[["x_sharp"]]) <- rows_sharp
+    # colnames(l_added[["x_sharp"]]) <- cols_sharp
+    # rownames(l_added[["x_blunt"]]) <- rows_blunt
+    # colnames(l_added[["x_blunt"]]) <- cols_blunt
     invisible(gc())
   }
+
   # Implementation of the parallel processing will introduce
   # heavy memory load, which is now limited to ~4Gb of RAM for
   # an average sized dataset. Consider the tradeoffs.

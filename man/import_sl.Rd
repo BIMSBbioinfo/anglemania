@@ -11,7 +11,7 @@ import_sl(seurat_list, min_mcells = 6)
 
 \item{min_mcells}{integer. Minimal number of Metacells
 present in a sample. If less, a sample is discarded.
-Defaulit is 6. Integration using Seurat CCA seemingly
+Default is 6. Integration using Seurat CCA seemingly
 doesn't work with <6 cells.}
 }
 \value{

@@ -23,9 +23,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// matrixAddition
+arma::sp_mat matrixAddition(arma::sp_mat A, arma::sp_mat B);
+RcppExport SEXP _anglemania_matrixAddition(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(matrixAddition(A, B));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_anglemania_dist2mat", (DL_FUNC) &_anglemania_dist2mat, 2},
+    {"_anglemania_matrixAddition", (DL_FUNC) &_anglemania_matrixAddition, 2},
     {NULL, NULL, 0}
 };
 

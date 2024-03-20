@@ -25,12 +25,13 @@ assemble_cons_nodes <- function(l_processed,
       message(paste0("Starting ", angle))
       cons_edges <- l_processed[[paste0("x_", angle)]]
       cons_edges <- melt_to_df(cons_edges)
-      cons_edges <- cons_edges[order(-angle)]
+      # cons_edges <- cons_edges[order(-angle)]
       cons_edges <- cons_edges[angle >= fringe]
       cons_edges <- data.table::as.data.table(cons_edges)
       cons_edges <- cons_edges[, edge := paste0(x, "_", y)]
       cons_edges <- cons_edges[, .(edge, angle)]
       colnames(cons_edges) <- c("edge", "importance")
+      data.table::setkey(cons_edges, edge)
       ####
       nodes <- names(l_processed$data_info)
 
@@ -42,11 +43,13 @@ assemble_cons_nodes <- function(l_processed,
           critangs_paths <- get_critangs_paths(l_processed,
                                                           node,
                                                           angle)
-          dt_cons_samp <- data.table::fread(file = critangs_paths, drop = 2)
+          dt_cons_samp <- data.table::fread(file = critangs_paths,
+                                            drop = 2,
+                                            key = "edge")
           # data.table::setkey(dt_cons_samp, edge)
           # data.table::setkey(cons_edges, edge)
-          # dt_cons_samp <- dt_cons_samp[cons_edges, nomatch = NULL]        
-          dt_cons_samp <- dt_cons_samp[edge %chin% cons_edges$edge]
+          dt_cons_samp <- dt_cons_samp[cons_edges, nomatch = NULL]
+          # dt_cons_samp <- dt_cons_samp[edge %chin% cons_edges$edge]
           },
         .progress = p
       ) -> l_nodes_samp

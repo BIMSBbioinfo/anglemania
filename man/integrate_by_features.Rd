@@ -4,7 +4,12 @@
 \alias{integrate_by_features}
 \title{Integrate samples in a seurat list}
 \usage{
-integrate_by_features(seurat_list, features_to_integrate, int_order = NULL)
+integrate_by_features(
+  seurat_list,
+  features_to_integrate,
+  int_order = NULL,
+  process = TRUE
+)
 }
 \arguments{
 \item{seurat_list}{seurat list.}
@@ -16,6 +21,9 @@ integrate_by_features(seurat_list, features_to_integrate, int_order = NULL)
 of samples within the seurat list. See Seurat::IntegrateData's argument
 sample.tree help page for more details. If not provided Seurat will
 construct the integration order from hclust. Default is NULL.}
+
+\item{process}{bool. Boolean TRUE/FALSE which indicates whether to further
+process the data, i.e., scale it and run PCA & UMAP. Default is TRUE.}
 }
 \value{
 seurat object. Integrated seurat object. Seurat::DefaultAssay

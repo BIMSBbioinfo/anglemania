@@ -1,5 +1,3 @@
-context("anglemanise function tests")
-
 test_that("Input validation works correctly", {
   # Invalid n_threads
   expect_error(anglemanise(sl_scaled_test_data, n_threads = -1))
@@ -9,11 +7,14 @@ test_that("Input validation works correctly", {
 })
 
 
-result <- anglemanise(sl_scaled_test_data)
+result <- anglemanise(sl_scaled_test_data,
+                      extrema = 0.1,
+                      n_threads = 16,
+                      path_to_write_angles = ".")
 
 test_that("Function handles valid inputs correctly", {
   # Verify the structure of the result
-  expect_type(result, list)
+  expect_type(result, "list")
   expect_equal(length(result), 4)
   expect_true("x_sharp" %in% names(result))
   expect_true("x_blunt" %in% names(result))
@@ -23,7 +24,7 @@ test_that("Function handles valid inputs correctly", {
 })
 
 test_that("Sharp and Blunt matrices are consistent", {
-  sharp_data <- matrix(c(
+  sharp_sparse_matrix <- Matrix::Matrix(c(
     5, 0, 0, 1, 0, 1, 0, 1, 0, 1,
     0, 5, 1, 0, 0, 0, 0, 0, 0, 2,
     0, 1, 5, 2, 0, 2, 0, 0, 0, 3,
@@ -34,13 +35,12 @@ test_that("Sharp and Blunt matrices are consistent", {
     1, 0, 0, 0, 1, 0, 1, 5, 0, 1,
     0, 0, 0, 1, 0, 0, 0, 0, 5, 0,
     1, 2, 3, 1, 1, 1, 0, 1, 0, 5),
-    nrow = 10, byrow = TRUE)
-  sharp_sparse_matrix <- as(data, "dgCMatrix")
+    nrow = 10, byrow = TRUE, sparse = TRUE)
   sharp_sparse_matrix@Dimnames[[2]] <- c("AL669831.5", "NOC2L", "HES4", "ISG15",
                                          "SDF4", "UBE2J2", "ACAP3", "INTS11",
                                          "AURKAIP1", "CCNL2")
   
-  blunt_data <- matrix(c(
+  blunt_sparse_matrix <- Matrix::Matrix(c(
     0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
     0, 0, 0, 0, 2, 0, 1, 1, 1, 0,
     1, 0, 0, 0, 0, 0, 1, 0, 0, 0,
@@ -51,8 +51,7 @@ test_that("Sharp and Blunt matrices are consistent", {
     0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 1, 1, 0, 0, 0, 0),
-    nrow = 10, byrow = TRUE)
-  blunt_sparse_matrix <- as(data, "dgCMatrix")
+    nrow = 10, byrow = TRUE, sparse = TRUE)
   blunt_sparse_matrix@Dimnames[[2]] <- c("AL669831.5", "NOC2L", "HES4", "ISG15",
                                          "SDF4", "UBE2J2", "ACAP3", "INTS11", 
                                          "AURKAIP1", "CCNL2")
@@ -69,16 +68,16 @@ test_that("Sharp and Blunt matrices are consistent", {
   })
 
 
-test_that("Check anglemanised $angles_dist", {
-  # Verify the structure of the result
-  expect_type(result, list)
-  expect_equal(length(result), 4)
-  expect_true("x_sharp" %in% names(result))
-  expect_true("x_blunt" %in% names(result))
-  expect_true("data_info" %in% names(result))
-  expect_true("l_angles" %in% names(result))
-  
-})
+# test_that("Check anglemanised $angles_dist", {
+#   # Verify the structure of the result
+#   expect_type(result, "list")
+#   expect_equal(length(result), 4)
+#   expect_true("x_sharp" %in% names(result))
+#   expect_true("x_blunt" %in% names(result))
+#   expect_true("data_info" %in% names(result))
+#   expect_true("l_angles" %in% names(result))
+#   
+# })
 
 
 test_that("Function handles edge cases correctly", {
@@ -87,3 +86,21 @@ test_that("Function handles edge cases correctly", {
   expect_error(anglemanise(mock_seurat_list))
 })
 
+
+
+blunt_sparse_matrix <- Matrix::Matrix(c(
+  0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
+  0, 0, 0, 0, 2, 0, 1, 1, 1, 0,
+  1, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 2, 0, 0, 0, 0, 1, 0, 0, 1,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+  0, 1, 1, 0, 1, 0, 0, 0, 0, 0,
+  0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 1, 1, 0, 0, 0, 0),
+  nrow = 10, sparse = TRUE)
+blunt_sparse_matrix@Dimnames[[2]] <- c("AL669831.5", "NOC2L", "HES4", "ISG15",
+                                       "SDF4", "UBE2J2", "ACAP3", "INTS11", 
+                                       "AURKAIP1", "CCNL2")
+class(blunt_sparse_matrix)

@@ -18,13 +18,15 @@
 melt_to_df <- function(x_mat_ang) { #nolint
   ##
   x_mat_ang[upper.tri(x_mat_ang, diag = TRUE)] <- NA
-  x_df_ang <- data.table::as.data.table(x_mat_ang, keep.rownames = "x")
-  x_df_ang <- data.table::melt(x_df_ang,
-                               id.vars = "x",
-                               variable.name = "y",
-                               value.name    = "angle")
-  x_df_ang <- na.omit(x_df_ang)
-  x_df_ang <- x_df_ang[, y := as.character(y)]
-  class(x_df_ang) <- "data.table"
+  
+  idx <- which(!is.na(x_mat_ang), arr.ind = TRUE)
+  
+  # Create a data table from indices and values
+  x_df_ang <- data.table::data.table(
+    x = rownames(x_mat_ang)[idx[, 1]],
+    y = colnames(x_mat_ang)[idx[, 2]],
+    angle = x_mat_ang[idx]
+  )
+  
   return(x_df_ang)
 }

@@ -28,10 +28,11 @@ import_sl <- function(seurat_list, min_mcells = 6) { #nolint
   if (length(seurat_list)<2){
     stop("Seurat list must at least contain two Seurat objects")
   }
-  if (any(sapply(seurat_list, function(x) attr(class(x), "package") != "SeuratObject"))){
+  if (any(sapply(seurat_list, function(x) class(x) != "Seurat")) || 
+      any(sapply(seurat_list, function(x) attr(class(x), "package") != "SeuratObject"))){
     stop("List contains elements that are not Seurat objects")
   }
-  if (!is.integer(min_mcells) || min_mcells <= 5) {
+  if (!is.numeric(min_mcells) || min_mcells <= 5) {
     stop("The argument 'min_mcells' must be an integer larger than 5.")
   }
   
@@ -48,13 +49,11 @@ import_sl <- function(seurat_list, min_mcells = 6) { #nolint
   ##  check if scale.data is present and SCTransform is necessary
   if (!all(sapply(seurat_list, function(x) "scale.data" %in% SeuratObject::Layers(x)))){
     message("scaled data is not present in all samples. 
-  Applying SCTransform to all samples.")
+    Normalizing and scaling all samples.")
     seurat_list <- lapply(seurat_list,
                           function(x) {
-                            Seurat::SCTransform(x,
-                                                return.only.var.genes = FALSE,
-                                                min_cells = 2,
-                                                verbose = FALSE)
+                            x <- Seurat::NormalizeData(x)
+                            x <- Seurat::ScaleData(x)
                           }
     )
   }

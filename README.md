@@ -19,3 +19,7 @@ Currently, all used functions are documented and ready to be roxygenised. Techni
 ## Ideas
 
 Following [google doc](https://docs.google.com/document/d/10TEWmnfBOlW7SGFl70eb_26Z-kTeOK-bcNg6WgZJMsk/edit?usp=sharing)
+
+<!-- badges: start -->
+  [![R-CMD-check](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
