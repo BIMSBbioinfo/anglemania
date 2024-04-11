@@ -19,7 +19,7 @@ melt_to_df <- function(x_mat_ang) { #nolint
   ##
   x_mat_ang[upper.tri(x_mat_ang, diag = TRUE)] <- NA
   
-  idx <- which(!is.na(x_mat_ang), arr.ind = TRUE)
+  idx <- Matrix::which(!is.na(x_mat_ang), arr.ind = TRUE)
   
   # Create a data table from indices and values
   x_df_ang <- data.table::data.table(
