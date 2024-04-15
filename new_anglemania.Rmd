@@ -1,0 +1,111 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+params:
+  dataset: Zethoven_Tothill_natcomm_2022_PCPG
+---
+
+```{r}
+library(data.table)
+library(dplyr)
+library(Seurat)
+library(SeuratDisk)
+library(ggplot2)
+library(bigmemory)
+library(bigalgebra)
+library(bigstatsr)
+# library(igraph)
+# library(BPCells)
+```
+
+
+```{r}
+# devtools::unload("anglemania")
+devtools::load_all("../anglemania/")
+```
+
+```{r}
+sessioninfo <- sessionInfo()
+# sessioninfo['otherPkgs']
+```
+
+# load data
+```{r}
+load("/data/bimsbstatic/public/akalin/akollot/Neuroblastoma/Results/Zethoven_Tothill_natcomm_2022_PCPG/anglemania/Zethoven_example_dataset.RDS")
+
+```
+
+# run anglemana
+## anglemanise
+```{r}
+sl <- sl_raw[1:10]
+
+sl[[1]]
+# l_processed <- big_anglemanise(sl, extrema = 0.005, n_cores = 16)
+time <- profvis::profvis({
+    l_processed <- big_anglemanise(sl, extrema = 0.005, n_cores = 10)
+})
+names(l_processed) <- names(sl)
+
+sapply(l_processed, function(x) {
+  x$l_angles$critical_angles
+})
+
+integration_features <- big_extract_integration_features(l_processed, cutoff = 7)
+
+integration_order <- get_integration_order(l_processed)
+```
+
+
+
+# explore gaussian fit and angle distribution
+```{r}
+x_mat <- LayerData(sl_raw[[1]], layer = "counts") %>% as.matrix()
+
+x_mat_ang <- big_extract_angles(x_mat)
+
+l_angles <- big_approximate_angles(x_mat_ang, quantile_split = 0.005)
+
+l_angles <- fit_gaussian_cor(l_angles)
+
+l_angles$statistics$mu
+l_angles$statistics$sigma
+l_angles$angles_dist$prob_gauss
+l_angles$angles_dist$angle
+
+ref_angles <- l_angles$angles_dist$angle
+gauss_quants <- l_angles$angles_dist$prob_gauss
+##
+extreme <- 0.03
+extrema <- c(extreme, 1-extreme)
+crit_vals <- purrr::map_dbl(
+  extrema,
+  ~ ref_angles[which.min(abs(gauss_quants - .x))]
+)
+crit_vals
+
+results_list <- big_factorise(x_mat, name = "test", extrema = extrema)
+str(results_list)
+
+
+```
+
+```{r}
+
+## fit the least squares and extract the coefficients
+fit <- nlm(
+  f,
+  c(0, 0.1), # this is q ==> mean and sd ==> expect mean of 0. what about sd??
+  l_processed[[1]]$l_angles$angles_dist$angle, # this is x
+  l_processed[[1]]$l_angles$angles_dist$prob
+)
+
+fit
+
+pnorm(l_processed[[1]]$l_angles$angles_dist$angle,
+  mean = fit$estimate[1],
+  sd = fit$estimate[2]
+) %>% density() %>% plot()
+```

@@ -48,7 +48,7 @@ anglemanise <- function(seurat_list, #nolint
   if (!is.character(path_to_write_angles)) {
     stop("path_to_write_angles has to be a string")
   }
-  if (length(extrema) > 2) {
+  if (length(extrema) > 2 || length(extrema) < 1) {
     stop("extrema should be numeric of length either 1 or 2")
   }
   ##  check if scale.data is present and SCTransform is necessary

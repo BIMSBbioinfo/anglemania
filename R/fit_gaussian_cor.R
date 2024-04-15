@@ -12,8 +12,8 @@
 #' @return list. List with multiple entries, one of which contains
 #' an approxiamted distribution and details of the gaussian fit.
 #' Others contains NAs to be filled by subsequent functions.
-#' @export fit_gaussian
-fit_gaussian <- function(l_approx) { # nolint
+#' @export fit_gaussian_cor
+fit_gaussian_cor <- function(l_approx) { # nolint
   ## function to compute sum of residual squares to a fit
   f <- function(q, x, prob) {
     res <- pnorm(x, q[1], q[2]) - prob
@@ -22,7 +22,7 @@ fit_gaussian <- function(l_approx) { # nolint
   ## fit the least squares and extract the coefficients
   coeff <- (fit <- nlm(
     f,
-    c(90, 10), # this is q
+    c(0, 0.1), # this is q ==> mean and sd ==> expect mean of 0. what about sd?? 
     l_approx$angles_dist$angle, # this is x
     l_approx$angles_dist$prob
   ))$estimate

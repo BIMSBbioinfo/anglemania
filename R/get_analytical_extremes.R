@@ -32,6 +32,14 @@ get_analytical_extremes <- function(l_approx, #nolint
                               ~ ref_angles[which.min(abs(gauss_quants - .x))]
   )
   ##
+  # FIXME: this should be done in a better way ==> currently, if the thresholds are not low/high enough, 
+  #   it will be fixed to 45 and 135 to have some sort of minimal extremes
+  # if (crit_vals[1] >= 45) {
+  #   crit_vals[1] <- 45
+  # }
+  # if (crit_vals[2] <= 135) {
+  #   crit_vals[2] <- 135
+  # }
   l_approx$critical_angles <- crit_vals
   ##
   return(l_approx)
