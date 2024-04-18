@@ -20,6 +20,8 @@
 #' @importFrom bigstatsr big_apply
 #' @importFrom bigstatsr as_FBM
 #' @importFrom margittr %>%
+#' @importFrom pbapply pblapply
+#' @importFrom pbapply pboptions
 #' @param seurat_list seurat list of seurat objects with scaled data.
 #' @param extrema double. Fraction of the angles
 #'   to be cut from both sides of an approximated angle
@@ -47,38 +49,64 @@ big_anglemanise <- function(seurat_list, # nolint
     if (length(extrema) > 2) {
         stop("extrema should be numeric of length either 1 or 2")
     }
-    # ##  check if scale.data is present and SCTransform is necessary
-    # if (!all(sapply(seurat_list, function(x) "scale.data" %in% SeuratObject::Layers(x)))) {
-    #     stop("scaled data is not present in all samples. \nPlease run import_sl on the Seurat list")
-    # }
-
     if (length(extrema) == 1) {
         extrema <- c(extrema, 1 - extrema)
     }
 
-    ## get scaled data matrices
-    list_x_mats <- parallel::mclapply(seurat_list, function(x) {
-        x <- SeuratObject::GetAssayData(x, assay = "RNA")
-    }, mc.cores = n_cores)
 
+    ############## Process inputs ###########################
+    # Get the list of count matrices
+    pboptions(
+        type = "timer",
+        style = 1,
+        char = "=",
+        title = "extract count matrices"
+    )
+    message("Extracting count matrices...")
+    list_x_mats <- pbapply::pblapply(seurat_list, function(x) {
+        x <- SeuratObject::GetAssayData(x, assay = "RNA")
+    }, cl = n_cores)
+
+    # Assign names to the list of count matrices
+    # If names(seurat_list) is NULL, it assigns sequential names
+    # based on the position of matrices in the list.
+    # Otherwise, it assigns basename of the corresponding
+    # seurat object names.
     if (is.null(names(list_x_mats))) {
         names(list_x_mats) <- paste0("X", seq_along(list_x_mats))
+    } else {
+        names(list_x_mats) <- sapply(names(seurat_list), basename)
     }
 
-    # p <- progressr::progressor(along = list_x_mats)
 
-    # p(message = sprintf("Processing %s", names(list_x_mats)[mat_ind]))
+    # Calculate correlation matrix of genes for each sample and only keep significant ones
+    #   for details see big_factorise
+    # l_processed <- parallel::mclapply(names(list_x_mats), function(name) {
+    #     x <- list_x_mats[[name]]
+    #     x <- big_factorise(
+    #         x_mat = x,
+    #         name = name,
+    #         extrema
+    #     )
+    # }, mc.cores = n_cores)
 
-    l_processed <- parallel::mclapply(names(list_x_mats), function(name) {
+
+    pbapply::pboptions(
+        type = "timer",
+        style = 1,
+        char = "=",
+        title = "big_anglemanise"
+    )
+    message("Calculating significant correlations...")
+    l_processed <- pbapply::pblapply(names(list_x_mats), function(name) {
         x <- list_x_mats[[name]]
         x <- big_factorise(
             x_mat = x,
             name = name,
             extrema
         )
+    }, cl = n_cores)
 
-        # copy and modify approximate_angles so that it works within bigstatsr
-    }, mc.cores = n_cores) # end of mcapply
-
+    gc()
     return(l_processed)
 }

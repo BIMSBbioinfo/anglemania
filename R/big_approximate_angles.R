@@ -32,6 +32,7 @@ big_approximate_angles <- function(x_mat_ang, # nolint
         ) %>% apply(2, mean, na.rm = TRUE), 
         # for each block of 500 columns (500 x n_genes) get the quantiles of all correlations 
         # and then calculate the mean of the respective quantiles 
+        # checked SD of the means previously and they are very very similar ==> very low SD
         prob = seq(0, 1, by = quantile_split)
     )
     # knitr::kable(head(angles_dist))

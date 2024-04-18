@@ -14,7 +14,7 @@
 #' @param x_mat Matrix. Contains normalised and scaled gene
 #'   expression.
 #' @param name character. The name of the dataset.
-#' @param extrema double. Fraction of the angles
+#' @param extrema double. Fraction of the correlation
 #'   to be cut from both sides of an approximated angle
 #'   distribution.
 #' @return list. First two elements are sparse matrices
@@ -34,26 +34,23 @@ big_factorise <- function(x_mat, # nolint
     }
     gene_names <- rownames(x_mat)
     n_seacells <- ncol(x_mat)
-    # compute angle matrix
-    x_mat_ang <- big_extract_angles(
+    # compute correlation matrix
+    
+    x_mat_ang <- big_extract_corr(
         x_mat %>% as.matrix()
     )
 
     # Estimate critical angles ==> Using a Gaussian fit.
-    message("Estimating critical angles...")
+
     l_angles <- big_estimate_critical_angles(x_mat_ang,
         s_dims = n_seacells,
         extrema = extrema
     )
 
-
-    message("Filtering angles...")
-    # Extract sharp and blunt angles using big_apply
     # TODO: make something like a progress bar
-    message(paste0("critical angles: ", paste0(l_angles$critical_angles, collapse = ", ")))
+
     results_dt <- big_apply(x_mat_ang,
         a.FUN = function(x_mat_ang, ind) {
-            # print(ind[1])
 
             # create subset matrix
             X.sub <- x_mat_ang[, ind, drop = FALSE]
@@ -63,7 +60,6 @@ big_factorise <- function(x_mat, # nolint
             # this is basically equivalent to cols(matrix) but the problem with the big_apply method is that
             # for each block the function is applied to, the columns are  1:500 for every block. (if blocksize = 500)
             # row(X.sub) <= cols_matrix is equivalent to upper.tri(X.sub)
-            # print(l_angles$critical_angles)
             sharp <- which(X.sub <= min(l_angles$critical_angles) & (row(X.sub) <= cols_matrix), arr.ind = TRUE) # get indices of the sharp angles
             blunt <- which(X.sub >= max(l_angles$critical_angles) & (row(X.sub) <= cols_matrix), arr.ind = TRUE) # get indices of the blunt angles
 
@@ -78,9 +74,7 @@ big_factorise <- function(x_mat, # nolint
             blunt[, 2] <- gene_names[ind[blunt[, 2]]]
             blunt[, 1] <- gene_names[blunt[, 1] %>% as.integer()]
 
-            if (ind[1] == 1){
-                message("Factorising angles...")
-            }
+
             # Combine indices and values
             sharp_data <- data.table(
                 gene_a = sharp[, 1],
@@ -106,7 +100,7 @@ big_factorise <- function(x_mat, # nolint
     # COMMENT: the name of the dataset is currently specified as the name, the mclapply function iterates over
     # FIXME: where dataset specification ==> name(list_element)
     results_dt$dataset <- name
-    message("finished filtering angles")
+
     results_list <- list(results = results_dt, l_angles = l_angles)
     # COMMENT: could now either work with the absolute angles or binarize like before
     # The Results list includes the following elements:
@@ -125,3 +119,5 @@ big_factorise <- function(x_mat, # nolint
     invisible(gc())
     return(results_list)
 }
+
+

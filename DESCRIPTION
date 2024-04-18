@@ -23,7 +23,8 @@ Imports:
     stringr,
     tidyr,
     parallelDist,
-    glmGamPoi
+    glmGamPoi,
+    pbapply
 LinkingTo: 
     Rcpp,
     RcppArmadillo

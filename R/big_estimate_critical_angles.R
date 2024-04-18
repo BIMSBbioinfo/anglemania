@@ -23,25 +23,41 @@
 #' @param extrema double. Fraction of the angles
 #'   to be cut from both sides of an approximated angle
 #'   distribution.
+#' @param filter_option character. One of "fit_gaus", "bootstrap_c",
+#'   "bootstrap_g", or "adj_pval".
 #' @return list. Records on parameters of the gaussian,
 #' goodness of fit, and critical angles.
 #' @export big_estimate_critical_angles
 big_estimate_critical_angles <- function(x_mat_ang, # nolint
                                      s_dims,
-                                     extrema) {
+                                     extrema,
+                                     filter_option = "fit_gaus") {
     quantile_split <- min(extrema)
     ##
-    out <- big_approximate_angles(x_mat_ang, quantile_split) %>%
-        fit_gaussian_cor(.) %>%
-        test_gof_Ks(.) %>%
-        estimate_MOAV_cor(., s_dims) %>%
-        get_analytical_extremes(., extrema)
-    ##
-    # if (any(out$critical_angles <= 0) || any(out$critical_angles >= 180)) {
-    #     message(
-    #         paste0("Angles at ", paste0(paste0(out$critical_angles, "%"), collapse = " and "), ":\n", paste0(out$critical_angles, collapse = " and "))
-    #     )
-    #     stop("Extrema is too thin, consider taking a larger margin")
-    # }
-    return(out)
+    if (filter_option == "fit_gaus") {
+        out <- big_approximate_angles(x_mat_ang, quantile_split) %>%
+            fit_gaussian_cor(.) %>%
+            test_gof_Ks(.) %>%
+            estimate_MOAV_cor(., s_dims) %>%
+            get_analytical_extremes(., extrema)
+        ##
+        # if (any(out$critical_angles <= 0) || any(out$critical_angles >= 180)) {
+        #     message(
+        #         paste0("Angles at ", paste0(paste0(out$critical_angles, "%"), collapse = " and "), ":\n", paste0(out$critical_angles, collapse = " and "))
+        #     )
+        #     stop("Extrema is too thin, consider taking a larger margin")
+        # }
+        return(out)
+    }
+
+    # NOTE: this is under construction :)
+    if (grepl("bootstrap", filter_option)) {
+        if (filter_option == "bootstrap_c") {
+
+        }
+    }
+
+    if (filter_option == "adj_pval") {
+
+    }
 }
