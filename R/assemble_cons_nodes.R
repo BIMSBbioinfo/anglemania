@@ -37,6 +37,8 @@ assemble_cons_nodes <- function(l_processed,
 
       p <- list(name = "Extracting critical angles",
                 clear = FALSE)
+      message("2")
+      browser()
       purrr::map(
         nodes,
         function(node) {
