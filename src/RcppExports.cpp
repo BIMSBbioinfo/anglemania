@@ -11,6 +11,17 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// computePValues
+void computePValues(arma::mat& cor_mat, int df);
+RcppExport SEXP _anglemania_computePValues(SEXP cor_matSEXP, SEXP dfSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type cor_mat(cor_matSEXP);
+    Rcpp::traits::input_parameter< int >::type df(dfSEXP);
+    computePValues(cor_mat, df);
+    return R_NilValue;
+END_RCPP
+}
 // dist2mat
 NumericMatrix dist2mat(NumericVector& x, int bf);
 RcppExport SEXP _anglemania_dist2mat(SEXP xSEXP, SEXP bfSEXP) {
@@ -37,6 +48,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_anglemania_computePValues", (DL_FUNC) &_anglemania_computePValues, 2},
     {"_anglemania_dist2mat", (DL_FUNC) &_anglemania_dist2mat, 2},
     {"_anglemania_matrixAddition", (DL_FUNC) &_anglemania_matrixAddition, 2},
     {NULL, NULL, 0}

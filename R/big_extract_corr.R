@@ -19,6 +19,8 @@ big_extract_corr <- function(
         stop("x_mat has to be a matrix")
     }
     X <- as_FBM(x_mat)
+    df <- ncol(X)-2 # important for the degrees of freedom when computing the p-values
+    print(paste0("computing p-values for ", n, " cells"))
     # log normalize the data
     big_apply(X, a.FUN = function(X, ind) {
         X.sub <- X[, ind, drop = FALSE]
@@ -39,6 +41,17 @@ big_extract_corr <- function(
     X <- big_cor(X, block.size = 1000)
     # the big_cor function from bigstatsr basically scales and centers the count matrix and calculates the covariance (cross product XT*X)
     diag(X) <- NA
+
+    # Calculate p-values and adjust them using the Benjamini-Hochberg method
+    big_apply(X, a.FUN = function(X, ind) {
+        X.sub <- X[, ind, drop = FALSE]
+        computePValues(X.sub, df = df)
+        # a C++ function that computes the p-values from the correlation matrix and replaces the values of the matrix in place.
+        # uses the CDF of a normal distribution not a students-t distribution. Justified by the fact that with higher df towards 30, students t CDF is very close to normal distribution.
+        X.sub <- p.adjust(X.sub, method = "BH")
+        X[, ind] <- X.sub
+        NULL
+    }, a.combine = "c", block.size = 1000)
 
     return(X)
 }

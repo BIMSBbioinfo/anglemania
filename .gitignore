@@ -22,3 +22,5 @@ external_packages.tsv*
 bm_anglemana.Rmd
 test_speed.R
 Time_profile*
+parallel_anglemania.Rmd
+new_anglemania.Rmd

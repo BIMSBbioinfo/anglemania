@@ -23,9 +23,8 @@
 #' @importFrom pbapply pblapply
 #' @importFrom pbapply pboptions
 #' @param seurat_list seurat list of seurat objects with scaled data.
-#' @param extrema double. Fraction of the angles
-#'   to be cut from both sides of an approximated angle
-#'   distribution.
+#' @param fdr_threshold double. The FDR threshold to apply
+#'   to the q-values. Defaults to 0.001.
 #' @param n_cores integer. Number of cores to use for
 #'   the computation of the cosine distances.
 #' @return list. First two elements are sparse matrices
@@ -36,7 +35,7 @@
 #' @seealso https://arxiv.org/abs/1306.0256
 #' @export big_anglemanise
 big_anglemanise <- function(seurat_list, # nolint
-                            extrema = 0.005,
+                            fdr_threshold = 0.001,
                             n_cores = 4) {
     ############## Validate inputs ###########################
 
@@ -46,11 +45,8 @@ big_anglemanise <- function(seurat_list, # nolint
     if (!is.numeric(n_cores) || n_cores < 1) {
         stop("n_cores has to be a positive integer")
     }
-    if (length(extrema) > 2) {
+    if (length(fdr_threshold) > 1) {
         stop("extrema should be numeric of length either 1 or 2")
-    }
-    if (length(extrema) == 1) {
-        extrema <- c(extrema, 1 - extrema)
     }
 
 
@@ -103,7 +99,7 @@ big_anglemanise <- function(seurat_list, # nolint
         x <- big_factorise(
             x_mat = x,
             name = name,
-            extrema
+            fdr_threshold = fdr_threshold
         )
     }, cl = n_cores)
 
