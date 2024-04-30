@@ -148,7 +148,7 @@ anglemanise <- function(seurat_list, #nolint
 #' @return list. 
 #' 
 #' @export anglemanise
-anglemanise_zscore <-  = function(
+anglemanise_zscore  = function(
     seurat_list,
     zscore_mean_threshold = 2,
     zscore_cv_threshold   = 2
@@ -196,4 +196,3 @@ anglemanise_zscore <-  = function(
 }
 
   
-}
