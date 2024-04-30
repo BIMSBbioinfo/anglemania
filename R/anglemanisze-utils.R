@@ -157,7 +157,27 @@ matrix_list_z_score_mean_sd = function(matrix_list_zscore) {
 #' angle_results = calculate_angles_seurat_list(list_of_seurats)
 calculate_angles_seurat_list = function(seurat_list) {
     lapply(seurat_list, function(seu) {
+        if(!"scale.data" %in% Layers(seu))
+            stop("scale.data not in seu")
         x_mat = GetAssayData(seu, "RNA", "scale.data")
         extract_angles(x_mat, n_threads = 16)
     })
+}
+
+
+# --------------------------------------------------------------------------------------------- #
+select_genes = function(
+    lout,
+    zscore_mean_threshold = 2,
+    zscore_cv_threshold   = 2
+
+){
+    gene_ind = which(
+        abs(lout$l_zscore_mean_sd$mean_zscore)     > zscore_mean_threshold & 
+        lout$l_zscore_mean_sd$cv_zscore > zscore_cv_threshold, 
+        arr.ind=TRUE
+    )
+    gene_names = rownames(lout$l_zscore_mean_sd$mean_zscore)[sort(unique(as.vector(gene_ind)))]
+    return(gene_names)
+
 }
