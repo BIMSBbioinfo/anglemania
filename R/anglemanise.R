@@ -172,25 +172,24 @@ anglemanise_zscore  = function(
     lmat_perm_ang    = calculate_angles_seurat_list(seul_perm_col)
 
     message("calculate permuted mean - sd ...")
-    perm_mean_sds    = lmat_mean_sds(lmat_perm_ang)
+    perm_mean_sds    = matrix_list_mean_sds(lmat_perm_ang)
 
     message("calculate angle z-scores ...")
-    lmat_zscore      = lmat_z_score(lmat_seu_ang, perm_mean_sds)
+    lmat_zscore      = matrix_list_z_score(lmat_seu_ang, perm_mean_sds)
     
     message("calculate z-score stats ...")
-    l_zscore_mean_sd = lmat_z_score_mean_sd(lmat_zscore)
+    l_zscore_mean_sd = matrix_list_z_score_mean_sd(lmat_zscore)
 
     message("returning features ...")
-    gene_ind = which(
-        abs(l_zscore_mean_sd$mean_zscore)     > zscore_mean_threshold & 
-        l_zscore_mean_sd$cv_zscore > zscore_cv_threshold, 
-        arr.ind=TRUE
-    )
-    gene_names = rownames(seurat_list[[1]])[sort(unique(as.vector(gene_ind)))]
-
     lout = list(
         l_zscore_mean_sd = l_zscore_mean_sd,
-        gene_names = gene_names
+        gene_names = NULL
+    )
+
+    lout = select_genes(
+        lout, 
+        zscore_mean_threshold = zscore_mean_threshold,
+        zscore_cv_threshold   = zscore_cv_threshold
     )
     return(lout)
 }

@@ -173,11 +173,11 @@ select_genes = function(
 
 ){
     gene_ind = which(
-        abs(lout$l_zscore_mean_sd$mean_zscore)     > zscore_mean_threshold & 
-        lout$l_zscore_mean_sd$cv_zscore > zscore_cv_threshold, 
+        abs(lout$l_zscore_mean_sd$mean_zscore)  > zscore_mean_threshold & 
+        abs(lout$l_zscore_mean_sd$cv_zscore) > zscore_cv_threshold, 
         arr.ind=TRUE
     )
-    gene_names = rownames(lout$l_zscore_mean_sd$mean_zscore)[sort(unique(as.vector(gene_ind)))]
-    return(gene_names)
+    lout$gene_names = rownames(lout$l_zscore_mean_sd$mean_zscore)[sort(unique(as.vector(gene_ind)))]
+    return(lout)
 
 }
