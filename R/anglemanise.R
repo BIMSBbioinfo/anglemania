@@ -122,3 +122,76 @@ anglemanise <- function(seurat_list, #nolint
   # an average sized dataset. Consider the tradeoffs.
   return(l_added)
 }
+
+
+
+#' Record critical angles between genes in gene expression
+#' matrices from a Seurat list.
+#'
+#' @description
+#' *anglemanise* is a high-level function that returns a list
+#' of lists containing critical angles between genes across
+#' input samples, angle statistics per sample, paths to the
+#' the angle records per sample.
+#'
+#' @details
+#' This is the main function of the package. It calculates
+#' angles between all genes across all samples provided in
+#' the Seurat list. It approximates the angle distribution
+#' for each sample and extracts values of critical angles. Data needs to be scaled.
+#'
+#' @importFrom Matrix Matrix
+#' @importFrom purrr map
+#' @importFrom SeuratObject LayerData
+#' @param seurat_list seurat list of seurat objects with scaled data.
+#' @param zscore_mean_threshold double.
+#' @param zscore_cv_threshold double.
+#' @return list. 
+#' 
+#' @export anglemanise
+anglemanise_zscore <-  function(
+    seurat_list,
+    zscore_mean_threshold = 2,
+    zscore_cv_threshold   = 2
+){
+
+    ### IMPORTANT - add ribosomal gene removal before the analysis
+    message("permute counts ...")
+    seul_perm_col    = seurat_list_permute_counts(seurat_list)
+    
+    message("normalize permuted data ...")
+    seul_perm_col    = lapply(seul_perm_col, function(seu){
+        seu %>%
+            NormalizeData(verbose=FALSE) %>%
+            ScaleData(verbose=FALSE)
+    })
+
+    message("calculate angles ...")
+    lmat_seu_ang     = calculate_angles_seurat_list(seurat_list)
+
+    message("calculate permuted angles ...")
+    lmat_perm_ang    = calculate_angles_seurat_list(seul_perm_col)
+
+    message("calculate permuted mean - sd ...")
+    perm_mean_sds    = lmat_mean_sds(lmat_perm_ang)
+
+    message("calculate angle z-scores ...")
+    lmat_zscore      = lmat_z_score(lmat_seu_ang, perm_mean_sds)
+    
+    message("calculate z-score stats ...")
+    l_zscore_mean_sd = lmat_z_score_mean_sd(lmat_zscore)
+
+    message("returning features ...")
+    gene_ind = which(
+        abs(l_zscore_mean_sd$mean_zscore)     > zscore_mean_threshold & 
+        l_zscore_mean_sd$cv_zscore > zscore_cv_threshold, 
+        arr.ind=TRUE
+    )
+    gene_names = rownames(seurat_list[[1]])[sort(unique(as.vector(gene_ind)))]
+
+    lout = list(
+        l_zscore_mean_sd = l_zscore_mean_sd,
+        gene_names = gene_names
+    )
+    return(lout)
+}

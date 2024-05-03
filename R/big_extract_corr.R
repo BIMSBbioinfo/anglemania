@@ -14,15 +14,10 @@
 #' @export big_extract_angles
 big_extract_corr <- function(
     x_mat) {
-    # validate inputs
-    if (!is.matrix(x_mat)) {
-        stop("x_mat has to be a matrix")
-    }
-    X <- as_FBM(x_mat)
-    df <- ncol(X)-2 # important for the degrees of freedom when computing the p-values
-    print(paste0("computing p-values for ", n, " cells"))
+
+    df <- ncol(x_mat)-2 # important for the degrees of freedom when computing the p-values
     # log normalize the data
-    big_apply(X, a.FUN = function(X, ind) {
+    bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
         X.sub <- X[, ind, drop = FALSE]
         # normalize the data:
         #   divide gene counts by the number of total counts per cell,
@@ -36,22 +31,11 @@ big_extract_corr <- function(
 
     # Calculate correlation matrix
     # first transpose the matrix because big_cor calculates the covariance (XT*X)
-    X <- big_transpose(X)
+    x_mat <- bigstatsr::big_transpose(x_mat)
 
-    X <- big_cor(X, block.size = 1000)
+    x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
     # the big_cor function from bigstatsr basically scales and centers the count matrix and calculates the covariance (cross product XT*X)
-    diag(X) <- NA
+    diag(x_mat) <- NA
 
-    # Calculate p-values and adjust them using the Benjamini-Hochberg method
-    big_apply(X, a.FUN = function(X, ind) {
-        X.sub <- X[, ind, drop = FALSE]
-        computePValues(X.sub, df = df)
-        # a C++ function that computes the p-values from the correlation matrix and replaces the values of the matrix in place.
-        # uses the CDF of a normal distribution not a students-t distribution. Justified by the fact that with higher df towards 30, students t CDF is very close to normal distribution.
-        X.sub <- p.adjust(X.sub, method = "BH")
-        X[, ind] <- X.sub
-        NULL
-    }, a.combine = "c", block.size = 1000)
-
-    return(X)
+    return(x_mat)
 }

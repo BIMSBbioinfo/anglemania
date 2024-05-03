@@ -35,7 +35,8 @@
 #' @seealso https://arxiv.org/abs/1306.0256
 #' @export big_anglemanise
 big_anglemanise <- function(seurat_list, # nolint
-                            fdr_threshold = 0.001,
+                            zscore_mean_threshold = 2,
+                            zscore_sn_threshold   = 2,
                             n_cores = 4) {
     ############## Validate inputs ###########################
 
@@ -45,9 +46,7 @@ big_anglemanise <- function(seurat_list, # nolint
     if (!is.numeric(n_cores) || n_cores < 1) {
         stop("n_cores has to be a positive integer")
     }
-    if (length(fdr_threshold) > 1) {
-        stop("extrema should be numeric of length either 1 or 2")
-    }
+
 
 
     ############## Process inputs ###########################
@@ -59,7 +58,9 @@ big_anglemanise <- function(seurat_list, # nolint
         title = "extract count matrices"
     )
     message("Extracting count matrices...")
+    intersect_genes <- Reduce(intersect, lapply(seurat_list, rownames))
     list_x_mats <- pbapply::pblapply(seurat_list, function(x) {
+        x <- subset(x, features = intersect_genes)
         x <- SeuratObject::GetAssayData(x, assay = "RNA")
     }, cl = n_cores)
 
@@ -74,35 +75,34 @@ big_anglemanise <- function(seurat_list, # nolint
         names(list_x_mats) <- sapply(names(seurat_list), basename)
     }
 
-
-    # Calculate correlation matrix of genes for each sample and only keep significant ones
-    #   for details see big_factorise
-    # l_processed <- parallel::mclapply(names(list_x_mats), function(name) {
-    #     x <- list_x_mats[[name]]
-    #     x <- big_factorise(
-    #         x_mat = x,
-    #         name = name,
-    #         extrema
-    #     )
-    # }, mc.cores = n_cores)
-
-
     pbapply::pboptions(
         type = "timer",
         style = 1,
         char = "=",
         title = "big_anglemanise"
     )
-    message("Calculating significant correlations...")
-    l_processed <- pbapply::pblapply(names(list_x_mats), function(name) {
+    message("Computing correlations and transforming to z-scores...")
+    list_zscore_mats <- pbapply::pblapply(names(list_x_mats), function(name) {
         x <- list_x_mats[[name]]
-        x <- big_factorise(
-            x_mat = x,
-            name = name,
-            fdr_threshold = fdr_threshold
-        )
+        x <- big_factorise(x_mat = x, name = name)
     }, cl = n_cores)
+    
+    message("Computing statistics...")
+    list_stats <- get_list_stats(list_zscore_mats)
+    invisible(gc())
 
-    gc()
-    return(l_processed)
+    l_out <- list(
+        list_stats = list_stats,
+        gene_names = NULL
+    )
+
+    message("Filtering features...")
+    l_out <- select_genes(
+        l_out,
+        zscore_mean_threshold = zscore_mean_threshold,
+        zscore_sn_threshold = zscore_sn_threshold,
+        intersect_genes = intersect_genes
+    )
+    
+    return(l_out)
 }
