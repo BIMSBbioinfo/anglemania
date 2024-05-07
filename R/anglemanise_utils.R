@@ -1,4 +1,26 @@
 # --------------------------------------------------------------------------------------------- #
+# Utility functions for the anglemanise package
+# --------------------------------------------------------------------------------------------- #
+#' Convert a sparse matrix into an FBM
+#'
+#' Converts a sparse matrix into an FBM with efficient memory usage.
+#'
+#' @param s_mat A sparse matrix.
+#' @return A FBM object from the bigstatsr package.
+#' @importFrom bigstatsr FBM
+sparse_to_fbm <- function(s_mat) {
+    n <- nrow(s_mat)
+    p <- ncol(s_mat)
+    X <- bigstatsr::FBM(n, p)
+    big_apply(X, a.FUN = function(X, ind) {
+        X[, ind] <- s_mat[, ind] %>% as.matrix()
+        NULL
+    }, a.combine = "c", block.size = 200)
+
+    return(X)
+}
+
+# --------------------------------------------------------------------------------------------- #
 #' Permute counts in a Seurat object
 #'
 #' This function permutes the counts in the assay data of a Seurat object either by columns or rows.
@@ -8,7 +30,7 @@
 #' @examples
 #' seu_permuted = permute_counts(seu, which = "columns")
 permute_counts <- function(X.sub, which = "columns", seed=1) {
-    
+    set.seed(seed)
     if (which == "columns") {
         X.sub <- apply(X.sub, 2, sample)
     } else if (which == "rows") {
@@ -33,21 +55,24 @@ get_dstat <- function(corr_matrix) {
     # calculate mean and standard deviation
     # n = number of entries that are not NA ==> so that when calling mean or sd, we do not count NA values, 
     #   corresponding to mean(..., na.rm = TRUE), sd(..., na.rm = TRUE)
-    n <- big_apply(corr_matrix,
+    n <- bigstatsr::big_apply(corr_matrix,
         a.FUN = function(X, ind) {
             sum(!is.na(X[, ind, drop = FALSE])) # this works because TRUE = 1 and FALSE = 0 in R
-        }, a.combine = "sum", block.size = 1000
+        }, a.combine = "sum", block.size = 200
     )
-    mean <- big_apply(corr_matrix, a.FUN = function(X, ind) {
-        sum(X[, ind, drop = FALSE], na.rm = TRUE) / n
-    }, a.combine = "c", block.size = 1000) %>% mean()
-    sd <- big_apply(corr_matrix, a.FUN = function(X, ind) {
-        sum((X[, ind, drop = FALSE] - mean)^2, na.rm = TRUE) / n
-    }, a.combine = "sum", block.size = 1000) %>% sqrt()
+
+    mean <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
+        sum(X[, ind, drop = FALSE], na.rm = TRUE)
+    }, a.combine = "sum", block.size = 200) / n
+
+    sd <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
+        sum((X[, ind, drop = FALSE] - mean)^2, na.rm = TRUE) / (n - 1)
+    }, a.combine = "sum", block.size = 200) %>% sqrt()
+
     dstat <- list(
         mean = mean,
         sd = sd,
-        sn = sd / mean
+        sn = sd / mean # signal-to-noise ratio
     )
     return(dstat)
 }
@@ -76,14 +101,14 @@ big_mat_list_mean <- function(fbmList) {
     }
     n_col <- ncol(fbmList[[1]])
     n_row <- nrow(fbmList[[1]])
-    mat_mean_zscore <- FBM(n_row, n_col)
+    mat_mean_zscore <- bigstatsr::FBM(n_row, n_col)
 
-    big_apply(mat_mean_zscore, a.FUN = function(X, ind) {
+    bigstatsr::big_apply(mat_mean_zscore, a.FUN = function(X, ind) {
         X.sub <- X[, ind, drop = FALSE]
         X.sub <- Reduce(function(x, y) x + y[, ind, drop = FALSE], fbmList, init = X.sub)
         X[, ind] <- X.sub / length(fbmList)
         NULL
-    }, a.combine = "c", block.size = 500)
+    }, a.combine = "c", block.size = 200)
 
     return(mat_mean_zscore)
 }
@@ -132,11 +157,11 @@ get_list_stats <- function(fbmList) {
 
     n_col <- ncol(fbmList[[1]])
     n_row <- nrow(fbmList[[1]])
-    mat_sds_zscore <- FBM(n_row, n_col)
+    mat_sds_zscore <- bigstatsr::FBM(n_row, n_col)
 
 
     message("Calculating sds...")
-    big_apply(mat_sds_zscore, a.FUN = function(X, ind) {
+    bigstatsr::big_apply(mat_sds_zscore, a.FUN = function(X, ind) {
         wrap_sds <- function(x, y) {
             x <- x + (y[, ind, drop = FALSE] - mat_mean_zscore[, ind, drop = FALSE])^2
         }
@@ -144,19 +169,19 @@ get_list_stats <- function(fbmList) {
         X.sub <- Reduce(wrap_sds, fbmList, init = X.sub)
         X[, ind] <- sqrt(X.sub / (length(fbmList) - 1))
         NULL
-    }, a.combine = "c", block.size = 500)
+    }, a.combine = "c", block.size = 200)
 
-    mat_sn_zscore <- FBM(n_row, n_col)
+    mat_sn_zscore <- bigstatsr::FBM(n_row, n_col)
     diag(mat_sds_zscore) <- NA # to avoid dividing by zero ==> diagonal is 0 cause of perfect correlation ofc
 
-    big_apply(mat_sn_zscore, a.FUN = function(X, ind) {
+    bigstatsr::big_apply(mat_sn_zscore, a.FUN = function(X, ind) {
         X[, ind] <- mat_mean_zscore[, ind, drop = FALSE] / mat_sds_zscore[, ind, drop = FALSE]
         NULL
-    }, a.combine = "c", block.size = 500)
+    }, a.combine = "c", block.size = 200)
     res <- list(
         mean_zscore = mat_mean_zscore[],
         sds_zscore = mat_sds_zscore[],
-        sn_zscore = mat_sn_zscore[] # signal-to-noise ratio ==> a number which we can use to say, correlation xy is 2 standard deviations away from the mean
+        sn_zscore = mat_sn_zscore[] 
     )
 
     return(res)

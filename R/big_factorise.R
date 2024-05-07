@@ -25,18 +25,18 @@
 #' @export big_factorise
 big_factorise <- function(x_mat, # nolint
                           name) {
-    x_mat <- x_mat %>%
-        as.matrix() %>% # COMMENT: Unfortunately, FBM cannot handle sparse matrices yet ==> need for transformation into FBM from matrix
-        bigstatsr::as_FBM()
+    x_mat <- sparse_to_fbm(x_mat)
     # initialize empty FBM with same dimensions as x_mat to store permuted correlation matrix
     x_mat_perm <- bigstatsr::FBM(nrow = nrow(x_mat), ncol = ncol(x_mat))
     
     # permute matrix
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+        set.seed(1)
         X.sub <- X[, ind, drop = FALSE]
-        X.sub <- permute_counts(X.sub)
+        X.sub <- apply(X.sub, 2, sample)
         x_mat_perm[, ind] <- X.sub
-    }, a.combine = "c", block.size = 1000)
+        NULL
+    }, a.combine = "c", block.size = 200)
 
     # compute correlation matrix for both original and permuted matrix
     x_mat_corr <- big_extract_corr(x_mat)
@@ -49,7 +49,7 @@ big_factorise <- function(x_mat, # nolint
     # transform original correlation matrix into zscores
     bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
         X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean) / dstat$sd
-    }, a.combine = "c", block.size = 1000)
+    }, a.combine = "c", block.size = 200)
 
     return(x_mat_corr)
 }

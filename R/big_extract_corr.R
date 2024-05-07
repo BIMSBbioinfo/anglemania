@@ -15,8 +15,6 @@
 big_extract_corr <- function(
     x_mat) {
 
-    df <- ncol(x_mat)-2 # important for the degrees of freedom when computing the p-values
-    # log normalize the data
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
         X.sub <- X[, ind, drop = FALSE]
         # normalize the data:
