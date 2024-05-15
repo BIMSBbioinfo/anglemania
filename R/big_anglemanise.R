@@ -19,7 +19,7 @@
 #' @importFrom bigstatsr big_transpose
 #' @importFrom bigstatsr big_apply
 #' @importFrom bigstatsr as_FBM
-#' @importFrom margittr %>%
+#' @importFrom magrittr %>%
 #' @importFrom pbapply pblapply
 #' @importFrom pbapply pboptions
 #' @param seurat_list seurat list of seurat objects with scaled data.
@@ -36,7 +36,8 @@
 #' @export big_anglemanise
 big_anglemanise <- function(seurat_list, # nolint
                             zscore_mean_threshold = 2,
-                            zscore_sn_threshold   = 2,
+                            zscore_sn_threshold  = 2,
+                            max_n_genes = 2000,
                             n_cores = 4) {
     ############## Validate inputs ###########################
 
@@ -59,9 +60,10 @@ big_anglemanise <- function(seurat_list, # nolint
     )
     message("Extracting count matrices...")
     intersect_genes <- Reduce(intersect, lapply(seurat_list, rownames))
+    message("Using intersection of genes. Number of genes: ", length(intersect_genes))
     list_x_mats <- pbapply::pblapply(seurat_list, function(x) {
         x <- subset(x, features = intersect_genes)
-        x <- SeuratObject::GetAssayData(x, assay = "RNA")
+        x <- SeuratObject::LayerData(x, layer = "counts", assay = "RNA") # GetAssayData or LayerData from SeuratObject?
     }, cl = n_cores)
 
     # Assign names to the list of count matrices
@@ -99,8 +101,9 @@ big_anglemanise <- function(seurat_list, # nolint
     message("Filtering features...")
     l_out <- select_genes(
         l_out,
-        zscore_mean_threshold = zscore_mean_threshold,
+        zscore_mean_threshold = 2,
         zscore_sn_threshold = zscore_sn_threshold,
+        max_n_genes = max_n_genes,
         intersect_genes = intersect_genes
     )
     

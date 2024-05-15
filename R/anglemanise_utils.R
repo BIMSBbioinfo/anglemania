@@ -175,7 +175,7 @@ get_list_stats <- function(fbmList) {
     diag(mat_sds_zscore) <- NA # to avoid dividing by zero ==> diagonal is 0 cause of perfect correlation ofc
 
     bigstatsr::big_apply(mat_sn_zscore, a.FUN = function(X, ind) {
-        X[, ind] <- mat_mean_zscore[, ind, drop = FALSE] / mat_sds_zscore[, ind, drop = FALSE]
+        X[, ind] <- abs(mat_mean_zscore[, ind, drop = FALSE]) / mat_sds_zscore[, ind, drop = FALSE]
         NULL
     }, a.combine = "c", block.size = 200)
     res <- list(
@@ -189,17 +189,43 @@ get_list_stats <- function(fbmList) {
 
 
 # --------------------------------------------------------------------------------------------- #
+extract_rows_for_unique_genes <- function(dt, max_n_genes) {
+    unique_genes <- numeric()
+    for (i in 1:nrow(dt)) {
+        # Add new unique genes from both columns of the current row
+        current_genes <- c(dt$geneA[i], dt$geneB[i])
+        unique_genes <- unique(c(unique_genes, current_genes))
+
+        # Stop if we have accumulated max_n_genes or more unique genes
+        if (length(unique_genes) >= max_n_genes) {
+            break
+        }
+    }
+    unique_genes <- sort(unique_genes)
+    return(unique_genes)
+}
+
 select_genes <- function(
     lout,
     zscore_mean_threshold = 2,
     zscore_sn_threshold = 2,
+    max_n_genes = 2000,
     intersect_genes) {
     gene_ind <- which(
-        abs(lout$list_stats$mean_zscore) > zscore_mean_threshold &
-            abs(lout$list_stats$sn_zscore) > zscore_sn_threshold,
+        upper.tri(lout$list_stats$sn_zscore) & 
+        (lout$list_stats$sn_zscore >= zscore_sn_threshold) &
+        (lout$list_stats$mean_zscore >= zscore_mean_threshold),
         arr.ind = TRUE
     )
+    top_n <- data.table::data.table(
+        geneA = gene_ind[, 1],
+        geneB = gene_ind[, 2],
+        zscore = lout$list_stats$mean_zscore[gene_ind]
+    )
+    data.table::setorder(top_n, -"zscore")
+    
+    top_n <- extract_rows_for_unique_genes(top_n, max_n_genes)
 
-    lout$gene_names <- intersect_genes[sort(unique(as.vector(gene_ind)))]
+    lout$gene_names <- intersect_genes[top_n]
     return(lout)
 }

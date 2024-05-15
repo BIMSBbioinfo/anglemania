@@ -1,17 +1,16 @@
 #'
 #' @description
-#' Constructs a matrix of angles between gene pairs. Basically this is a converted correlation matrix
-#' leverages file-backed matrices from the bigstatsr package.
-#'
+#' Constructs a matrix of correlations between gene pairs.
+#' 
 #' @param x_mat matrix. Contains normalised and scaled gene
 #'   expression, where rows are genes and columns are samples.
 #' @param gene_names vector. A character vector specifying the gene_names of the dataset
 #' for Seurat object this would be the rownames of the Seurat object (rownames(se)) 
 #' ==> when using big_factorise, those are already extracted
 #' Specified before in \code{\link{big_factorise}}.
-#' @return FBM (bigstatsr file-backed matrix). Square matrix containing angles between
+#' @return FBM (bigstatsr file-backed matrix). Square matrix containing correlations between
 #' vectors of gene expression (rwos of the input matrix).
-#' @export big_extract_angles
+#' @export big_extract_corr
 big_extract_corr <- function(
     x_mat) {
 

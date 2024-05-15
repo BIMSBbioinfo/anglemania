@@ -23,6 +23,7 @@ Imports:
     stringr,
     tidyr,
     parallelDist,
+    bigstatsr,
     glmGamPoi,
     pbapply
 LinkingTo: 

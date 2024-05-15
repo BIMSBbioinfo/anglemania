@@ -12,3 +12,4 @@ R/flippitise.R
 ^vignettes$
 ^LICENSE\.md$
 ^\.github$
+^archive

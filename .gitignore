@@ -5,6 +5,7 @@
 /playground
 /snapshots
 /deprecated
+/vignettes
 cleanup*
 test.snapshots
 *Jansky*
@@ -19,8 +20,8 @@ prepare*
 external_packages.tsv*
 .Rhistory
 /renv
-bm_anglemana.Rmd
+*.Rmd
 test_speed.R
 Time_profile*
-parallel_anglemania.Rmd
-new_anglemania.Rmd
+archive/
+bigstatsr*
