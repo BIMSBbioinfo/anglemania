@@ -20,15 +20,14 @@
 integrate_by_features <- function(seurat_list,
                                   features_to_integrate,
                                   int_order = NULL,
-                                  process = TRUE) {
+                                  process = TRUE,
+                                  verbose = FALSE) {
   smallest_DS <- min(sapply(seurat_list, function(x) ncol(x)))
-  # seu_intgr <- integrate_by_features(sl, purrr::reduce(l_ifts, union))    # possible to provide custom integration order
   n <- ifelse(smallest_DS <= 10, smallest_DS - 1, 10)
-  print(n)
   anchors <- Seurat::FindIntegrationAnchors(
     object.list = seurat_list,
     anchor.features = features_to_integrate,
-    verbose = TRUE,
+    verbose = verbose,
     dims = 1:n,
     k.filter = n,
     k.anchor = n,
@@ -36,21 +35,14 @@ integrate_by_features <- function(seurat_list,
     reduction = "cca"
   )
 
-  features_intersect <- Reduce(
-    function(x, y) intersect(x, y), lapply(seurat_list, rownames)
-  )
-
   seurat_combined <- Seurat::IntegrateData(
     anchorset = anchors,
     dims = 1:n,
     k.weight = n,
-    features.to.integrate = features_intersect,
     sample.tree = int_order,
-    verbose = TRUE
+    verbose = verbose
   )
 
-
-  Seurat::DefaultAssay(seurat_combined) <- "integrated"
   if (process) {
     get_n_neighbors <- function(num_cells) {
       if (num_cells < 30) {
@@ -61,19 +53,16 @@ integrate_by_features <- function(seurat_list,
         return(30)
       }
     }
-    #### SCALE DATA ####
-    seurat_combined <- Seurat::SCTransform(seurat_combined,
-      return.only.var.genes = FALSE,
-      min_cells = 5, # default
-      verbose = FALSE
-    )
     #### RUN PCA AND UMAP ####
     n_seacells <- ncol(seurat_combined)
     n_pcs <- ifelse(n_seacells <= 30, n_seacells - 1, 30)
     n_neighbors <- get_n_neighbors(n_seacells)
-
     message("Running PCA with ", n_pcs, " PCs")
+    
+    Seurat::DefaultAssay(seurat_combined) <- "integrated"
+    seurat_combined <- Seurat::ScaleData(seurat_combined)
     seurat_combined <- Seurat::RunPCA(seurat_combined, npcs = n_pcs)
+
     message("Running UMAP with ", n_pcs, " PCs and ", n_neighbors, " neighbors")
     seurat_combined <- Seurat::RunUMAP(
       seurat_combined,
