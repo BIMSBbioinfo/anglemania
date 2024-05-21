@@ -13,3 +13,4 @@ R/flippitise.R
 ^LICENSE\.md$
 ^\.github$
 ^archive
+^guix
