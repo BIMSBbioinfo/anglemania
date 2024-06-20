@@ -26,3 +26,4 @@ Time_profile*
 archive/
 bigstatsr*
 guix/
+.vscode/

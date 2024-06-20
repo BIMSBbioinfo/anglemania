@@ -60,15 +60,16 @@ integrate_by_features <- function(seurat_list,
     message("Running PCA with ", n_pcs, " PCs")
     
     Seurat::DefaultAssay(seurat_combined) <- "integrated"
-    seurat_combined <- Seurat::ScaleData(seurat_combined)
-    seurat_combined <- Seurat::RunPCA(seurat_combined, npcs = n_pcs)
+    seurat_combined <- Seurat::ScaleData(seurat_combined, verbose = verbose)
+    seurat_combined <- Seurat::RunPCA(seurat_combined, npcs = n_pcs, verbose = verbose)
 
     message("Running UMAP with ", n_pcs, " PCs and ", n_neighbors, " neighbors")
     seurat_combined <- Seurat::RunUMAP(
       seurat_combined,
       reduction = "pca",
       dims = 1:n_pcs,
-      n.neighbors = n_neighbors
+      n.neighbors = n_neighbors,
+      verbose = verbose
     )
   }
 
