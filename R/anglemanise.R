@@ -151,7 +151,8 @@ anglemanise <- function(seurat_list, #nolint
 anglemanise_zscore  = function(
     seurat_list,
     zscore_mean_threshold = 2,
-    zscore_cv_threshold   = 2
+    zscore_cv_threshold   = 2,
+    weight = 1
 ){
 
     ### IMPORTANT - add ribosomal gene removal before the analysis
@@ -178,7 +179,10 @@ anglemanise_zscore  = function(
     lmat_zscore      = matrix_list_z_score(lmat_seu_ang, perm_mean_sds)
     
     message("calculate z-score stats ...")
-    l_zscore_mean_sd = matrix_list_z_score_mean_sd(lmat_zscore)
+    l_zscore_mean_sd = matrix_list_z_score_mean_sd(
+      lmat_zscore, 
+      weight = weight
+    )
 
     message("returning features ...")
     lout = list(

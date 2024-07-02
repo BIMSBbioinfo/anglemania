@@ -114,7 +114,10 @@ matrix_list_z_score = function(matrix_list, dstat) {
 #' @return A list containing the mean z-score, standard deviation of z-scores, and coefficient of variation of z-scores.
 #' @examples
 #' summary_stats = matrix_list_z_score_mean_sd(list_of_zscore_matrices)
-matrix_list_z_score_mean_sd = function(matrix_list_zscore) {
+matrix_list_z_score_mean_sd = function(
+    matrix_list_zscore, 
+    weight = 1
+) {
 
     message("remove lower tri ..")
     matrix_list_zscore = lapply(matrix_list_zscore, remove_lower_tri_mat)
@@ -125,19 +128,44 @@ matrix_list_z_score_mean_sd = function(matrix_list_zscore) {
         mat
     })
 
-    message("mean ..")
-    mat_mean_zscore = matrix_list_zscore[[1]]
-    for(i in 2:length(matrix_list_zscore)) {
-        mat_mean_zscore = mat_mean_zscore + matrix_list_zscore[[i]]
+    message("denominator ..")
+    if(length(weight) == 1){
+        denominator = 1/length(matrix_list_zscore)
+    }else{
+        if(is.null(names(weight)))
+            stop("weight needs to be a named vector")
+        
+        nams = unique(names(weight))
+        nvec = table(names(weight))[nams]
+        weight_vec = sapply(nams, function(x)unique(weight[x]))
+        denominator = 1/sum(weight_vec * nvec)
     }
-    mat_mean_zscore = mat_mean_zscore / length(matrix_list_zscore)
+
+    message("mean ..")
+    mat_mean_zscore = matrix_list_zscore[[1]]*weight[1]
+    for(i in 2:length(matrix_list_zscore)) {
+        
+        # Enables calcualtion of the weighted mean score for MEAN
+        curent_mean_weight = 1
+        if(length(weight) > 1)
+            curent_mean_weight = weight[i]
+
+        mat_mean_zscore = mat_mean_zscore + matrix_list_zscore[[i]]*curent_mean_weight
+    }
+    mat_mean_zscore = mat_mean_zscore * denominator
 
     message("sd ..")
-    mat_sds_zscore = (matrix_list_zscore[[1]] - mat_mean_zscore)^2
+    mat_sds_zscore = (matrix_list_zscore[[1]] - mat_mean_zscore)^2 * weight[1]
     for(i in 2:length(matrix_list_zscore)) {
-        mat_sds_zscore = mat_sds_zscore + (matrix_list_zscore[[i]] - mat_mean_zscore)^2
+
+        # Enables calcualtion of the weighted mean score for SDS
+        curent_sds_weight = 1
+        if(length(weight) > 1)
+            curent_sds_weight = weight[i]
+
+        mat_sds_zscore = mat_sds_zscore + ((matrix_list_zscore[[i]] - mat_mean_zscore)^2) * curent_sds_weight
     }
-    mat_sds_zscore = sqrt(mat_sds_zscore / (length(matrix_list_zscore) - 1))
+    mat_sds_zscore = sqrt(mat_sds_zscore * denominator)
 
     message("returning ..")
     return(list(
