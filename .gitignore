@@ -27,3 +27,4 @@ archive/
 bigstatsr*
 guix/
 .vscode/
+playground/

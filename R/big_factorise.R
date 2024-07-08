@@ -13,7 +13,6 @@
 #'
 #' @param x_mat Matrix. Contains normalised and scaled gene
 #'   expression.
-#' @param name character. The name of the dataset.
 #' @param fdr_threshold double. Fraction of the correlation
 #'   to be cut from both sides of an approximated angle
 #'   distribution.
@@ -23,9 +22,9 @@
 #'   with angles statistics and paths to the values of
 #'   critical mangles.
 #' @export big_factorise
-big_factorise <- function(x_mat, # nolint
-                          name) {
-    x_mat <- sparse_to_fbm(x_mat)
+big_factorise <- function(x_mat # nolint
+    ) {
+    # x_mat <- sparse_to_fbm(x_mat)
     # initialize empty FBM with same dimensions as x_mat to store permuted correlation matrix
     x_mat_perm <- bigstatsr::FBM(nrow = nrow(x_mat), ncol = ncol(x_mat))
     

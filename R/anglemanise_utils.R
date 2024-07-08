@@ -89,24 +89,31 @@ get_dstat <- function(corr_matrix) {
 #' @examples
 #' combined_matrix <- big_add_mat_list(list(fbm1, fbm2, fbm3))
 #' @importFrom bigstatsr FBM
-big_mat_list_mean <- function(fbmList) {
-    # TODO: add input validations
-    if (length(fbmList) <= 1) {
-        stop("input list is empty or only contains one FBM")
+big_mat_list_mean <- function(anglem_object) {
+    # TODO: add input validations 
+    if (class(anglem_object) != "anglem") {
+        stop("anglem_object needs to be a anglem object")
     }
-
     # Check if all matrices in the list have the same dimensions
-    if (!all(sapply(fbmList, function(x) identical(dim(fbmList[[1]]), dim(x))))) {
+    if (!all(sapply(matrix_list(anglem_object), function(x) identical(dim(matrix_list(anglem_object)[[1]]), dim(x))))) {
         stop("All matrices in the list have the same dimensions.")
     }
-    n_col <- ncol(fbmList[[1]])
-    n_row <- nrow(fbmList[[1]])
+
+    n_col <- ncol(matrix_list(anglem_object)[[1]])
+    n_row <- nrow(matrix_list(anglem_object)[[1]])
     mat_mean_zscore <- bigstatsr::FBM(n_row, n_col)
 
     bigstatsr::big_apply(mat_mean_zscore, a.FUN = function(X, ind) {
         X.sub <- X[, ind, drop = FALSE]
-        X.sub <- Reduce(function(x, y) x + y[, ind, drop = FALSE], fbmList, init = X.sub)
-        X[, ind] <- X.sub / length(fbmList)
+        wrap_mean <- function(final_mat, batch) {
+            batch_mat <- matrix_list(anglem_object)[[batch]][, ind, drop = FALSE] * anglem_object@weights[batch]
+            final_mat <- final_mat + batch_mat
+        }
+        #COMMENT: So currently I run this function in the reduce statement on the names of the weights vector
+        X.sub <- Reduce(wrap_mean, names(anglem_object@weights), init = X.sub)
+        X[, ind] <- X.sub # / length(matrix_list(anglem_object))
+        #COMMENT: 08/07/2024 now that the individual zscore matrices have been scaled by the weight, which is adjusted so that sum(weight)==1 we do not have to
+        #COMMENT: divide by the number of matrices 
         NULL
     }, a.combine = "c", block.size = 200)
 
@@ -144,30 +151,47 @@ big_mat_list_mean <- function(fbmList) {
 #' @seealso \code{\link[bigstatsr]{FBM}}, \code{\link[bigstatsr]{big_apply}}
 #'
 #' @export
-get_list_stats <- function(fbmList) {
-    if (length(fbmList) <= 1) {
-        stop("input list is empty or only contains one FBM")
+get_list_stats <- function(anglem_object) {
+    # TODO: change for anglem object    
+    if (class(anglem_object) != "anglem") {
+        stop("anglem_object needs to be a anglem object")
     }
     # Check if all matrices in the list have the same dimensions
-    if (!all(sapply(fbmList, function(x) identical(dim(fbmList[[1]]), dim(x))))) {
-        stop("All matrices in the list have the same dimensions.")
+    if (!all(sapply(matrix_list(anglem_object), function(x) identical(dim(matrix_list(anglem_object)[[1]]), dim(x))))) {
+        stop("All matrices in the list need to have the same dimensions.")
     }
+    message("Weighting matrix_list...")
+    # Weight all matrices
+    # tmp_names <- names(anglem_object@weights)
+    # matrix_list(anglem_object) <- pbapply::pblapply(tmp_names, function(batch_name) {
+    #     print(batch_name)
+    #     bigstatsr::big_apply(matrix_list(anglem_object)[[batch_name]], function(X, ind) {
+    #         X[, ind] <- X[, ind] * anglem_object@weights[batch_name]
+    #         NULL
+    #     }, a.combine = "c", block.size = 200)
+    #     return(matrix_list(anglem_object)[[batch_name]])
+    # })
+    # names(matrix_list) <- tmp_names
     message("Calculating mean...")
-    mat_mean_zscore <- big_mat_list_mean(fbmList)
-
-    n_col <- ncol(fbmList[[1]])
-    n_row <- nrow(fbmList[[1]])
+    mat_mean_zscore <- big_mat_list_mean(anglem_object)
+    
+    n_col <- ncol(matrix_list(anglem_object)[[1]])
+    n_row <- nrow(matrix_list(anglem_object)[[1]])
     mat_sds_zscore <- bigstatsr::FBM(n_row, n_col)
 
 
     message("Calculating sds...")
+    # TODO: add weighting
     bigstatsr::big_apply(mat_sds_zscore, a.FUN = function(X, ind) {
-        wrap_sds <- function(x, y) {
-            x <- x + (y[, ind, drop = FALSE] - mat_mean_zscore[, ind, drop = FALSE])^2
+        wrap_sds <- function(final_mat, batch) {
+            batch_mat <- matrix_list(anglem_object)[[batch]]
+            final_mat <- final_mat + (batch_mat[, ind, drop = FALSE] - mat_mean_zscore[, ind, drop = FALSE])^2 * anglem_object@weights[batch]
         }
         X.sub <- X[, ind, drop = FALSE]
-        X.sub <- Reduce(wrap_sds, fbmList, init = X.sub)
-        X[, ind] <- sqrt(X.sub / (length(fbmList) - 1))
+        X.sub <- Reduce(wrap_sds, names(anglem_object@weights), init = X.sub)
+        X[, ind] <- sqrt(X.sub) # / length(matrix_list(anglem_object))
+        #COMMENT: 08/07/2024 now that the individual zscore matrices have been scaled by the weight, which is adjusted so that sum(weight)==1 we do not have to
+        #COMMENT: divide by the number of matrices
         NULL
     }, a.combine = "c", block.size = 200)
 
@@ -187,7 +211,6 @@ get_list_stats <- function(fbmList) {
     return(res)
 }
 
-
 # --------------------------------------------------------------------------------------------- #
 extract_rows_for_unique_genes <- function(dt, max_n_genes) {
     unique_genes <- numeric()
@@ -206,26 +229,62 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 }
 
 select_genes <- function(
-    lout,
+    anglem_object,
     zscore_mean_threshold = 2,
     zscore_sn_threshold = 2,
-    max_n_genes = 2000,
-    intersect_genes) {
+    max_n_genes = 2000) {
+
+    if (class(anglem_object) != "anglem") {
+        stop("anglem_object needs to be a anglem object")
+    }
+
     gene_ind <- which(
-        upper.tri(lout$list_stats$sn_zscore) & 
-        (lout$list_stats$sn_zscore >= zscore_sn_threshold) &
-        (lout$list_stats$mean_zscore >= zscore_mean_threshold),
+        upper.tri(list_stats(anglem_object)$sn_zscore) & 
+        (list_stats(anglem_object)$sn_zscore >= zscore_sn_threshold) & # signal-to-noise ratio is above 0 anyways, no need to use absolute
+        (abs(list_stats(anglem_object)$mean_zscore) >= zscore_mean_threshold), # for mean zscore, use absolute value
         arr.ind = TRUE
     )
-    top_n <- data.table::data.table(
+
+    #COMMENT: 08/07/2024 current approach:
+    # If no genes passed the cutoff, increase the threshold
+    if (nrow(gene_ind) == 0) {
+        message("No genes passed the cutoff.")
+        quantile90mean <- quantile(abs(list_stats(anglem_object)$mean_zscore), 0.95, na.rm = TRUE)
+        quantile90sn <- quantile(list_stats(anglem_object)$sn_zscore, 0.95, na.rm = TRUE)
+        if (quantile90mean < zscore_mean_threshold) {
+            zscore_mean_threshold <- quantile90mean
+            message(paste0("zscore_mean_threshold is lower than the 95% quantile of the absolute mean zscores. Setting the zscore_mean_threshold to:\t", zscore_mean_threshold))
+        }
+        if (quantile90sn < zscore_sn_threshold) {
+            zscore_sn_threshold <- quantile90sn
+            message(paste0("zscore_sn_threshold is higher than 95% quantile. Setting the zscore_sn_threshold to:\t", round(zscore_sn_threshold, 2)))
+        }
+        print(paste0("zscore_mean_threshold:", zscore_mean_threshold, " zscore_sn_threshold:", round(zscore_sn_threshold, 2)))
+
+        # Re-run the selection
+        gene_ind <- which(
+            upper.tri(list_stats(anglem_object)$sn_zscore) & 
+            (list_stats(anglem_object)$sn_zscore >= zscore_sn_threshold) & # signal-to-noise ratio is above 0 anyways, no need to use absolute
+            (abs(list_stats(anglem_object)$mean_zscore) >= zscore_mean_threshold), # for mean zscore, use absolute value
+            arr.ind = TRUE
+        )
+
+        message("If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: anglem_object <- select_genes(anglem_object, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)")
+        message("Please inspect integration_genes(anglem_object)$info for info on the scores of the selected gene pairs.")
+    }
+
+    top_n <- data.frame(
         geneA = gene_ind[, 1],
         geneB = gene_ind[, 2],
-        zscore = lout$list_stats$mean_zscore[gene_ind]
+        zscore = list_stats(anglem_object)$mean_zscore[gene_ind],
+        snscore = list_stats(anglem_object)$sn_zscore[gene_ind]
     )
-    data.table::setorder(top_n, -"zscore")
-    
-    top_n <- extract_rows_for_unique_genes(top_n, max_n_genes)
 
-    lout$gene_names <- intersect_genes[top_n]
-    return(lout)
+
+    #order df
+    top_n <- top_n[order(top_n$zscore, decreasing = TRUE), ]
+    anglem_object@integration_genes$info <- top_n
+    top_n <- extract_rows_for_unique_genes(top_n, max_n_genes)
+    anglem_object@integration_genes$genes <- intersect_genes(anglem_object)[top_n]
+    return(anglem_object)
 }
