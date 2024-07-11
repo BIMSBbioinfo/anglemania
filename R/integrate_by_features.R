@@ -5,7 +5,8 @@
 #' by VF.
 #'
 #' @import Seurat
-#' @param seurat_list seurat list.
+#' @param seurat_object seurat object containing all samples/batches.
+#' @param anglem_object anglem object. Previously generated using create_anglem() and big_anglemanise(). Important to set the right dataset_key and batch_key!
 #' @param features_to_integrate character vector. Vector of gene names
 #'   (features) to construct anchors from.
 #' @param int_order data.frame. Table specifying the integration order
@@ -17,16 +18,23 @@
 #' @return seurat object. Integrated seurat object. Seurat::DefaultAssay
 #' is set to "integrated".
 #' @export integrate_by_features
-integrate_by_features <- function(seurat_list,
-                                  features_to_integrate,
+integrate_by_features <- function(seurat_object,
+                                  anglem_object,
                                   int_order = NULL,
-                                  process = TRUE,
+                                  process = TRUE, # should scaling, PCA, and UMAP already be performed on the integrated data?
                                   verbose = FALSE) {
-  smallest_DS <- min(sapply(seurat_list, function(x) ncol(x)))
+
+  dataset_key <- anglem_object@dataset_key
+  batch_key <- anglem_object@batch_key
+  seurat_object <- add_unique_batch_key(seurat_object, dataset_key, batch_key) # temporarily adds unique batch key "batch" to metadata of the seurat object
+  seurat_list <- Seurat::SplitObject(seurat_object, split.by = "batch") # split by batch
+
+  smallest_DS <- min(sapply(seurat_list, function(x) ncol(x))) # When working with SEACells/metacells, the number of cells can be really low. Adjust the following algorithm parameters accordingly.
   n <- ifelse(smallest_DS <= 10, smallest_DS - 1, 10)
-  anchors <- Seurat::FindIntegrationAnchors(
+  message("Finding integration anchors...")
+  anchors <- Seurat::FindIntegrationAnchors( # COMMENT: don't worry about normalizing and scaling, the function does log normalization and scaling by default! https://satijalab.org/seurat/reference/findintegrationanchors
     object.list = seurat_list,
-    anchor.features = features_to_integrate,
+    anchor.features = extract_integration_genes(anglem_object),
     verbose = verbose,
     dims = 1:n,
     k.filter = n,
@@ -35,7 +43,8 @@ integrate_by_features <- function(seurat_list,
     reduction = "cca"
   )
 
-  seurat_combined <- Seurat::IntegrateData(
+  message("Integrating samples...")
+  seurat_combined <- Seurat::IntegrateData( # automatically performs log normalization BUT NOT SCALING
     anchorset = anchors,
     dims = 1:n,
     k.weight = n,
