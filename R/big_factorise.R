@@ -22,15 +22,16 @@
 #'   with angles statistics and paths to the values of
 #'   critical mangles.
 #' @export big_factorise
-big_factorise <- function(x_mat # nolint
+big_factorise <- function(x_mat,
+                          seed = 1 # nolint
     ) {
     # x_mat <- sparse_to_fbm(x_mat)
     # initialize empty FBM with same dimensions as x_mat to store permuted correlation matrix
     x_mat_perm <- bigstatsr::FBM(nrow = nrow(x_mat), ncol = ncol(x_mat))
     
     # permute matrix
+    set.seed(seed)
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
-        set.seed(1)
         X.sub <- X[, ind, drop = FALSE]
         X.sub <- apply(X.sub, 2, sample)
         x_mat_perm[, ind] <- X.sub

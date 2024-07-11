@@ -29,14 +29,15 @@ sparse_to_fbm <- function(s_mat) {
 #' @return A new Seurat object with permuted count data.
 #' @examples
 #' seu_permuted = permute_counts(seu, which = "columns")
-permute_counts <- function(X.sub, which = "columns", seed=1) {
-    set.seed(seed)
-    if (which == "columns") {
-        X.sub <- apply(X.sub, 2, sample)
-    } else if (which == "rows") {
-        X.sub <- t(apply(X.sub, 1, sample))
-    }
-}
+# NOTE: this function is not used in the package currently 09/07/2024
+# permute_counts <- function(X.sub, which = "columns", seed=1) {
+#     set.seed(seed)
+#     if (which == "columns") {
+#         X.sub <- apply(X.sub, 2, sample)
+#     } else if (which == "rows") {
+#         X.sub <- t(apply(X.sub, 1, sample))
+#     }
+# }
 
 # --------------------------------------------------------------------------------------------- #
 #' Compute mean and standard deviation of the correlation matrix
@@ -213,18 +214,8 @@ get_list_stats <- function(anglem_object) {
 
 # --------------------------------------------------------------------------------------------- #
 extract_rows_for_unique_genes <- function(dt, max_n_genes) {
-    unique_genes <- numeric()
-    for (i in 1:nrow(dt)) {
-        # Add new unique genes from both columns of the current row
-        current_genes <- c(dt$geneA[i], dt$geneB[i])
-        unique_genes <- unique(c(unique_genes, current_genes))
-
-        # Stop if we have accumulated max_n_genes or more unique genes
-        if (length(unique_genes) >= max_n_genes) {
-            break
-        }
-    }
-    unique_genes <- sort(unique_genes)
+    unique_genes <- unique(as.vector(rbind(dt$geneA, dt$geneB)))
+    unique_genes <- unique_genes[1:ifelse(max_n_genes > length(unique_genes), length(unique_genes), max_n_genes)]
     return(unique_genes)
 }
 

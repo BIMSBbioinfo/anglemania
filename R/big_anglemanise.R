@@ -68,7 +68,8 @@ big_anglemanise <- function(anglem_object, # nolint
     )
     message("Computing correlations and transforming to z-scores...")
     matrix_list(anglem_object) <- pbapply::pblapply(matrix_list(anglem_object), function(x) {
-        x <- big_factorise(x_mat = x)
+        x <- big_factorise(x_mat = x,
+                           seed = 1)
     }, cl = n_cores)
     
     message("Computing statistics...")
