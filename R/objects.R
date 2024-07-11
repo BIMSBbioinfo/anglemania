@@ -23,13 +23,13 @@ setClass(
 
     prototype = list(
         matrix_list = list(),
-        dataset_key = NA_character_,
+        dataset_key = NULL,
         batch_key = NA_character_,
         data_info = data.frame(),
         weights = NA_real_,
         list_stats = list(),
         intersect_genes = NA_character_,
-        min_cells_per_gene = 10,
+        min_cells_per_gene = 1,
         integration_genes = list(info = "data.frame", genes = "character")
     )
 )
@@ -41,8 +41,8 @@ setMethod("show", "anglem", function(object) {
     cat("--------------\n")
     cat("Dataset key:", object@dataset_key, "\n")
     cat("Batch key:", object@batch_key, "\n")
-    cat("Number of datasets:", nrow(unique(object@data_info[, object@dataset_key])), "\n")
-    cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
+    cat("Number of datasets:", ifelse(is.na(object@dataset_key), 1, nrow(unique(object@data_info[, object@dataset_key]))), "\n")
+    if(!is.na(object@dataset_key)) cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
     cat("Total number of batches:", nrow(object@data_info), "\n")
     cat("Batches (showing first 5):\n")
     if (nrow(object@data_info) > 5) {
@@ -136,9 +136,36 @@ setMethod("extract_integration_genes", "anglem", function(object){
 
 
 # -------------------------------------------------------------------------------- #
+#' Add a unique batch key to the metadata of a seurat object
+#' 
+#' @param seurat_object A Seurat object
+#' @param dataset_key A column name in the metadata of the Seurat object
+#' @param batch_key A column name in the metadata of the Seurat object
+#' @return A Seurat object with a unique batch key
+#' @export add_unique_batch_key
+#' @examples
+#' add_unique_batch_key(seurat_object, dataset_key = "dataset", batch_key = "batch")
+add_unique_batch_key <- function(seurat_object, dataset_key = NULL, batch_key, new_unique_batch_key = "batch") {
+
+    if (!is.null(dataset_key)) {
+                meta <- seurat_object[[]] %>%
+                    tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE) %>%
+                    tidyr::unite("batch", all_of(c(dataset_key, "batch")), sep = ":", remove = FALSE)
+            } else {
+                meta <- seurat_object[[]] %>%
+                    tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE)
+            }
+    seurat_object[[]] <- meta
+
+    return(seurat_object)
+}
+
+# -------------------------------------------------------------------------------- #
+
 #' Create an Anglem Object from a Seurat Object
 #' 
 #' This function constructs an `anglem` object from a given Seurat object, which includes the extraction and processing of count matrices, filtering of genes based on expression in a minimum number of cells, and storing the results along with dataset and batch information.
+#' It also adds weights for each dataset based on the number of batches in each dataset. If n(dataset) == 1, then the weight is 1/n(batches) for each batch.
 #' 
 #' @param seurat_object A Seurat object containing single-cell RNA-seq data.
 #' @param dataset_key A character vector of length 1 indicating the column name in the Seurat object meta data that identifies the dataset to which each cell belongs. If NULL, all cells are assumed to belong to the same dataset.
@@ -172,9 +199,9 @@ setMethod("extract_integration_genes", "anglem", function(object){
 # constructor for anglem class
 create_anglem <- function(
     seurat_object,
-    dataset_key = NA_character_,
+    dataset_key = NULL,
     batch_key,
-    min_cells_per_gene = 10
+    min_cells_per_gene = 1
     ){
         # validate inputs
         if (class(seurat_object) != "Seurat") {
@@ -200,18 +227,9 @@ create_anglem <- function(
         }
 
         # create column in meta data that combines dataset_key and batch_key for each cell so that you can split the Seurat Object by this column
-        if (!is.null(dataset_key)) {
-            meta <- seurat_object[[]] %>%
-                tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE) %>%
-                tidyr::unite("batch", all_of(c(dataset_key, "batch")), sep = ":", remove = FALSE)
-        } else {
-            meta <- seurat_object[[]] %>%
-                tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE)
-        }
+        seurat_object <- add_unique_batch_key(seurat_object, dataset_key, batch_key)
 
-        seurat_object[[]] <- meta
-
-
+        meta <- seurat_object[[]]
         message("Extracting count matrices...") 
         matrix_list <- Seurat::SplitObject(seurat_object, split.by = "batch")
         names(matrix_list) <- unique(meta$batch)
@@ -231,7 +249,7 @@ create_anglem <- function(
             names(weights) <- data_info$batch
         } else { # if there is only one dataset, then weight is 1 ==> no need to adjust. 
             data_info <- meta %>%
-                dplyr::select(batch, all_of(, batch_key)) %>%
+                dplyr::select(batch, all_of(batch_key)) %>%
                 dplyr::distinct() %>%
                 dplyr::mutate(weight = 1/nrow(.)) 
 
@@ -242,7 +260,7 @@ create_anglem <- function(
         anglem_object <- new(
             "anglem",
             matrix_list = matrix_list, # matrix_list: A list of sparse matrices, one for each batch.
-            dataset_key = dataset_key, # dataset_key: The key used to denote the dataset.
+            dataset_key = ifelse(is.null(dataset_key), NA_character_, dataset_key), # dataset_key: The key used to denote the dataset.
             batch_key = batch_key, # batch_key: The key used to denote the batch.
             data_info = data_info, # data_info: A data frame summarizing the number of samples per dataset and their weights.
             weights = weights, # weights: A numeric vector of weights for each dataset based on the number of samples. By default, the weights are adjusted to the size of the dataset_key if provided. Otherwise each batch has the same weight.
@@ -264,7 +282,7 @@ create_anglem <- function(
         matrix_list(anglem_object) <- pbapply::pblapply(matrix_list(anglem_object), function(x){
             x <- x[intersect_genes(anglem_object), ]
             x <- sparse_to_fbm(x) # convert sparse matrix into FBM. This function is part of anglemania and is described in anglemanise-utils.R
-        }, cl = bigstatsr::nb_cores()) # COMMENT: currently using all cores - 1 by default! (see nb_cores from bigstatsr package)
+        }, cl = 4) # COMMENT: add cores parameter??
 
         return(anglem_object)
 }
