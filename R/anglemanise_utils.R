@@ -15,7 +15,7 @@ sparse_to_fbm <- function(s_mat) {
     big_apply(X, a.FUN = function(X, ind) {
         X[, ind] <- s_mat[, ind] %>% as.matrix()
         NULL
-    }, a.combine = "c", block.size = 200)
+    }, a.combine = "c", block.size = 1000)
 
     return(X)
 }
@@ -59,16 +59,16 @@ get_dstat <- function(corr_matrix) {
     n <- bigstatsr::big_apply(corr_matrix,
         a.FUN = function(X, ind) {
             sum(!is.na(X[, ind, drop = FALSE])) # this works because TRUE = 1 and FALSE = 0 in R
-        }, a.combine = "sum", block.size = 200
+        }, a.combine = "sum", block.size = 1000
     )
 
     mean <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
         sum(X[, ind, drop = FALSE], na.rm = TRUE)
-    }, a.combine = "sum", block.size = 200) / n
+    }, a.combine = "sum", block.size = 1000) / n
 
     sd <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
         sum((X[, ind, drop = FALSE] - mean)^2, na.rm = TRUE) / (n - 1)
-    }, a.combine = "sum", block.size = 200) %>% sqrt()
+    }, a.combine = "sum", block.size = 1000) %>% sqrt()
 
     dstat <- list(
         mean = mean,
@@ -116,7 +116,7 @@ big_mat_list_mean <- function(anglem_object) {
         #COMMENT: 08/07/2024 now that the individual zscore matrices have been scaled by the weight, which is adjusted so that sum(weight)==1 we do not have to
         #COMMENT: divide by the number of matrices 
         NULL
-    }, a.combine = "c", block.size = 200)
+    }, a.combine = "c", block.size = 1000)
 
     return(mat_mean_zscore)
 }
@@ -169,7 +169,7 @@ get_list_stats <- function(anglem_object) {
     #     bigstatsr::big_apply(matrix_list(anglem_object)[[batch_name]], function(X, ind) {
     #         X[, ind] <- X[, ind] * anglem_object@weights[batch_name]
     #         NULL
-    #     }, a.combine = "c", block.size = 200)
+    #     }, a.combine = "c", block.size = 1000)
     #     return(matrix_list(anglem_object)[[batch_name]])
     # })
     # names(matrix_list) <- tmp_names
@@ -194,7 +194,7 @@ get_list_stats <- function(anglem_object) {
         #COMMENT: 08/07/2024 now that the individual zscore matrices have been scaled by the weight, which is adjusted so that sum(weight)==1 we do not have to
         #COMMENT: divide by the number of matrices
         NULL
-    }, a.combine = "c", block.size = 200)
+    }, a.combine = "c", block.size = 1000)
 
     mat_sn_zscore <- bigstatsr::FBM(n_row, n_col)
     diag(mat_sds_zscore) <- NA # to avoid dividing by zero ==> diagonal is 0 cause of perfect correlation ofc
@@ -202,7 +202,7 @@ get_list_stats <- function(anglem_object) {
     bigstatsr::big_apply(mat_sn_zscore, a.FUN = function(X, ind) {
         X[, ind] <- abs(mat_mean_zscore[, ind, drop = FALSE]) / mat_sds_zscore[, ind, drop = FALSE]
         NULL
-    }, a.combine = "c", block.size = 200)
+    }, a.combine = "c", block.size = 1000)
     res <- list(
         mean_zscore = mat_mean_zscore[],
         sds_zscore = mat_sds_zscore[],

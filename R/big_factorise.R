@@ -36,7 +36,7 @@ big_factorise <- function(x_mat,
         X.sub <- apply(X.sub, 2, sample)
         x_mat_perm[, ind] <- X.sub
         NULL
-    }, a.combine = "c", block.size = 200)
+    }, a.combine = "c", block.size = 1000)
 
     # compute correlation matrix for both original and permuted matrix
     x_mat_corr <- big_extract_corr(x_mat)
@@ -49,7 +49,7 @@ big_factorise <- function(x_mat,
     # transform original correlation matrix into zscores
     bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
         X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean) / dstat$sd
-    }, a.combine = "c", block.size = 200)
+    }, a.combine = "c", block.size = 1000)
 
     return(x_mat_corr)
 }

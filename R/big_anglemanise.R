@@ -70,7 +70,7 @@ big_anglemanise <- function(anglem_object, # nolint
     matrix_list(anglem_object) <- pbapply::pblapply(matrix_list(anglem_object), function(x) {
         x <- big_factorise(x_mat = x,
                            seed = 1)
-    }, cl = n_cores)
+    })
     
     message("Computing statistics...")
     list_stats(anglem_object) <- get_list_stats(anglem_object)

@@ -43,7 +43,7 @@ setMethod("show", "anglem", function(object) {
     cat("Batch key:", object@batch_key, "\n")
     cat("Number of datasets:", ifelse(is.na(object@dataset_key), 1, nrow(unique(object@data_info[, object@dataset_key]))), "\n")
     if(!is.na(object@dataset_key)) cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
-    cat("Total number of batches:", nrow(object@data_info), "\n")
+    cat("Total number of batches:", nrow(object@data_info), "\n") #FIXME: check if there are actually more than 1 batch...
     cat("Batches (showing first 5):\n")
     if (nrow(object@data_info) > 5) {
         cat(paste(object@data_info[1:5, "batch"], collapse = ", "), ", ...\n")
@@ -147,7 +147,7 @@ setMethod("extract_integration_genes", "anglem", function(object){
 #' add_unique_batch_key(seurat_object, dataset_key = "dataset", batch_key = "batch")
 add_unique_batch_key <- function(seurat_object, dataset_key = NULL, batch_key, new_unique_batch_key = "batch") {
 
-    if (!is.null(dataset_key)) {
+    if (!is.null(dataset_key) && !is.na(dataset_key)) {
                 meta <- seurat_object[[]] %>%
                     tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE) %>%
                     tidyr::unite("batch", all_of(c(dataset_key, "batch")), sep = ":", remove = FALSE)
