@@ -16,6 +16,8 @@
 #' @param fdr_threshold double. Fraction of the correlation
 #'   to be cut from both sides of an approximated angle
 #'   distribution.
+#' @param method character. Method to be used for calculating the relationship of a gene pair. 
+#'   Default is pearson correlation. Other options are 'pearson', 'spearman' and 'diem' (https://bytez.com/docs/arxiv/2407.08623/paper)
 #' @return list. First two elements are sparse matrices
 #'   containing the significant sharp and blunt angles
 #'   between genes. Third and fourth elements are lists
@@ -23,6 +25,7 @@
 #'   critical mangles.
 #' @export big_factorise
 big_factorise <- function(x_mat,
+                          method = "pearson",
                           seed = 1 # nolint
     ) {
     # x_mat <- sparse_to_fbm(x_mat)
@@ -39,12 +42,35 @@ big_factorise <- function(x_mat,
     }, a.combine = "c", block.size = 1000)
 
     # compute correlation matrix for both original and permuted matrix
-    x_mat_corr <- big_extract_corr(x_mat)
-    x_mat_perm_corr <- big_extract_corr(x_mat_perm)
+    x_mat_corr <- big_extract_corr(x_mat, method = method)
+    x_mat_perm_corr <- big_extract_corr(x_mat_perm, method = method)
+    
+    if (method == "diem"){
+        bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
+            # 1. calculate euclidean distance from pearson correlation. Is simple!:
+            # dij = sqrt(2*(1-rij))
+            X.sub <- X[, ind, drop = FALSE]
+            X.sub <- sqrt(2*(1-X.sub))
+            x_mat_corr[, ind] <- X.sub
+            NULL
+        }, a.combine = "c", block.size = 1000)
 
-    # get the mean and standard deviation of the permuted correlation matrix 
-    # will be used to transform the original correlation matrix into zscores
-    dstat <- get_dstat(x_mat_perm_corr)
+        dstat <- get_dstat(x_mat_corr)
+
+        scale_factor <- (dstat$min-dstat$max)/dstat$var
+        bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
+            # 2. calculate DIEM by subtracting the mean and scale by (Vmax-Vmin)/variance
+            X.sub <- X[, ind, drop = FALSE]            
+            X.sub <- scale_factor * (X.sub - dstat$mean)
+            NULL
+        }, a.combine = "c", block.size = 1000)
+
+    } else { 
+        dstat <- get_dstat(x_mat_perm_corr) 
+        }
+        # get the mean, variance, and standard deviation of the permuted correlation matrix 
+        # will be used to transform the original correlation matrix into zscores
+
 
     # transform original correlation matrix into zscores
     bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {

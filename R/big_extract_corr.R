@@ -4,16 +4,16 @@
 #' 
 #' @param x_mat matrix. Contains normalised and scaled gene
 #'   expression, where rows are genes and columns are samples.
-#' @param gene_names vector. A character vector specifying the gene_names of the dataset
-#' for Seurat object this would be the rownames of the Seurat object (rownames(se)) 
-#' ==> when using big_factorise, those are already extracted
-#' Specified before in \code{\link{big_factorise}}.
+#' @param method character. Method to be used for calculating the relationship of a gene pair.
+#'   Default is pearson correlation. Other options are 'pearson' and 'spearman' (or 'diem') but 
+#'      the code only changes for spearman.
 #' @return FBM (bigstatsr file-backed matrix). Square matrix containing correlations between
 #' vectors of gene expression (rwos of the input matrix).
 #' @export big_extract_corr
 big_extract_corr <- function(
-    x_mat) {
-
+    x_mat,
+    method = "pearson") {
+        
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
         X.sub <- X[, ind, drop = FALSE]
         # normalize the data:
@@ -30,6 +30,15 @@ big_extract_corr <- function(
     # first transpose the matrix because big_cor calculates the covariance (XT*X)
     x_mat <- bigstatsr::big_transpose(x_mat)
 
+    # transform to ranks if method is spearman
+    if (method == "spearman"){
+        big_apply(x_mat, a.FUN = function(X, ind) {
+            X.sub <- X[, ind, drop = FALSE]
+            X.sub <- apply(X.sub, 2, rank)
+            x_mat[, ind] <- X.sub
+            NULL
+        })
+    }
     x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
     # the big_cor function from bigstatsr basically scales and centers the count matrix and calculates the covariance (cross product XT*X)
     diag(x_mat) <- NA

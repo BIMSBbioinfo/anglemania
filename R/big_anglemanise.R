@@ -25,8 +25,8 @@
 #' @param anglem_object seurat object. The Seurat object should be a combined seurat object of all the datasets and samples.
 #' @param fdr_threshold double. The FDR threshold to apply
 #'   to the q-values. Defaults to 0.001.
-#' @param n_cores integer. Number of cores to use for
-#'   the computation of the cosine distances.
+#' @param method character. Method to be used for calculating the relationship of a gene pair. 
+#'   Default is pearson correlation. Other options are 'pearson' and 'diem' (https://bytez.com/docs/arxiv/2407.08623/paper)
 #' @return list. First two elements are sparse matrices
 #'   recording the number of sharp and blunt angles across
 #'   the datasets. Third and fourth elements are lists with
@@ -35,10 +35,10 @@
 #' @seealso https://arxiv.org/abs/1306.0256
 #' @export big_anglemanise
 big_anglemanise <- function(anglem_object, # nolint
+                            method = "pearson",
                             zscore_mean_threshold = 2,
                             zscore_sn_threshold  = 2,
-                            max_n_genes = 2000,
-                            n_cores = 3) {
+                            max_n_genes = 2000) {
     ############## Validate inputs ###########################
 
     if (class(anglem_object) != "anglem") {
@@ -53,11 +53,8 @@ big_anglemanise <- function(anglem_object, # nolint
     if (!is.numeric(zscore_sn_threshold) || zscore_sn_threshold < 0) {
         stop("zscore_sn_threshold has to be a non-negative number")
     }
-    if (!is.numeric(max_n_genes) || max_n_genes < 1) {
+    if (!is.null(max_n_genes) & (!is.numeric(max_n_genes) || max_n_genes < 1)) {
         stop("max_n_genes has to be a positive integer")
-    }
-    if (!is.numeric(n_cores) || n_cores < 1) {
-        stop("n_cores has to be a positive integer")
     }
     ############## Process inputs ###########################
     pbapply::pboptions(
@@ -69,6 +66,7 @@ big_anglemanise <- function(anglem_object, # nolint
     message("Computing correlations and transforming to z-scores...")
     matrix_list(anglem_object) <- pbapply::pblapply(matrix_list(anglem_object), function(x) {
         x <- big_factorise(x_mat = x,
+                           method = method,
                            seed = 1)
     })
     

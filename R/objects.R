@@ -42,7 +42,7 @@ setMethod("show", "anglem", function(object) {
     cat("Dataset key:", object@dataset_key, "\n")
     cat("Batch key:", object@batch_key, "\n")
     cat("Number of datasets:", ifelse(is.na(object@dataset_key), 1, nrow(unique(object@data_info[, object@dataset_key]))), "\n")
-    if(!is.na(object@dataset_key)) cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
+    if(!is.null(object@dataset_key)) cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
     cat("Total number of batches:", nrow(object@data_info), "\n") #FIXME: check if there are actually more than 1 batch...
     cat("Batches (showing first 5):\n")
     if (nrow(object@data_info) > 5) {
@@ -144,7 +144,7 @@ setMethod("extract_integration_genes", "anglem", function(object){
 #' @return A Seurat object with a unique batch key
 #' @export add_unique_batch_key
 #' @examples
-#' add_unique_batch_key(seurat_object, dataset_key = "dataset", batch_key = "batch")
+#' seurat_object <- add_unique_batch_key(seurat_object, dataset_key = "dataset", batch_key = "batch")
 add_unique_batch_key <- function(seurat_object, dataset_key = NULL, batch_key, new_unique_batch_key = "batch") {
 
     if (!is.null(dataset_key) && !is.na(dataset_key)) {
@@ -155,7 +155,7 @@ add_unique_batch_key <- function(seurat_object, dataset_key = NULL, batch_key, n
                 meta <- seurat_object[[]] %>%
                     tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE)
             }
-    seurat_object[[]] <- meta
+    seurat_object[[]] <- meta # FIXME: not sure if you can actually assign the meta data to a seurat object like this...
 
     return(seurat_object)
 }
@@ -230,12 +230,33 @@ create_anglem <- function(
         seurat_object <- add_unique_batch_key(seurat_object, dataset_key, batch_key)
 
         meta <- seurat_object[[]]
+
+        # get the barcodes corresponding to each batch
+        matrix_list <- split(rownames(meta), meta$batch)
+
+        # extract counts for each batch
         message("Extracting count matrices...") 
-        matrix_list <- Seurat::SplitObject(seurat_object, split.by = "batch")
-        names(matrix_list) <- unique(meta$batch)
-        matrix_list <- lapply(matrix_list, function(x) {
-            x <- SeuratObject::LayerData(x, layer = "counts", assay = "RNA") # GetAssayData or LayerData from SeuratObject?
-                })
+        message("Filtering each batch to at least ", min_cells_per_gene, " cells per gene...")
+        matrix_list <- lapply(matrix_list, function(cell_barcodes){
+            counts_matrix <- SeuratObject::LayerData(seurat_object, cells = cell_barcodes, layer = "counts", assay = "RNA")
+            filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
+            filt_features <- names(filt_features[filt_features])
+            counts_matrix <- counts_matrix[filt_features, ]
+            return(counts_matrix)
+            })
+
+        # reduce to intersection of genes between batches
+        message("Using the intersection of filtered genes from all batches...")
+        intersect_genes <- Reduce(intersect, lapply(matrix_list, function(x){
+            rownames(x)
+        }))
+        message("Number of genes in intersected set: ", length(intersect_genes))
+
+        matrix_list <- pbapply::pblapply(matrix_list, function(x){
+            x <- x[intersect_genes, ]                    # use the intersection of expressed genes between the batches
+            x <- sparse_to_fbm(x) # convert sparse matrix into FBM. This function is part of anglemania and is described in anglemanise-utils.R
+        }, cl = bigstatsr::nb_cores()) # COMMENT: add cores parameter??
+
 
         if (!is.null(dataset_key)) {
             data_info <- meta %>%
@@ -243,7 +264,7 @@ create_anglem <- function(
                 dplyr::distinct() %>%
                 dplyr::group_by(across(all_of(dataset_key))) %>%
                 dplyr::add_count(across(all_of(dataset_key)), name = "n_samples") %>%
-                dplyr::mutate(weight = 1/n_samples/n_groups(.)) # equal weight for each sample of a dataset. ==> sum(weight) = 1
+                dplyr::mutate(weight = 1/n_samples/dplyr::n_groups(.)) # equal weight for each sample of a dataset. ==> sum(weight) = 1
 
             weights <- data_info$weight
             names(weights) <- data_info$batch
@@ -264,25 +285,10 @@ create_anglem <- function(
             batch_key = batch_key, # batch_key: The key used to denote the batch.
             data_info = data_info, # data_info: A data frame summarizing the number of samples per dataset and their weights.
             weights = weights, # weights: A numeric vector of weights for each dataset based on the number of samples. By default, the weights are adjusted to the size of the dataset_key if provided. Otherwise each batch has the same weight.
-            min_cells_per_gene = min_cells_per_gene # min_cells_per_gene: The minimum number of cells per gene threshold used for filtering.
+            min_cells_per_gene = min_cells_per_gene, # min_cells_per_gene: The minimum number of cells per gene threshold used for filtering.
+            intersect_genes = intersect_genes
         )
 
-        message("Filtering each batch to at least ", min_cells_per_gene, " cells per gene...")
-        intersect_genes(anglem_object) <- Reduce(intersect, lapply(matrix_list(anglem_object), function(x){
-            # indicate which features are expressed 
-            # then only keep the genes that are expressed in at least min_cells_per_gene cells
-            filt_features <- Matrix::rowSums(x > 0) >= anglem_object@min_cells_per_gene  
-
-            names(filt_features[filt_features])
-        }))
-
-        message("Using the intersection of filtered genes from all batches...")
-        message("Number of genes in intersected set: ", length(intersect_genes(anglem_object)))
-
-        matrix_list(anglem_object) <- pbapply::pblapply(matrix_list(anglem_object), function(x){
-            x <- x[intersect_genes(anglem_object), ]
-            x <- sparse_to_fbm(x) # convert sparse matrix into FBM. This function is part of anglemania and is described in anglemanise-utils.R
-        }, cl = 4) # COMMENT: add cores parameter??
 
         return(anglem_object)
 }

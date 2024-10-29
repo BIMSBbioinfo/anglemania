@@ -12,7 +12,7 @@ sparse_to_fbm <- function(s_mat) {
     n <- nrow(s_mat)
     p <- ncol(s_mat)
     X <- bigstatsr::FBM(n, p)
-    big_apply(X, a.FUN = function(X, ind) {
+    bigstatsr::big_apply(X, a.FUN = function(X, ind) {
         X[, ind] <- s_mat[, ind] %>% as.matrix()
         NULL
     }, a.combine = "c", block.size = 1000)
@@ -66,14 +66,28 @@ get_dstat <- function(corr_matrix) {
         sum(X[, ind, drop = FALSE], na.rm = TRUE)
     }, a.combine = "sum", block.size = 1000) / n
 
-    sd <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
+    var <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
         sum((X[, ind, drop = FALSE] - mean)^2, na.rm = TRUE) / (n - 1)
-    }, a.combine = "sum", block.size = 1000) %>% sqrt()
+    }, a.combine = "sum", block.size = 1000)
+
+    sd <- sqrt(var)
+
+    min <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
+        min(X[, ind, drop = FALSE], na.rm = TRUE)
+    }, a.combine = "min", block.size = 1000)
+
+    max <- bigstatsr::big_apply(corr_matrix, a.FUN = function(X, ind) {
+        max(X[, ind, drop = FALSE], na.rm = TRUE)
+    }, a.combine = "max", block.size = 1000)
+
 
     dstat <- list(
         mean = mean,
+        var = var,
         sd = sd,
-        sn = sd / mean # signal-to-noise ratio
+        sn = sd / mean, # signal-to-noise ratio
+        min = min,
+        max = max
     )
     return(dstat)
 }
@@ -223,12 +237,15 @@ select_genes <- function(
     anglem_object,
     zscore_mean_threshold = 2,
     zscore_sn_threshold = 2,
-    max_n_genes = 2000) {
+    max_n_genes = NULL) {
 
     if (class(anglem_object) != "anglem") {
         stop("anglem_object needs to be a anglem object")
     }
-
+    if (is.null(max_n_genes)) { # if no max_n_genes specified, use all genes that pass the threshold
+        max_n_genes <- length(intersect_genes(anglem_object))
+    }
+    
     gene_ind <- which(
         upper.tri(list_stats(anglem_object)$sn_zscore) & 
         (list_stats(anglem_object)$sn_zscore >= zscore_sn_threshold) & # signal-to-noise ratio is above 0 anyways, no need to use absolute
@@ -238,17 +255,18 @@ select_genes <- function(
 
     #COMMENT: 08/07/2024 current approach:
     # If no genes passed the cutoff, increase the threshold
-    if (nrow(gene_ind) == 0) {
+    if (nrow(gene_ind) == 0) { 
+        # FIXME: what if you only select like 10 genes...
         message("No genes passed the cutoff.")
-        quantile90mean <- quantile(abs(list_stats(anglem_object)$mean_zscore), 0.95, na.rm = TRUE)
-        quantile90sn <- quantile(list_stats(anglem_object)$sn_zscore, 0.95, na.rm = TRUE)
-        if (quantile90mean < zscore_mean_threshold) {
-            zscore_mean_threshold <- quantile90mean
-            message(paste0("zscore_mean_threshold is lower than the 95% quantile of the absolute mean zscores. Setting the zscore_mean_threshold to:\t", zscore_mean_threshold))
+        quantile95mean <- quantile(abs(list_stats(anglem_object)$mean_zscore), 0.99, na.rm = TRUE)
+        quantile95sn <- quantile(list_stats(anglem_object)$sn_zscore, 0.99, na.rm = TRUE)
+        if (quantile95mean < zscore_mean_threshold) {
+            zscore_mean_threshold <- quantile95mean
+            message(paste0("zscore_mean_threshold is lower than the 99% quantile of the absolute mean zscores. Setting the zscore_mean_threshold to:\t", zscore_mean_threshold))
         }
-        if (quantile90sn < zscore_sn_threshold) {
-            zscore_sn_threshold <- quantile90sn
-            message(paste0("zscore_sn_threshold is higher than 95% quantile. Setting the zscore_sn_threshold to:\t", round(zscore_sn_threshold, 2)))
+        if (quantile95sn < zscore_sn_threshold) {
+            zscore_sn_threshold <- quantile95sn
+            message(paste0("zscore_sn_threshold is higher than 99% quantile. Setting the zscore_sn_threshold to:\t", round(zscore_sn_threshold, 2)))
         }
         print(paste0("zscore_mean_threshold:", zscore_mean_threshold, " zscore_sn_threshold:", round(zscore_sn_threshold, 2)))
 
@@ -273,7 +291,7 @@ select_genes <- function(
 
 
     #order df
-    top_n <- top_n[order(top_n$zscore, decreasing = TRUE), ]
+    top_n <- top_n[order(abs(top_n$zscore), decreasing = TRUE), ]
     anglem_object@integration_genes$info <- top_n
     top_n <- extract_rows_for_unique_genes(top_n, max_n_genes)
     anglem_object@integration_genes$genes <- intersect_genes(anglem_object)[top_n]
