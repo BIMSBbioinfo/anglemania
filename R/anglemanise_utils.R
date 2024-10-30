@@ -1,12 +1,12 @@
 # --------------------------------------------------------------------------------------------- #
 # Utility functions for the anglemanise package
 # --------------------------------------------------------------------------------------------- #
-#' Convert a sparse matrix into an FBM
+#' Convert a sparse matrix into a file-backed matrix (\code{\link[bigstatsr]{FBM}})
 #'
-#' Converts a sparse matrix into an FBM with efficient memory usage.
+#' Converts a sparse matrix into an \code{\link[bigstatsr]{FBM}} with efficient memory usage.
 #'
 #' @param s_mat A sparse matrix.
-#' @return A FBM object from the bigstatsr package.
+#' @return An \code{\link[bigstatsr]{FBM}} object from the \pkg{bigstatsr} package.
 #' @importFrom bigstatsr FBM
 sparse_to_fbm <- function(s_mat) {
     n <- nrow(s_mat)
@@ -45,9 +45,10 @@ sparse_to_fbm <- function(s_mat) {
 #' Computes the mean and standard deviation of the correlation matrix
 #' using the big_apply function.
 #'
-#' @param corr_matrix A FBM object from the bigstatsr package.
-#' @return A list with two entries: \code{mean} and \code{sd}.
+#' @param corr_matrix An \code{\link[bigstatsr]{FBM}} object.
+#' @return A list with statistical measures including \code{mean}, \code{sd}, \code{var}, \code{sn}, \code{min}, and \code{max}.
 #' @importFrom bigstatsr big_apply
+#' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 get_dstat <- function(corr_matrix) {
     # check if FBM is used as input
     if (!inherits(corr_matrix, "FBM")) {
@@ -93,16 +94,16 @@ get_dstat <- function(corr_matrix) {
 }
 
 # --------------------------------------------------------------------------------------------- #
-#' Calculates the mean matrix of a list of FBMs.
-#' Every element is summed together and divided by the number of FBMs.
+#' Calculates the \code{mean} for each element of a \code{NxM} dimensional matrix
+#' from a list of \code{NxM} dimensional \code{\link[bigstatsr]{FBM}}s.
 #'
-#' This function takes a list of FBMs, and calculates the mean of every element in the FBM.
-#' If the list is empty or the FBMs have different dimensions, it throws an error.
+#' This function takes an \code{anglem} object containing a list of \code{\link[bigstatsr]{FBM}}s and calculates the \code{mean} of every element.
+#' If the list is empty or the \code{\link[bigstatsr]{FBM}}s have different dimensions, it throws an error.
 #'
-#' @param fbmList A list of FBM objects to be added.
-#' @return A new FBM object containing the sum of all FBMs in the list.
+#' @param anglem_object An \code{anglem} object containing the list of \code{\link[bigstatsr]{FBM}}s.
+#' @return A new \code{\link[bigstatsr]{FBM}} object containing the \code{mean} values.
 #' @examples
-#' combined_matrix <- big_add_mat_list(list(fbm1, fbm2, fbm3))
+#' combined_matrix <- big_mat_list_mean(anglem_object)
 #' @importFrom bigstatsr FBM
 big_mat_list_mean <- function(anglem_object) {
     # TODO: add input validations 
@@ -136,35 +137,17 @@ big_mat_list_mean <- function(anglem_object) {
 }
 
 # --------------------------------------------------------------------------------------------- #
-#' Calculate statistical measures from a list of FBMs
+#' Calculate statistical measures from a list of \code{\link[bigstatsr]{FBM}}s
 #'
-#' This function computes the mean, standard deviations, and coefficient of variation for each element
-#' across a list of FBMs. The function first checks that the input list contains more than one FBM
-#' and that all FBMs have the same dimensions. It calculates the z-score mean, standard deviation,
-#' and coefficient of variation for each element across the FBMs in the list.
+#' This function computes the mean, standard deviations, and signal-to-noise ratio (SNR) for each element
+#' across a list of \code{\link[bigstatsr]{FBM}}s in an \code{anglem} object.
 #'
-#' @param fbmList A list of FBM objects from the bigstatsr package.
-#'
-#' @return A list containing three FBMs: mean_zscore, sds_zscore, and cv_zscore, which represent
-#' the mean, standard deviation, and coefficient of variation z-scores of the elements across
-#' the provided FBMs respectively.
-#'
-#' @importFrom bigstatsr FBM
-#' @importFrom bigstatsr big_apply
-#'
+#' @param anglem_object An \code{anglem} object containing the list of \code{\link[bigstatsr]{FBM}}s.
+#' @return A list containing three matrices: \code{mean_zscore}, \code{sds_zscore}, and \code{sn_zscore}.
+#' @importFrom bigstatsr FBM big_apply
+#' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 #' @examples
-#' fbm_list <- list(fbm1, fbm2, fbm3)
-#' stats_results <- get_list_stats(fbm_list)
-#'
-#' @details The function first calculates the mean for each element by summing up elements across
-#' all FBMs and dividing by the number of FBMs. It then calculates the variance for each element,
-#' takes the square root to get the standard deviation, and finally computes the coefficient of variation
-#' for each element as the ratio of the standard deviation to the mean. The calculations avoid dividing by
-#' zero by assigning NA to diagonal elements when computing the coefficient of variation, assuming
-#' these might represent self-correlations.
-#'
-#' @seealso \code{\link[bigstatsr]{FBM}}, \code{\link[bigstatsr]{big_apply}}
-#'
+#' stats_results <- get_list_stats(anglem_object)
 #' @export
 get_list_stats <- function(anglem_object) {
     # TODO: change for anglem object    
@@ -227,12 +210,73 @@ get_list_stats <- function(anglem_object) {
 }
 
 # --------------------------------------------------------------------------------------------- #
+#' Extract Unique Genes from Gene Pairs Data Frame
+#'
+#' This function extracts unique gene identifiers from a data frame containing gene pairs
+#' and returns a vector of genes up to a specified maximum number.
+#'
+#' @param dt A data frame containing gene pairs, with columns \code{geneA} and \code{geneB}.
+#' @param max_n_genes An integer specifying the maximum number of unique genes to return.
+#' @return A vector of unique gene identifiers.
+#' @details
+#' The function combines the \code{geneA} and \code{geneB} columns, extracts unique gene names,
+#' and returns the first \code{max_n_genes} genes. If \code{max_n_genes} exceeds the number of
+#' unique genes available, all unique genes are returned.
+#' @examples
+#' \dontrun{
+#' gene_pairs <- data.frame(geneA = c("Gene1", "Gene2"), geneB = c("Gene3", "Gene4"))
+#' unique_genes <- extract_rows_for_unique_genes(gene_pairs, max_n_genes = 3)
+#' print(unique_genes)
+#' }
+#' @seealso \code{\link{select_genes}}
 extract_rows_for_unique_genes <- function(dt, max_n_genes) {
     unique_genes <- unique(as.vector(rbind(dt$geneA, dt$geneB)))
     unique_genes <- unique_genes[1:ifelse(max_n_genes > length(unique_genes), length(unique_genes), max_n_genes)]
     return(unique_genes)
 }
 
+
+#' Select Genes Based on Statistical Thresholds from an Anglem Object
+#'
+#' This function selects genes from an \code{\link{anglem}} object based on specified thresholds
+#' for the absolute mean z-score and signal-to-noise ratio (SNR) z-score. It updates the
+#' \code{integration_genes} slot of the \code{\link{anglem}} object with the selected genes
+#' and associated information.
+#'
+#' @param anglem_object An \code{\link{anglem}} object containing statistical matrices such as
+#' mean z-scores and SNR z-scores.
+#' @param zscore_mean_threshold Numeric value specifying the threshold for the absolute mean z-score.
+#' Default is 2.
+#' @param zscore_sn_threshold Numeric value specifying the threshold for the SNR z-score.
+#' Default is 2.
+#' @param max_n_genes Integer specifying the maximum number of genes to select. If \code{NULL},
+#' all genes that pass the thresholds are used. Default is \code{NULL}.
+#' @return The input \code{\link{anglem}} object with the \code{integration_genes} slot updated
+#' to include the selected genes and their statistical information.
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item Checks if the input object is of class \code{\link{anglem}}.
+#'   \item If \code{max_n_genes} is not specified, it uses all genes that pass the thresholds.
+#'   \item Identifies gene pairs where both the mean z-score and SNR z-score exceed the specified thresholds.
+#'   \item If no gene pairs meet the criteria, it adjusts the thresholds to the 99th percentile values of the corresponding statistics and re-selects.
+#'   \item Extracts unique genes from the selected gene pairs using \code{\link{extract_rows_for_unique_genes}}.
+#'   \item Updates the \code{integration_genes} slot of the \code{anglem_object} with the selected genes and their statistics.
+#' }
+#' @examples
+#' \dontrun{
+#' # Assume anglem_object is already created and contains necessary statistical matrices
+#' anglem_object <- select_genes(
+#'     anglem_object,
+#'     zscore_mean_threshold = 2,
+#'     zscore_sn_threshold = 2,
+#'     max_n_genes = 2000
+#' )
+#' # Inspect the selected genes and their statistics
+#' head(anglem_object@integration_genes$info)
+#' }
+#' @seealso \code{\link{extract_rows_for_unique_genes}}, \code{\link{intersect_genes}}, \code{\link{list_stats}}
+#' @export
 select_genes <- function(
     anglem_object,
     zscore_mean_threshold = 2,

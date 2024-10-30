@@ -1,22 +1,61 @@
-#' Integrate samples in a seurat list
+#' Integrate Samples in a Seurat Object Using Selected Features from \code{anglem_object} Object
 #'
 #' @description
-#' Integrates samples in the seurat list using CCA and parameters devised
-#' by VF.
+#' `integrate_by_features` integrates samples or batches within a Seurat object using canonical correlation analysis (CCA) based on a set of selected features (genes). The function utilizes an `anglem` object to extract integration genes and handles the integration process, including optional downstream processing steps such as scaling, PCA, and UMAP visualization.
 #'
-#' @import Seurat
-#' @param seurat_object seurat object containing all samples/batches.
-#' @param anglem_object anglem object. Previously generated using create_anglem() and big_anglemanise(). Important to set the right dataset_key and batch_key!
-#' @param features_to_integrate character vector. Vector of gene names
-#'   (features) to construct anchors from.
-#' @param int_order data.frame. Table specifying the integration order
-#'   of samples within the seurat list. See Seurat::IntegrateData's argument
-#'   sample.tree help page for more details. If not provided Seurat will
-#'   construct the integration order from hclust. Default is NULL.
-#' @param process bool. Boolean TRUE/FALSE which indicates whether to further
-#'   process the data, i.e., scale it and run PCA & UMAP. Default is TRUE.
-#' @return seurat object. Integrated seurat object. Seurat::DefaultAssay
-#' is set to "integrated".
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item **Batch Key Addition**: Adds a unique batch key to the Seurat object's metadata to distinguish different batches or samples. Batch key is set to the \code{anglem_object}'s \code{batch_key}.
+#'   \item **Splitting**: Splits the Seurat object into a list of Seurat objects based on the batch key.
+#'   \item **Integration**: Calls \code{\link{integrate_seurat_list}} to integrate the list of Seurat objects using the features extracted from the \code{anglem_object}.
+#' }
+#'
+#' The integration is performed using Seurat's CCA-based methods, and parameters are adjusted based on the smallest dataset to ensure compatibility with small sample sizes (e.g., metacells or SEACells). If \code{process = TRUE}, the function will also scale the data, run PCA, and compute UMAP embeddings.
+#'
+#' @param seurat_object A \code{\link[Seurat]{Seurat}} object containing all samples or batches to be integrated.
+#' @param anglem_object An \code{\link{anglem}} object previously generated using \code{\link{create_anglem}} and \code{\link{big_anglemanise}}. It is important that the \code{dataset_key} and \code{batch_key} are correctly set in the \code{anglem_object}.
+#' @param int_order An optional data frame specifying the integration order of samples within the Seurat list. See the \code{sample.tree} argument in \code{\link[Seurat]{IntegrateData}} for more details. If not provided, Seurat will construct the integration order using hierarchical clustering. Default is \code{NULL}.
+#' @param process Logical value indicating whether to further process the data after integration (i.e., scale it, run PCA, and compute UMAP embeddings). Default is \code{TRUE}.
+#' @param verbose Logical value indicating whether to display progress messages during integration. Default is \code{FALSE}.
+#'
+#' @return A \code{\link[Seurat]{Seurat}} object containing the integrated data. The default assay is set to \code{"integrated"}.
+#'
+#' @importFrom Seurat SplitObject NormalizeData FindIntegrationAnchors IntegrateData ScaleData RunPCA RunUMAP DefaultAssay
+#' @importFrom pbapply pblapply
+#'
+#' @seealso
+#' \code{\link{create_anglem}},
+#' \code{\link{big_anglemanise}},
+#' \code{\link{extract_integration_genes}},
+#' \code{\link{integrate_seurat_list}},
+#' \code{\link[Seurat]{IntegrateData}},
+#' \code{\link[Seurat]{FindIntegrationAnchors}}
+#'
+#' @examples
+#' \dontrun{
+#' # Load required libraries
+#' library(Seurat)
+#' library(pbapply)
+#'
+#' # Assume seurat_object is a Seurat object containing all samples/batches
+#' # and anglem_object is an anglem object with integration genes identified
+#'
+#' # Integrate the Seurat object using the anglem object
+#' integrated_seurat <- integrate_by_features(
+#'   seurat_object = seurat_object,
+#'   anglem_object = anglem_object,
+#'   process = TRUE,
+#'   verbose = TRUE
+#' )
+#'
+#' # Access the integrated assay
+#' DefaultAssay(integrated_seurat) # Should be "integrated"
+#'
+#' # Visualize UMAP embedding
+#' DimPlot(integrated_seurat, reduction = "umap", group.by = "batch")
+#' }
+#'
 #' @export integrate_by_features
 integrate_by_features <- function(seurat_object,
                                   anglem_object,
@@ -41,20 +80,67 @@ integrate_by_features <- function(seurat_object,
 }
 
 
-
-#' Integrate samples in a seurat list
-#' 
-#' @import Seurat
-#' @param seurat_list list of seurat objects containing all samples/batches.
-#' @param features character vector. Vector of gene names used for integration
-#' @param int_order data.frame. Table specifying the integration order
-#'   of samples within the seurat list. See Seurat::IntegrateData's argument
-#'   sample.tree help page for more details. If not provided Seurat will
-#'   construct the integration order from hclust. Default is NULL.
-#' @param process bool. Boolean TRUE/FALSE which indicates whether to further
-#'   process the data, i.e., scale it and run PCA & UMAP. Default is TRUE.
-#' @return seurat object. Integrated seurat object. Seurat::DefaultAssay
-#' is set to "integrated".
+#' Integrate a List of Seurat Objects Using Selected Features
+#'
+#' @description
+#' `integrate_seurat_list` integrates a list of Seurat objects (e.g., representing different samples or batches) using canonical correlation analysis (CCA) based on a set of selected features (genes). The function handles normalization, finding integration anchors, integrating data, and optional downstream processing steps such as scaling, PCA, and UMAP visualization.
+#'
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item **Normalization**: Each Seurat object in the list is log-normalized using \code{\link[Seurat]{NormalizeData}}.
+#'   \item **Parameter Adjustment**: Integration parameters are adjusted based on the smallest dataset to accommodate cases with a small number of cells (e.g., metacells).
+#'   \item **Finding Integration Anchors**: Uses \code{\link[Seurat]{FindIntegrationAnchors}} to find anchors between datasets based on the provided features.
+#'   \item **Integration**: Integrates the datasets using \code{\link[Seurat]{IntegrateData}}.
+#'   \item **Optional Processing**: If \code{process = TRUE}, the function scales the data, runs PCA, and computes UMAP embeddings.
+#' }
+#'
+#' The integration is performed using Seurat's CCA-based methods, and the function is designed to handle datasets with varying sizes efficiently.
+#'
+#' @param seurat_list A list of \code{\link[Seurat]{Seurat}} objects to be integrated.
+#' @param features A character vector of gene names (features) used for integration.
+#' @param int_order An optional data frame specifying the integration order of samples within the Seurat list. See the \code{sample.tree} argument in \code{\link[Seurat]{IntegrateData}} for more details. If not provided, Seurat will construct the integration order using hierarchical clustering. Default is \code{NULL}.
+#' @param process Logical value indicating whether to further process the data after integration (i.e., scale it, run PCA, and compute UMAP embeddings). Default is \code{TRUE}.
+#' @param verbose Logical value indicating whether to display progress messages during integration. Default is \code{FALSE}.
+#'
+#' @return A \code{\link[Seurat]{Seurat}} object containing the integrated data. The default assay is set to \code{"integrated"}.
+#'
+#' @importFrom Seurat NormalizeData FindIntegrationAnchors IntegrateData ScaleData RunPCA RunUMAP DefaultAssay
+#' @importFrom pbapply pblapply
+#'
+#' @seealso
+#' \code{\link{integrate_by_features}},
+#' \code{\link[Seurat]{IntegrateData}},
+#' \code{\link[Seurat]{FindIntegrationAnchors}},
+#' \code{\link[Seurat]{NormalizeData}},
+#' \code{\link[Seurat]{ScaleData}},
+#' \code{\link[Seurat]{RunPCA}},
+#' \code{\link[Seurat]{RunUMAP}}
+#'
+#' @examples
+#' \dontrun{
+#' # Load required libraries
+#' library(Seurat)
+#' library(pbapply)
+#'
+#' # Assume seurat_list is a list of Seurat objects representing different samples
+#' # and features is a vector of gene names used for integration
+#'
+#' # Integrate the Seurat list
+#' integrated_seurat <- integrate_seurat_list(
+#'   seurat_list = seurat_list,
+#'   features = features,
+#'   process = TRUE,
+#'   verbose = TRUE
+#' )
+#'
+#' # Access the integrated assay
+#' DefaultAssay(integrated_seurat) # Should be "integrated"
+#'
+#' # Visualize UMAP embedding
+#' DimPlot(integrated_seurat, reduction = "umap", group.by = "batch")
+#' }
+#'
 #' @export integrate_seurat_list
 integrate_seurat_list <- function(seurat_list,
                                   features,

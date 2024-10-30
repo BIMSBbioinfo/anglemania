@@ -20,29 +20,29 @@
 #' @seealso \code{\link{create_anglem}}, \code{\link{big_anglemanise}}
 #' @exportClass anglem
 setClass(
-    "anglem",
-    slots = c(
-        matrix_list = "list",
-        dataset_key = "character",
-        batch_key = "character",
-        data_info = "data.frame",
-        weights = "numeric",
-        list_stats = "list",
-        intersect_genes = "character",
-        min_cells_per_gene = "numeric",
-        integration_genes = "list"),
-
-    prototype = list(
-        matrix_list = list(),
-        dataset_key = NULL,
-        batch_key = NA_character_,
-        data_info = data.frame(),
-        weights = NA_real_,
-        list_stats = list(),
-        intersect_genes = NA_character_,
-        min_cells_per_gene = 1,
-        integration_genes = list(info = "data.frame", genes = "character")
-    )
+  "anglem",
+  slots = c(
+    matrix_list = "list",
+    dataset_key = "character",
+    batch_key = "character",
+    data_info = "data.frame",
+    weights = "numeric",
+    list_stats = "list",
+    intersect_genes = "character",
+    min_cells_per_gene = "numeric",
+    integration_genes = "list"
+  ),
+  prototype = list(
+    matrix_list = list(),
+    dataset_key = NULL,
+    batch_key = NA_character_,
+    data_info = data.frame(),
+    weights = NA_real_,
+    list_stats = list(),
+    intersect_genes = NA_character_,
+    min_cells_per_gene = 1,
+    integration_genes = list(info = "data.frame", genes = "character")
+  )
 )
 
 
@@ -59,27 +59,27 @@ setClass(
 #' show(anglem_object)
 #' }
 setMethod("show", "anglem", function(object) {
-    cat("Anglem object\n")
-    cat("--------------\n")
-    cat("Dataset key:", object@dataset_key, "\n")
-    cat("Batch key:", object@batch_key, "\n")
-    cat("Number of datasets:", ifelse(is.na(object@dataset_key), 1, nrow(unique(object@data_info[, object@dataset_key]))), "\n")
-    if(!is.null(object@dataset_key)) cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
-    cat("Total number of batches:", nrow(object@data_info), "\n") #FIXME: check if there are actually more than 1 batch...
-    cat("Batches (showing first 5):\n")
-    if (nrow(object@data_info) > 5) {
-        cat(paste(object@data_info[1:5, "batch"], collapse = ", "), ", ...\n")
-    } else {
-        cat(paste(object@data_info[, "batch"], collapse = ", "), "\n")
-    }
-    cat("Number of intersected genes:", length(object@intersect_genes), "\n")
-    cat("Intersected genes (showing first 10):\n")
-    if (length(object@intersect_genes) > 10) {
-        cat(paste(object@intersect_genes[1:10], collapse = ", "), ", ...\n")
-    } else {
-        cat(paste(object@intersect_genes, collapse = ", "), "\n")
-    }
-    cat("Min cells per gene:", object@min_cells_per_gene, "\n")
+  cat("Anglem object\n")
+  cat("--------------\n")
+  cat("Dataset key:", object@dataset_key, "\n")
+  cat("Batch key:", object@batch_key, "\n")
+  cat("Number of datasets:", ifelse(is.na(object@dataset_key), 1, nrow(unique(object@data_info[, object@dataset_key]))), "\n")
+  if (!is.null(object@dataset_key)) cat("Datasets:", paste(unique(object@data_info[, object@dataset_key]), collapse = ", "), "\n")
+  cat("Total number of batches:", nrow(object@data_info), "\n") # FIXME: check if there are actually more than 1 batch...
+  cat("Batches (showing first 5):\n")
+  if (nrow(object@data_info) > 5) {
+    cat(paste(object@data_info[1:5, "batch"], collapse = ", "), ", ...\n")
+  } else {
+    cat(paste(object@data_info[, "batch"], collapse = ", "), "\n")
+  }
+  cat("Number of intersected genes:", length(object@intersect_genes), "\n")
+  cat("Intersected genes (showing first 10):\n")
+  if (length(object@intersect_genes) > 10) {
+    cat(paste(object@intersect_genes[1:10], collapse = ", "), ", ...\n")
+  } else {
+    cat(paste(object@intersect_genes, collapse = ", "), "\n")
+  }
+  cat("Min cells per gene:", object@min_cells_per_gene, "\n")
 })
 
 
@@ -95,7 +95,7 @@ setMethod("show", "anglem", function(object) {
 #' # Access the matrix list
 #' matrices <- matrix_list(anglem_object)
 #' }
-#' @export matrix_list
+#' @export
 setGeneric("matrix_list", function(object) standardGeneric("matrix_list"))
 setMethod("matrix_list", "anglem", function(object) object@matrix_list)
 
@@ -113,8 +113,8 @@ setMethod("matrix_list", "anglem", function(object) object@matrix_list)
 #' }
 setGeneric("matrix_list<-", function(object, value) standardGeneric("matrix_list<-"))
 setReplaceMethod("matrix_list", "anglem", function(object, value) {
-    object@matrix_list <- value
-    object
+  object@matrix_list <- value
+  object
 })
 
 
@@ -198,13 +198,13 @@ setMethod("weights", "anglem", function(object) object@weights)
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
 setReplaceMethod("weights", "anglem", function(object, value) {
-    if (!is.numeric(value)) stop("weights must be numeric")
-    if (is.null(names(value))) stop("weights need to be a named vector")
-    # Scale the weights so that the sum of weights is 1
-    message("Scaling provided weights to sum to 1...")
-    value <- value / sum(value)
-    object@weights <- value
-    object
+  if (!is.numeric(value)) stop("weights must be numeric")
+  if (is.null(names(value))) stop("weights need to be a named vector")
+  # Scale the weights so that the sum of weights is 1
+  message("Scaling provided weights to sum to 1...")
+  value <- value / sum(value)
+  object@weights <- value
+  object
 })
 
 
@@ -239,9 +239,9 @@ setMethod("list_stats", "anglem", function(object) object@list_stats)
 #' @export
 setGeneric("list_stats<-", function(object, value) standardGeneric("list_stats<-"))
 setReplaceMethod("list_stats", "anglem", function(object, value) {
-    if (!is.list(value)) stop("list_stats must be a list")
-    object@list_stats <- value
-    object
+  if (!is.list(value)) stop("list_stats must be a list")
+  object@list_stats <- value
+  object
 })
 
 # -------------------------------------------------------------------------------- #
@@ -275,8 +275,8 @@ setMethod("intersect_genes", "anglem", function(object) object@intersect_genes)
 #' @export
 setGeneric("intersect_genes<-", function(object, value) standardGeneric("intersect_genes<-"))
 setReplaceMethod("intersect_genes", "anglem", function(object, value) {
-    object@intersect_genes <- value
-    object
+  object@intersect_genes <- value
+  object
 })
 
 
@@ -295,11 +295,11 @@ setReplaceMethod("intersect_genes", "anglem", function(object, value) {
 #' @export extract_integration_genes
 setGeneric("extract_integration_genes", function(object) standardGeneric("extract_integration_genes"))
 setMethod("extract_integration_genes", "anglem", function(object) {
-    object@integration_genes$genes
+  object@integration_genes$genes
 })
 setGeneric("extract_integration_genes", function(object) standardGeneric("extract_integration_genes"))
-setMethod("extract_integration_genes", "anglem", function(object){
-    object@integration_genes$genes
+setMethod("extract_integration_genes", "anglem", function(object) {
+  object@integration_genes$genes
 })
 
 
@@ -322,33 +322,31 @@ setMethod("extract_integration_genes", "anglem", function(object){
 #' \dontrun{
 #' # Add a unique batch key to the Seurat object
 #' seurat_object <- add_unique_batch_key(
-#'     seurat_object,
-#'     dataset_key = "dataset",
-#'     batch_key = "batch",
-#'     new_unique_batch_key = "unique_batch"
+#'   seurat_object,
+#'   dataset_key = "dataset",
+#'   batch_key = "batch",
+#'   new_unique_batch_key = "unique_batch"
 #' )
 #' }
 #'
 #' @export add_unique_batch_key
 
 add_unique_batch_key <- function(
-    seurat_object,
-    dataset_key = NULL, 
-    batch_key, 
-    new_unique_batch_key = "batch"
-    ) {
+  seurat_object, 
+  dataset_key = NULL, 
+  batch_key, 
+  new_unique_batch_key = "batch"
+) {  if (!is.null(dataset_key) && !is.na(dataset_key)) {
+    meta <- seurat_object[[]] %>%
+      tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE) %>%
+      tidyr::unite("batch", all_of(c(dataset_key, "batch")), sep = ":", remove = FALSE)
+  } else {
+    meta <- seurat_object[[]] %>%
+      tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE)
+  }
+  seurat_object[[]] <- meta # FIXME: not sure if you can actually assign the meta data to a seurat object like this...
 
-    if (!is.null(dataset_key) && !is.na(dataset_key)) {
-                meta <- seurat_object[[]] %>%
-                    tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE) %>%
-                    tidyr::unite("batch", all_of(c(dataset_key, "batch")), sep = ":", remove = FALSE)
-            } else {
-                meta <- seurat_object[[]] %>%
-                    tidyr::unite("batch", all_of(batch_key), sep = "_", remove = FALSE)
-            }
-    seurat_object[[]] <- meta # FIXME: not sure if you can actually assign the meta data to a seurat object like this...
-
-    return(seurat_object)
+  return(seurat_object)
 }
 
 # -------------------------------------------------------------------------------- #
@@ -412,10 +410,10 @@ add_unique_batch_key <- function(
 #'
 #' # Create an anglem object
 #' anglem_object <- create_anglem(
-#'     seurat_object = se,
-#'     dataset_key = "Experiment",
-#'     batch_key = "Method",
-#'     min_cells_per_gene = 10
+#'   seurat_object = se,
+#'   dataset_key = "Experiment",
+#'   batch_key = "Method",
+#'   min_cells_per_gene = 10
 #' )
 #' }
 #'
@@ -425,95 +423,93 @@ create_anglem <- function(
     seurat_object,
     dataset_key = NULL,
     batch_key,
-    min_cells_per_gene = 1
-    ){
-        # validate inputs
-        if (class(seurat_object) != "Seurat") {
-            stop("seurat_object needs to be a Seurat object")
-        }
+    min_cells_per_gene = 1) {
+  # validate inputs
+  if (class(seurat_object) != "Seurat") {
+    stop("seurat_object needs to be a Seurat object")
+  }
 
-        if (is.null(dataset_key)) {
-            message("No dataset_key specified.\n Assuming that all samples belong to the same dataset and are separated by batch_key: ", batch_key)
-        }
+  if (is.null(dataset_key)) {
+    message("No dataset_key specified.\n Assuming that all samples belong to the same dataset and are separated by batch_key: ", batch_key)
+  }
 
-        if (!is.null(dataset_key)) {
-            if (!is.character(dataset_key) || length(dataset_key) != 1) {
-                stop("dataset_key needs to be a character vector of length 1 corresponding to the column in the meta data of the Seurat object that indicates which dataset the cells belong to")
-            }
-        }
+  if (!is.null(dataset_key)) {
+    if (!is.character(dataset_key) || length(dataset_key) != 1) {
+      stop("dataset_key needs to be a character vector of length 1 corresponding to the column in the meta data of the Seurat object that indicates which dataset the cells belong to")
+    }
+  }
 
-        if (is.null(batch_key)){
-            stop("batch_key is not specified! batch_key needs to be a character vector indicating the batch key(s) in the meta data of the Seurat object")
-        }
+  if (is.null(batch_key)) {
+    stop("batch_key is not specified! batch_key needs to be a character vector indicating the batch key(s) in the meta data of the Seurat object")
+  }
 
-        if (!is.character(batch_key)) {
-            stop("batch_key needs to be a character vector indicating the batch key(s) in the meta data of the Seurat object")
-        }
+  if (!is.character(batch_key)) {
+    stop("batch_key needs to be a character vector indicating the batch key(s) in the meta data of the Seurat object")
+  }
 
-        # create column in meta data that combines dataset_key and batch_key for each cell so that you can split the Seurat Object by this column
-        seurat_object <- add_unique_batch_key(seurat_object, dataset_key, batch_key)
+  # create column in meta data that combines dataset_key and batch_key for each cell so that you can split the Seurat Object by this column
+  seurat_object <- add_unique_batch_key(seurat_object, dataset_key, batch_key)
 
-        meta <- seurat_object[[]]
+  meta <- seurat_object[[]]
 
-        # get the barcodes corresponding to each batch
-        matrix_list <- split(rownames(meta), meta$batch)
+  # get the barcodes corresponding to each batch
+  matrix_list <- split(rownames(meta), meta$batch)
 
-        # extract counts for each batch
-        message("Extracting count matrices...") 
-        message("Filtering each batch to at least ", min_cells_per_gene, " cells per gene...")
-        matrix_list <- lapply(matrix_list, function(cell_barcodes){
-            counts_matrix <- SeuratObject::LayerData(seurat_object, cells = cell_barcodes, layer = "counts", assay = "RNA")
-            filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
-            filt_features <- names(filt_features[filt_features])
-            counts_matrix <- counts_matrix[filt_features, ]
-            return(counts_matrix)
-            })
+  # extract counts for each batch
+  message("Extracting count matrices...")
+  message("Filtering each batch to at least ", min_cells_per_gene, " cells per gene...")
+  matrix_list <- lapply(matrix_list, function(cell_barcodes) {
+    counts_matrix <- SeuratObject::LayerData(seurat_object, cells = cell_barcodes, layer = "counts", assay = "RNA")
+    filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
+    filt_features <- names(filt_features[filt_features])
+    counts_matrix <- counts_matrix[filt_features, ]
+    return(counts_matrix)
+  })
 
-        # reduce to intersection of genes between batches
-        message("Using the intersection of filtered genes from all batches...")
-        intersect_genes <- Reduce(intersect, lapply(matrix_list, function(x){
-            rownames(x)
-        }))
-        message("Number of genes in intersected set: ", length(intersect_genes))
+  # reduce to intersection of genes between batches
+  message("Using the intersection of filtered genes from all batches...")
+  intersect_genes <- Reduce(intersect, lapply(matrix_list, function(x) {
+    rownames(x)
+  }))
+  message("Number of genes in intersected set: ", length(intersect_genes))
 
-        matrix_list <- pbapply::pblapply(matrix_list, function(x){
-            x <- x[intersect_genes, ]                    # use the intersection of expressed genes between the batches
-            x <- sparse_to_fbm(x) # convert sparse matrix into FBM. This function is part of anglemania and is described in anglemanise-utils.R
-        }, cl = bigstatsr::nb_cores()) # COMMENT: add cores parameter??
-
-
-        if (!is.null(dataset_key)) {
-            data_info <- meta %>%
-                dplyr::select(batch, all_of(c(dataset_key, batch_key))) %>%
-                dplyr::distinct() %>%
-                dplyr::group_by(across(all_of(dataset_key))) %>%
-                dplyr::add_count(across(all_of(dataset_key)), name = "n_samples") %>%
-                dplyr::mutate(weight = 1/n_samples/dplyr::n_groups(.)) # equal weight for each sample of a dataset. ==> sum(weight) = 1
-
-            weights <- data_info$weight
-            names(weights) <- data_info$batch
-        } else { # if there is only one dataset, then weight is 1 ==> no need to adjust. 
-            data_info <- meta %>%
-                dplyr::select(batch, all_of(batch_key)) %>%
-                dplyr::distinct() %>%
-                dplyr::mutate(weight = 1/nrow(.)) 
-
-            weights <- data_info$weight
-            names(weights) <- data_info$batch
-        }
-        # create anglem object
-        anglem_object <- new(
-            "anglem",
-            matrix_list = matrix_list, # matrix_list: A list of sparse matrices, one for each batch.
-            dataset_key = ifelse(is.null(dataset_key), NA_character_, dataset_key), # dataset_key: The key used to denote the dataset.
-            batch_key = batch_key, # batch_key: The key used to denote the batch.
-            data_info = data_info, # data_info: A data frame summarizing the number of samples per dataset and their weights.
-            weights = weights, # weights: A numeric vector of weights for each dataset based on the number of samples. By default, the weights are adjusted to the size of the dataset_key if provided. Otherwise each batch has the same weight.
-            min_cells_per_gene = min_cells_per_gene, # min_cells_per_gene: The minimum number of cells per gene threshold used for filtering.
-            intersect_genes = intersect_genes
-        )
+  matrix_list <- pbapply::pblapply(matrix_list, function(x) {
+    x <- x[intersect_genes, ] # use the intersection of expressed genes between the batches
+    x <- sparse_to_fbm(x) # convert sparse matrix into FBM. This function is part of anglemania and is described in anglemanise-utils.R
+  }, cl = bigstatsr::nb_cores()) # COMMENT: add cores parameter??
 
 
-        return(anglem_object)
+  if (!is.null(dataset_key)) {
+    data_info <- meta %>%
+      dplyr::select(batch, all_of(c(dataset_key, batch_key))) %>%
+      dplyr::distinct() %>%
+      dplyr::group_by(across(all_of(dataset_key))) %>%
+      dplyr::add_count(across(all_of(dataset_key)), name = "n_samples") %>%
+      dplyr::mutate(weight = 1 / n_samples / dplyr::n_groups(.)) # equal weight for each sample of a dataset. ==> sum(weight) = 1
+
+    weights <- data_info$weight
+    names(weights) <- data_info$batch
+  } else { # if there is only one dataset, then weight is 1 ==> no need to adjust.
+    data_info <- meta %>%
+      dplyr::select(batch, all_of(batch_key)) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(weight = 1 / nrow(.))
+
+    weights <- data_info$weight
+    names(weights) <- data_info$batch
+  }
+  # create anglem object
+  anglem_object <- new(
+    "anglem",
+    matrix_list = matrix_list, # matrix_list: A list of sparse matrices, one for each batch.
+    dataset_key = ifelse(is.null(dataset_key), NA_character_, dataset_key), # dataset_key: The key used to denote the dataset.
+    batch_key = batch_key, # batch_key: The key used to denote the batch.
+    data_info = data_info, # data_info: A data frame summarizing the number of samples per dataset and their weights.
+    weights = weights, # weights: A numeric vector of weights for each dataset based on the number of samples. By default, the weights are adjusted to the size of the dataset_key if provided. Otherwise each batch has the same weight.
+    min_cells_per_gene = min_cells_per_gene, # min_cells_per_gene: The minimum number of cells per gene threshold used for filtering.
+    intersect_genes = intersect_genes
+  )
+
+
+  return(anglem_object)
 }
-
