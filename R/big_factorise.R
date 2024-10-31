@@ -1,34 +1,55 @@
 #' Factorize Angle Matrices into Z-Scores
 #'
 #' @description
-#' `big_factorise` computes the angle matrix of the input gene expression matrix using the specified method, performs permutation to create a null distribution, and transforms the correlations into z-scores. This function is optimized for large datasets using the \pkg{bigstatsr} package.
+#' `big_factorise` computes the angle matrix of the input gene expression
+#' matrix using the specified method, performs permutation to create a null
+#' distribution, and transforms the correlations into z-scores. This function
+#' is optimized for large datasets using the \pkg{bigstatsr} package.
 #'
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'   \item **Permutation**: The input matrix is permuted column-wise to disrupt existing angles, creating a null distribution.
-#'   \item **Angle Computation**: Computes the angle matrix for both the original and permuted matrices using \code{\link{big_extract_corr}}.
+#'   \item **Permutation**: The input matrix is permuted column-wise to disrupt
+#'     existing angles, creating a null distribution.
+#'   \item **Angle Computation**: Computes the angle matrix for both the
+#'     original and permuted matrices using \code{\link{big_extract_corr}}.
 #'   \item **Method-Specific Processing**:
 #'   \itemize{
-#'     \item If \code{method = "diem"}, computes Euclidean distances and scales the angles accordingly, based on the methodology from the DIEM algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
-#'     \item For other methods (\code{"pearson"}, \code{"spearman"}), statistical measures are computed from the permuted data.
+#'     \item If \code{method = "diem"}, computes Euclidean distances and scales
+#'       the angles accordingly, based on the methodology from the DIEM
+#'       algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
+#'     \item For other methods (\code{"pearson"}, \code{"spearman"}),
+#'       statistical measures are computed from the permuted data.
 #'   }
-#'   \item **Statistical Measures**: Calculates mean, variance, and standard deviation using \code{\link{get_dstat}}.
-#'   \item **Z-Score Transformation**: Transforms the original angle matrix into z-scores.
+#'   \item **Statistical Measures**: Calculates mean, variance, and standard
+#'     deviation using \code{\link{get_dstat}}.
+#'   \item **Z-Score Transformation**: Transforms the original angle matrix into
+#'     z-scores.
 #' }
-#' This process allows for the identification of invariant gene-gene relationships by comparing them to a null distribution derived from the permuted data.
+#' This process allows for the identification of invariant gene-gene
+#' relationships by comparing them to a null distribution derived from the
+#' permuted data.
 #'
-#' @param x_mat A \code{\link[bigstatsr]{FBM}} object representing the normalized and scaled gene expression matrix.
-#' @param method A character string specifying the method for calculating the relationship between gene pairs. Default is \code{"pearson"}. Other options include \code{"spearman"} and \code{"diem"} (see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
-#' @param seed An integer value for setting the seed for reproducibility during permutation. Default is \code{1}.
+#' @param x_mat A \code{\link[bigstatsr]{FBM}} object representing the
+#'   normalized and scaled gene expression matrix.
+#' @param method A character string specifying the method for calculating the
+#'   relationship between gene pairs. Default is \code{"pearson"}. Other options
+#'   include \code{"spearman"} and \code{"diem"} (see
+#'   \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
+#' @param seed An integer value for setting the seed for reproducibility during
+#'   permutation. Default is \code{1}.
 #'
-#' @return An \code{\link[bigstatsr]{FBM}} object containing the z-score-transformed angle matrix.
+#' @return An \code{\link[bigstatsr]{FBM}} object containing the
+#'   z-score-transformed angle matrix.
 #'
 #' @importFrom bigstatsr FBM big_apply
 #' @importFrom stats set.seed
 #'
 #' @seealso
-#' \code{\link{big_extract_corr}}, \code{\link{get_dstat}}, \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
+#' \code{\link{big_extract_corr}},
+#' \code{\link{get_dstat}},
+#' \code{\link[bigstatsr]{big_apply}},
+#' \code{\link[bigstatsr]{FBM}}
 #'
 #' @examples
 #' \dontrun{
@@ -40,74 +61,96 @@
 #' set.seed(123)
 #' n_genes <- 1000
 #' n_samples <- 500
-#' x_mat <- FBM(n_genes, n_samples, init = rnorm(n_genes * n_samples))
+#' x_mat <- FBM(
+#'   n_genes,
+#'   n_samples,
+#'   init = rnorm(n_genes * n_samples)
+#' )
 #'
 #' # Run big_factorise
 #' zscore_matrix <- big_factorise(
-#'     x_mat = x_mat,
-#'     method = "pearson",
-#'     seed = 123
+#'   x_mat = x_mat,
+#'   method = "pearson",
+#'   seed = 123
 #' )
 #'
 #' # View a portion of the z-score matrix
 #' zscore_submatrix <- zscore_matrix[1:5, 1:5]
 #' print(zscore_submatrix)
 #' }
-#' @export big_factorise
-big_factorise <- function(x_mat,
-                          method = "pearson",
-                          seed = 1 # nolint
-    ) {
-    # x_mat <- sparse_to_fbm(x_mat)
-    # initialize empty FBM with same dimensions as x_mat to store permuted correlation matrix
-    x_mat_perm <- bigstatsr::FBM(nrow = nrow(x_mat), ncol = ncol(x_mat))
-    
-    # permute matrix
-    set.seed(seed)
-    bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+#' @export
+big_factorise <- function(
+    x_mat,
+    method = "pearson",
+    seed = 1) {
+  # Initialize empty FBM to store permuted correlation matrix
+  x_mat_perm <- bigstatsr::FBM(
+    nrow = nrow(x_mat),
+    ncol = ncol(x_mat)
+  )
+
+  # Permute matrix
+  set.seed(seed)
+  bigstatsr::big_apply(
+    x_mat,
+    a.FUN = function(X, ind) {
+      X.sub <- X[, ind, drop = FALSE]
+      X.sub <- apply(X.sub, 2, sample)
+      x_mat_perm[, ind] <- X.sub
+      NULL
+    },
+    a.combine = "c",
+    block.size = 1000
+  )
+
+  # Compute correlation matrix for both original and permuted matrix
+  x_mat_corr <- big_extract_corr(x_mat, method = method)
+  x_mat_perm_corr <- big_extract_corr(x_mat_perm, method = method)
+
+  if (method == "diem") {
+    bigstatsr::big_apply(
+      x_mat_corr,
+      a.FUN = function(X, ind) {
+        # 1. Calculate Euclidean distance from Pearson correlation:
+        #    dij = sqrt(2 * (1 - rij))
         X.sub <- X[, ind, drop = FALSE]
-        X.sub <- apply(X.sub, 2, sample)
-        x_mat_perm[, ind] <- X.sub
+        X.sub <- sqrt(2 * (1 - X.sub))
+        x_mat_corr[, ind] <- X.sub
         NULL
-    }, a.combine = "c", block.size = 1000)
+      },
+      a.combine = "c",
+      block.size = 1000
+    )
 
-    # compute correlation matrix for both original and permuted matrix
-    x_mat_corr <- big_extract_corr(x_mat, method = method)
-    x_mat_perm_corr <- big_extract_corr(x_mat_perm, method = method)
-    
-    if (method == "diem"){
-        bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
-            # 1. calculate euclidean distance from pearson correlation. Is simple!:
-            # dij = sqrt(2*(1-rij))
-            X.sub <- X[, ind, drop = FALSE]
-            X.sub <- sqrt(2*(1-X.sub))
-            x_mat_corr[, ind] <- X.sub
-            NULL
-        }, a.combine = "c", block.size = 1000)
+    dstat <- get_dstat(x_mat_corr)
 
-        dstat <- get_dstat(x_mat_corr)
+    scale_factor <- (dstat$min - dstat$max) / dstat$var
+    bigstatsr::big_apply(
+      x_mat_corr,
+      a.FUN = function(X, ind) {
+        # 2. Calculate DIEM by subtracting the mean and scaling
+        X.sub <- X[, ind, drop = FALSE]
+        X.sub <- scale_factor * (X.sub - dstat$mean)
+        x_mat_corr[, ind] <- X.sub
+        NULL
+      },
+      a.combine = "c",
+      block.size = 1000
+    )
+  } else {
+    dstat <- get_dstat(x_mat_perm_corr)
+  }
 
-        scale_factor <- (dstat$min-dstat$max)/dstat$var
-        bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
-            # 2. calculate DIEM by subtracting the mean and scale by (Vmax-Vmin)/variance
-            X.sub <- X[, ind, drop = FALSE]            
-            X.sub <- scale_factor * (X.sub - dstat$mean)
-            NULL
-        }, a.combine = "c", block.size = 1000)
+  # Transform original correlation matrix into z-scores
+  bigstatsr::big_apply(
+    x_mat_corr,
+    a.FUN = function(X, ind) {
+      X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean) / dstat$sd
+      NULL
+    },
+    a.combine = "c",
+    block.size = 1000
+  )
 
-    } else { 
-        dstat <- get_dstat(x_mat_perm_corr) 
-        }
-        # get the mean, variance, and standard deviation of the permuted correlation matrix 
-        # will be used to transform the original correlation matrix into zscores
-
-
-    # transform original correlation matrix into zscores
-    bigstatsr::big_apply(x_mat_corr, a.FUN = function(X, ind) {
-        X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean) / dstat$sd
-    }, a.combine = "c", block.size = 1000)
-
-    return(x_mat_corr)
+  return(x_mat_corr)
 }
-
-

@@ -1,102 +1,132 @@
+# ---------------------------------------------------------------------------
+# Compute Critical Angles Between Genes Across Samples in an Anglem Object
+# ---------------------------------------------------------------------------
+
 #' Compute Critical Angles Between Genes Across Samples in an Anglem Object
 #'
 #' @description
-#' `big_anglemanise` computes critical angles between genes across all samples provided in an \code{\link{anglem}} object. It calculates angles, transforms them to z-scores, computes statistical measures, and selects genes based on specified thresholds.
+#' `big_anglemanise` computes critical angles between genes across all samples
+#' provided in an \code{\link{anglem}} object. It calculates angles,
+#' transforms them to z-scores, computes statistical measures, and selects
+#' genes based on specified thresholds.
 #'
 #' @details
 #' This function performs the following steps:
 #' \enumerate{
-#'   \item Computes angles between genes for each sample in the \code{anglem_object} using the specified \code{method}, via \code{\link{big_factorise}}.
+#'   \item Computes angles between genes for each sample in the
+#'     \code{anglem_object} using the specified \code{method}, via
+#'     \code{\link{big_factorise}}.
 #'   \item Transforms the angles to z-scores.
-#'   \item Computes statistical measures (mean z-score, signal-to-noise ratio) across samples using \code{\link{get_list_stats}}.
-#'   \item Selects genes based on specified z-score thresholds using \code{\link{select_genes}}.
+#'   \item Computes statistical measures (mean z-score, signal-to-noise ratio)
+#'     across samples using \code{\link{get_list_stats}}.
+#'   \item Selects genes based on specified z-score thresholds using
+#'     \code{\link{select_genes}}.
 #' }
-#' The function uses \code{\link[pbapply]{pblapply}} for parallel processing to improve computation speed. The data in the \code{anglem_object} must be scaled prior to computation.
+#' The function uses \code{\link[pbapply]{pblapply}} for parallel processing to
+#' improve computation speed. The data in the \code{anglem_object} must be
+#' scaled prior to computation.
 #'
-#' The computed statistics and selected genes are added to the \code{anglem_object}, which is returned.
+#' The computed statistics and selected genes are added to the
+#' \code{anglem_object}, which is returned.
 #'
-#' @param anglem_object An \code{\link{anglem}} object containing gene expression data and associated metadata.
-#' @param method Character string specifying the method to use for calculating the relationship between gene pairs. Default is \code{"pearson"}. Other options include \code{"diem"} (see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
-#' @param zscore_mean_threshold Numeric value specifying the threshold for the mean z-score. Default is \code{2}.
-#' @param zscore_sn_threshold Numeric value specifying the threshold for the signal-to-noise z-score. Default is \code{2}.
-#' @param max_n_genes Integer specifying the maximum number of genes to select. Default is \code{2000}.
+#' @param anglem_object An \code{\link{anglem}} object containing gene
+#' expression
+#'   data and associated metadata.
+#' @param method Character string specifying the method to use for calculating
+#' the relationship between gene pairs. Default is \code{"pearson"}.
+#' Other options include \code{"diem"}
+#' (see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
+#' @param zscore_mean_threshold Numeric value specifying the threshold
+#'  for the mean z-score. Default is \code{2.5}.
+#' @param zscore_sn_threshold Numeric value specifying the threshold for the
+#'   signal-to-noise z-score. Default is \code{2.5}.
+#' @param max_n_genes Integer specifying the maximum number of genes to select.
+#'   Default is \code{2000}.
 #'
-#' @return An updated \code{\link{anglem}} object with computed statistics and selected genes based on the specified thresholds.
+#' @return An updated \code{\link{anglem}} object with computed statistics and
+#'   selected genes based on the specified thresholds.
 #'
 #' @importFrom pbapply pblapply
 #' @importFrom pbapply pboptions
 #'
 #' @seealso
-#' \code{\link{create_anglem}},
-#' \code{\link{get_list_stats}},
-#' \code{\link{select_genes}},
-#' \code{\link{big_factorise}},
-#' \code{\link[bigstatsr]{big_apply}},
-#' \url{https://arxiv.org/abs/1306.0256}
+#'   \code{\link{create_anglem}},
+#'   \code{\link{get_list_stats}},
+#'   \code{\link{select_genes}},
+#'   \code{\link{big_factorise}},
+#'   \code{\link[bigstatsr]{big_apply}},
+#'   \url{https://arxiv.org/abs/1306.0256}
 #'
 #' @examples
 #' \dontrun{
 #' # Assuming you have an anglem_object already created
 #' anglem_object <- big_anglemanise(
-#'     anglem_object,
-#'     method = "pearson",
-#'     zscore_mean_threshold = 2,
-#'     zscore_sn_threshold = 2,
-#'     max_n_genes = 2000
+#'   anglem_object,
+#'   method = "pearson",
+#'   zscore_mean_threshold = 2,
+#'   zscore_sn_threshold = 2,
+#'   max_n_genes = 2000
 #' )
 #'
 #' # Access the selected genes
 #' selected_genes <- anglem_object@integration_genes$genes
 #' }
 #'
-#' @export big_anglemanise
-big_anglemanise <- function(anglem_object, # nolint
-                            method = "pearson",
-                            zscore_mean_threshold = 2.5,
-                            zscore_sn_threshold  = 2.5,
-                            max_n_genes = 2000) {
-    ############## Validate inputs ###########################
+#' @export
+big_anglemanise <- function(
+    anglem_object,
+    method = "pearson",
+    zscore_mean_threshold = 2.5,
+    zscore_sn_threshold = 2.5,
+    max_n_genes = 2000) {
+  # Validate inputs
+  if (!inherits(anglem_object, "anglem")) {
+    stop("anglem_object needs to be an anglem object")
+  }
 
-    if (class(anglem_object) != "anglem") {
-        stop("anglem_object needs to be a anglem object")
-    }
+  # dataset_key and batch_key are checked in create_anglem!
 
-    # dataset_key and batch_key are checked in create_anglem!
+  if (!is.numeric(zscore_mean_threshold) || zscore_mean_threshold < 0) {
+    stop("zscore_mean_threshold has to be a non-negative number")
+  }
+  if (!is.numeric(zscore_sn_threshold) || zscore_sn_threshold < 0) {
+    stop("zscore_sn_threshold has to be a non-negative number")
+  }
+  if (!is.null(max_n_genes) &&
+    (!is.numeric(max_n_genes) || max_n_genes < 1)) {
+    stop("max_n_genes has to be a positive integer")
+  }
 
-    if (!is.numeric(zscore_mean_threshold) || zscore_mean_threshold < 0) {
-        stop("zscore_mean_threshold has to be a non-negative number")
+  # Process inputs
+  pbapply::pboptions(
+    type = "timer",
+    style = 1,
+    char = "=",
+    title = "big_anglemanise"
+  )
+  message("Computing angles and transforming to z-scores...")
+  matrix_list(anglem_object) <- pbapply::pblapply(
+    matrix_list(anglem_object),
+    function(x) {
+      big_factorise(
+        x_mat = x,
+        method = method,
+        seed = 1
+      )
     }
-    if (!is.numeric(zscore_sn_threshold) || zscore_sn_threshold < 0) {
-        stop("zscore_sn_threshold has to be a non-negative number")
-    }
-    if (!is.null(max_n_genes) & (!is.numeric(max_n_genes) || max_n_genes < 1)) {
-        stop("max_n_genes has to be a positive integer")
-    }
-    ############## Process inputs ###########################
-    pbapply::pboptions(
-        type = "timer",
-        style = 1,
-        char = "=",
-        title = "big_anglemanise"
-    )
-    message("Computing angles and transforming to z-scores...")
-    matrix_list(anglem_object) <- pbapply::pblapply(matrix_list(anglem_object), function(x) {
-        x <- big_factorise(x_mat = x,
-                           method = method,
-                           seed = 1)
-    })
-    
-    message("Computing statistics...")
-    list_stats(anglem_object) <- get_list_stats(anglem_object)
-    invisible(gc())
+  )
 
-    message("Filtering features...")
-    anglem_object <- select_genes(
-        anglem_object,
-        zscore_mean_threshold = zscore_mean_threshold,
-        zscore_sn_threshold = zscore_sn_threshold,
-        max_n_genes = max_n_genes
-    )
-    
-    return(anglem_object)
+  message("Computing statistics...")
+  list_stats(anglem_object) <- get_list_stats(anglem_object)
+  invisible(gc())
+
+  message("Filtering features...")
+  anglem_object <- select_genes(
+    anglem_object,
+    zscore_mean_threshold = zscore_mean_threshold,
+    zscore_sn_threshold = zscore_sn_threshold,
+    max_n_genes = max_n_genes
+  )
+
+  return(anglem_object)
 }
