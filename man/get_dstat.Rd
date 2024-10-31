@@ -7,12 +7,16 @@
 get_dstat(corr_matrix)
 }
 \arguments{
-\item{corr_matrix}{A FBM object from the bigstatsr package.}
+\item{corr_matrix}{An \code{\link[bigstatsr]{FBM}} object.}
 }
 \value{
-A list with two entries: \code{mean} and \code{sd}.
+A list with statistical measures including \code{mean}, \code{sd},
+\code{var}, \code{sn}, \code{min}, and \code{max}.
 }
 \description{
-Computes the mean and standard deviation of the correlation matrix
-using the big_apply function.
+Computes the mean and standard deviation of the correlation matrix using the
+\code{big_apply} function.
+}
+\seealso{
+\code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 }

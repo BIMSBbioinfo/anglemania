@@ -2,7 +2,8 @@
 % Please edit documentation in R/anglemanise_utils.R
 \name{sparse_to_fbm}
 \alias{sparse_to_fbm}
-\title{Convert a sparse matrix into an FBM}
+\title{Convert a sparse matrix into a file-backed matrix
+(\code{\link[bigstatsr]{FBM}})}
 \usage{
 sparse_to_fbm(s_mat)
 }
@@ -10,8 +11,10 @@ sparse_to_fbm(s_mat)
 \item{s_mat}{A sparse matrix.}
 }
 \value{
-A FBM object from the bigstatsr package.
+An \code{\link[bigstatsr]{FBM}} object from the \pkg{bigstatsr}
+package.
 }
 \description{
-Converts a sparse matrix into an FBM with efficient memory usage.
+Converts a sparse matrix into an \code{\link[bigstatsr]{FBM}} with efficient
+memory usage.
 }

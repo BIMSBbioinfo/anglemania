@@ -43,7 +43,6 @@
 #'   z-score-transformed angle matrix.
 #'
 #' @importFrom bigstatsr FBM big_apply
-#' @importFrom stats set.seed
 #'
 #' @seealso
 #' \code{\link{big_extract_corr}},

@@ -2,35 +2,87 @@
 % Please edit documentation in R/big_factorise.R
 \name{big_factorise}
 \alias{big_factorise}
-\title{Factorise angle matrices}
+\title{Factorize Angle Matrices into Z-Scores}
 \usage{
-big_factorise(x_mat, name)
+big_factorise(x_mat, method = "pearson", seed = 1)
 }
 \arguments{
-\item{x_mat}{Matrix. Contains normalised and scaled gene
-expression.}
+\item{x_mat}{A \code{\link[bigstatsr]{FBM}} object representing the
+normalized and scaled gene expression matrix.}
 
-\item{name}{character. The name of the dataset.}
+\item{method}{A character string specifying the method for calculating the
+relationship between gene pairs. Default is \code{"pearson"}. Other options
+include \code{"spearman"} and \code{"diem"} (see
+\url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
 
-\item{fdr_threshold}{double. Fraction of the correlation
-to be cut from both sides of an approximated angle
-distribution.}
+\item{seed}{An integer value for setting the seed for reproducibility during
+permutation. Default is \code{1}.}
 }
 \value{
-list. First two elements are sparse matrices
-containing the significant sharp and blunt angles
-between genes. Third and fourth elements are lists
-with angles statistics and paths to the values of
-critical mangles.
+An \code{\link[bigstatsr]{FBM}} object containing the
+z-score-transformed angle matrix.
 }
 \description{
-Generates two a one-hot encoded square matrixces
-recording the presence/absence (1/0) of sharp and blunt
-critical angles.
+\code{big_factorise} computes the angle matrix of the input gene expression
+matrix using the specified method, performs permutation to create a null
+distribution, and transforms the correlations into z-scores. This function
+is optimized for large datasets using the \pkg{bigstatsr} package.
 }
 \details{
-\emph{factorise} extracts angles between genes, estimates
-critical angles by approximation of the angle distribution,
-and records angles passing the critical threshold into
-a sparse matrix.
+The function performs the following steps:
+\enumerate{
+\item \strong{Permutation}: The input matrix is permuted column-wise to disrupt
+existing angles, creating a null distribution.
+\item \strong{Angle Computation}: Computes the angle matrix for both the
+original and permuted matrices using \code{\link{big_extract_corr}}.
+\item \strong{Method-Specific Processing}:
+\itemize{
+\item If \code{method = "diem"}, computes Euclidean distances and scales
+the angles accordingly, based on the methodology from the DIEM
+algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
+\item For other methods (\code{"pearson"}, \code{"spearman"}),
+statistical measures are computed from the permuted data.
+}
+\item \strong{Statistical Measures}: Calculates mean, variance, and standard
+deviation using \code{\link{get_dstat}}.
+\item \strong{Z-Score Transformation}: Transforms the original angle matrix into
+z-scores.
+}
+This process allows for the identification of invariant gene-gene
+relationships by comparing them to a null distribution derived from the
+permuted data.
+}
+\examples{
+\dontrun{
+# Load necessary packages
+library(bigstatsr)
+
+# Assume x_mat is a normalized and scaled FBM gene expression matrix
+# For example, create a random FBM for demonstration
+set.seed(123)
+n_genes <- 1000
+n_samples <- 500
+x_mat <- FBM(
+  n_genes,
+  n_samples,
+  init = rnorm(n_genes * n_samples)
+)
+
+# Run big_factorise
+zscore_matrix <- big_factorise(
+  x_mat = x_mat,
+  method = "pearson",
+  seed = 123
+)
+
+# View a portion of the z-score matrix
+zscore_submatrix <- zscore_matrix[1:5, 1:5]
+print(zscore_submatrix)
+}
+}
+\seealso{
+\code{\link{big_extract_corr}},
+\code{\link{get_dstat}},
+\code{\link[bigstatsr]{big_apply}},
+\code{\link[bigstatsr]{FBM}}
 }

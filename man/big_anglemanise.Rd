@@ -2,45 +2,85 @@
 % Please edit documentation in R/big_anglemanise.R
 \name{big_anglemanise}
 \alias{big_anglemanise}
-\title{Record critical angles between genes in gene expression
-matrices from a Seurat list.}
+\title{Compute Critical Angles Between Genes Across Samples in an Anglem Object}
 \usage{
 big_anglemanise(
-  seurat_list,
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2,
-  max_n_genes = 2000,
-  n_cores = 4
+  anglem_object,
+  method = "pearson",
+  zscore_mean_threshold = 2.5,
+  zscore_sn_threshold = 2.5,
+  max_n_genes = 2000
 )
 }
 \arguments{
-\item{seurat_list}{seurat list of seurat objects with scaled data.}
+\item{anglem_object}{An \code{\link{anglem}} object containing gene
+expression
+data and associated metadata.}
 
-\item{n_cores}{integer. Number of cores to use for
-the computation of the cosine distances.}
+\item{method}{Character string specifying the method to use for calculating
+the relationship between gene pairs. Default is \code{"pearson"}.
+Other options include \code{"diem"}
+(see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
 
-\item{fdr_threshold}{double. The FDR threshold to apply
-to the q-values. Defaults to 0.001.}
+\item{zscore_mean_threshold}{Numeric value specifying the threshold
+for the mean z-score. Default is \code{2.5}.}
+
+\item{zscore_sn_threshold}{Numeric value specifying the threshold for the
+signal-to-noise z-score. Default is \code{2.5}.}
+
+\item{max_n_genes}{Integer specifying the maximum number of genes to select.
+Default is \code{2000}.}
 }
 \value{
-list. First two elements are sparse matrices
-recording the number of sharp and blunt angles across
-the datasets. Third and fourth elements are lists with
-angles statistics and paths to the values of critical
-angles.
+An updated \code{\link{anglem}} object with computed statistics and
+selected genes based on the specified thresholds.
 }
 \description{
-\emph{anglemanise} is a high-level function that returns a list
-of lists containing critical angles between genes across
-input samples, angle statistics per sample, paths to the
-the angle records per sample.
+\code{big_anglemanise} computes critical angles between genes across all samples
+provided in an \code{\link{anglem}} object. It calculates angles,
+transforms them to z-scores, computes statistical measures, and selects
+genes based on specified thresholds.
 }
 \details{
-This is the main function of the package. It calculates
-angles between all genes across all samples provided in
-the Seurat list. It approximates the angle distribution
-for each sample and extracts values of critical angles. Data needs to be scaled.
+This function performs the following steps:
+\enumerate{
+\item Computes angles between genes for each sample in the
+\code{anglem_object} using the specified \code{method}, via
+\code{\link{big_factorise}}.
+\item Transforms the angles to z-scores.
+\item Computes statistical measures (mean z-score, signal-to-noise ratio)
+across samples using \code{\link{get_list_stats}}.
+\item Selects genes based on specified z-score thresholds using
+\code{\link{select_genes}}.
+}
+The function uses \code{\link[pbapply]{pblapply}} for parallel processing to
+improve computation speed. The data in the \code{anglem_object} must be
+scaled prior to computation.
+
+The computed statistics and selected genes are added to the
+\code{anglem_object}, which is returned.
+}
+\examples{
+\dontrun{
+# Assuming you have an anglem_object already created
+anglem_object <- big_anglemanise(
+  anglem_object,
+  method = "pearson",
+  zscore_mean_threshold = 2,
+  zscore_sn_threshold = 2,
+  max_n_genes = 2000
+)
+
+# Access the selected genes
+selected_genes <- anglem_object@integration_genes$genes
+}
+
 }
 \seealso{
-https://arxiv.org/abs/1306.0256
+\code{\link{create_anglem}},
+\code{\link{get_list_stats}},
+\code{\link{select_genes}},
+\code{\link{big_factorise}},
+\code{\link[bigstatsr]{big_apply}},
+\url{https://arxiv.org/abs/1306.0256}
 }

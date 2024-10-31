@@ -379,7 +379,6 @@ setMethod("extract_integration_genes", "anglem", function(object) {
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
-#' @importFrom SeuratObject "%>%"
 #'
 #' @examples
 #' \dontrun{

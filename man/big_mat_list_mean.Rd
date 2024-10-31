@@ -2,21 +2,22 @@
 % Please edit documentation in R/anglemanise_utils.R
 \name{big_mat_list_mean}
 \alias{big_mat_list_mean}
-\title{Calculates the mean matrix of a list of FBMs.
-Every element is summed together and divided by the number of FBMs.}
+\title{Calculates the mean for each element of a matrix from a list of FBMs}
 \usage{
-big_mat_list_mean(fbmList)
+big_mat_list_mean(anglem_object)
 }
 \arguments{
-\item{fbmList}{A list of FBM objects to be added.}
+\item{anglem_object}{An \code{anglem} object containing the list of FBMs.}
 }
 \value{
-A new FBM object containing the sum of all FBMs in the list.
+A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 }
 \description{
-This function takes a list of FBMs, and calculates the mean of every element in the FBM.
-If the list is empty or the FBMs have different dimensions, it throws an error.
+This function takes an \code{anglem} object containing a list of
+\code{\link[bigstatsr]{FBM}}s and calculates the mean of every element.
+If the list is empty or the FBMs have different dimensions,
+it throws an error.
 }
 \examples{
-combined_matrix <- big_add_mat_list(list(fbm1, fbm2, fbm3))
+combined_matrix <- big_mat_list_mean(anglem_object)
 }

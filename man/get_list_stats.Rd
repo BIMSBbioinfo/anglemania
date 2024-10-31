@@ -4,35 +4,22 @@
 \alias{get_list_stats}
 \title{Calculate statistical measures from a list of FBMs}
 \usage{
-get_list_stats(fbmList)
+get_list_stats(anglem_object)
 }
 \arguments{
-\item{fbmList}{A list of FBM objects from the bigstatsr package.}
+\item{anglem_object}{An \code{anglem} object containing the list of FBMs.}
 }
 \value{
-A list containing three FBMs: mean_zscore, sds_zscore, and cv_zscore, which represent
-the mean, standard deviation, and coefficient of variation z-scores of the elements across
-the provided FBMs respectively.
+A list containing three matrices: \code{mean_zscore},
+\code{sds_zscore}, and \code{sn_zscore}.
 }
 \description{
-This function computes the mean, standard deviations, and coefficient of variation for each element
-across a list of FBMs. The function first checks that the input list contains more than one FBM
-and that all FBMs have the same dimensions. It calculates the z-score mean, standard deviation,
-and coefficient of variation for each element across the FBMs in the list.
-}
-\details{
-The function first calculates the mean for each element by summing up elements across
-all FBMs and dividing by the number of FBMs. It then calculates the variance for each element,
-takes the square root to get the standard deviation, and finally computes the coefficient of variation
-for each element as the ratio of the standard deviation to the mean. The calculations avoid dividing by
-zero by assigning NA to diagonal elements when computing the coefficient of variation, assuming
-these might represent self-correlations.
+Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
+for each element across a list of FBMs in an \code{anglem} object.
 }
 \examples{
-fbm_list <- list(fbm1, fbm2, fbm3)
-stats_results <- get_list_stats(fbm_list)
-
+stats_results <- get_list_stats(anglem_object)
 }
 \seealso{
-\code{\link[bigstatsr]{FBM}}, \code{\link[bigstatsr]{big_apply}}
+\code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 }

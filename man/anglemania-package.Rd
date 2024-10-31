@@ -6,7 +6,7 @@
 \alias{anglemania-package}
 \title{anglemania: What the Package Does (One Line, Title Case)}
 \description{
-What the package does (one paragraph).
+anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
 }
 \section{anglemania functions}{
 
@@ -14,7 +14,7 @@ The anglemania functions ...
 }
 
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com}
+\strong{Maintainer}: Aaron Kollotzek \email{aaron.kollotzek@mdc-berlin.de} (\href{https://orcid.org/0009-0009-7142-4015}{ORCID})
 
 }
 \keyword{internal}
