@@ -63,9 +63,8 @@
 #'
 #' @export
 big_extract_corr <- function(
-  x_mat,
-  method = "pearson"
-) {
+    x_mat,
+    method = "pearson") {
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- X[, ind, drop = FALSE]
     # Normalize the data:

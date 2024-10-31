@@ -394,11 +394,10 @@ setMethod("extract_integration_genes", "anglem", function(object) {
 #'
 #' @export
 add_unique_batch_key <- function(
-  seurat_object,
-  dataset_key = NULL,
-  batch_key,
-  new_unique_batch_key = "batch"
-) {
+    seurat_object,
+    dataset_key = NULL,
+    batch_key,
+    new_unique_batch_key = "batch") {
   if (!is.null(dataset_key) && !is.na(dataset_key)) {
     meta <- seurat_object[[]] %>%
       tidyr::unite(
@@ -519,11 +518,10 @@ add_unique_batch_key <- function(
 #'
 #' @export
 create_anglem <- function(
-  seurat_object,
-  dataset_key = NULL,
-  batch_key,
-  min_cells_per_gene = 1
-) {
+    seurat_object,
+    dataset_key = NULL,
+    batch_key,
+    min_cells_per_gene = 1) {
   # Validate inputs
   if (!inherits(seurat_object, "Seurat")) {
     stop("seurat_object needs to be a Seurat object")
