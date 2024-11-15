@@ -35,32 +35,6 @@
 #' \code{\link[bigstatsr]{FBM}},
 #' \code{\link{big_factorise}}
 #'
-#' @examples
-#' \dontrun{
-#' # Load necessary library
-#' library(bigstatsr)
-#'
-#' # Create a random gene expression FBM for demonstration
-#' n_genes <- 1000
-#' n_samples <- 500
-#' set.seed(123)
-#' x_mat <- FBM(
-#'   n_genes,
-#'   n_samples,
-#'   init = rpois(n_genes * n_samples, lambda = 5)
-#' )
-#'
-#' # Compute the gene-gene correlation matrix using Pearson correlation
-#' corr_matrix <- big_extract_corr(x_mat, method = "pearson")
-#'
-#' # Compute the gene-gene correlation matrix using Spearman correlation
-#' corr_matrix_spearman <- big_extract_corr(x_mat, method = "spearman")
-#'
-#' # Access a subset of the correlation matrix
-#' corr_subset <- corr_matrix[1:5, 1:5]
-#' print(corr_subset)
-#' }
-#'
 #' @export
 big_extract_corr <- function(
     x_mat,

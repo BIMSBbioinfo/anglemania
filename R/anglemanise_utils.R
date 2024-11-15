@@ -125,8 +125,6 @@ get_dstat <- function(corr_matrix) {
 #'
 #' @param anglem_object An \code{anglem} object containing the list of FBMs.
 #' @return A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
-#' @examples
-#' combined_matrix <- big_mat_list_mean(anglem_object)
 #' @importFrom bigstatsr FBM
 big_mat_list_mean <- function(anglem_object) {
   if (!inherits(anglem_object, "anglem")) {
@@ -185,8 +183,6 @@ big_mat_list_mean <- function(anglem_object) {
 #'   \code{sds_zscore}, and \code{sn_zscore}.
 #' @importFrom bigstatsr FBM big_apply
 #' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
-#' @examples
-#' stats_results <- get_list_stats(anglem_object)
 #' @export
 get_list_stats <- function(anglem_object) {
   if (!inherits(anglem_object, "anglem")) {
@@ -280,8 +276,8 @@ get_list_stats <- function(anglem_object) {
 #' @examples
 #' \dontrun{
 #' gene_pairs <- data.frame(
-#'   geneA = c("Gene1", "Gene2"),
-#'   geneB = c("Gene3", "Gene4")
+#'   geneA = c("Gene1", "Gene2", "Gene3", "Gene4"),
+#'   geneB = c("Gene3", "Gene4", "Gene5", "Gene6")
 #' )
 #' unique_genes <- extract_rows_for_unique_genes(
 #'   gene_pairs,
@@ -336,19 +332,6 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'     \code{\link{extract_rows_for_unique_genes}}.
 #'   \item Updates the \code{integration_genes} slot of the \code{anglem_object}
 #'     with the selected genes and their statistics.
-#' }
-#' @examples
-#' \dontrun{
-#' # Assume anglem_object is already created and contains necessary statistical
-#' # matrices
-#' anglem_object <- select_genes(
-#'   anglem_object,
-#'   zscore_mean_threshold = 2,
-#'   zscore_sn_threshold = 2,
-#'   max_n_genes = 2000
-#' )
-#' # Inspect the selected genes and their statistics
-#' head(anglem_object@integration_genes$info)
 #' }
 #' @seealso \code{\link{extract_rows_for_unique_genes}},
 #'   \code{\link{intersect_genes}}, \code{\link{list_stats}}

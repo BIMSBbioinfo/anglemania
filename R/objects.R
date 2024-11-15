@@ -74,11 +74,6 @@ setClass(
 #' @param object An \code{anglem} object.
 #' @return Prints a summary to the console.
 #' @importMethodsFrom methods show
-#' @examples
-#' \dontrun{
-#' # Assuming anglem_object is an existing anglem object
-#' show(anglem_object)
-#' }
 setMethod("show", "anglem", function(object) {
   cat("Anglem object\n")
   cat("--------------\n")
@@ -90,7 +85,7 @@ setMethod("show", "anglem", function(object) {
     nrow(unique(object@data_info[, object@dataset_key]))
   )
   cat("Number of datasets:", num_datasets, "\n")
-  if (!is.null(object@dataset_key)) {
+  if (is.character(object@dataset_key)) {
     cat(
       "Datasets:",
       paste(unique(object@data_info[, object@dataset_key]), collapse = ", "),
@@ -129,11 +124,6 @@ setMethod("show", "anglem", function(object) {
 #' @param object An \code{anglem} object.
 #' @return A list of \code{\link[bigstatsr]{FBM}} objects containing gene
 #'   expression matrices.
-#' @examples
-#' \dontrun{
-#' # Access the matrix list
-#' matrices <- matrix_list(anglem_object)
-#' }
 #' @export
 setGeneric(
   "matrix_list",
@@ -148,11 +138,6 @@ setMethod("matrix_list", "anglem", function(object) object@matrix_list)
 #' @param object An \code{anglem} object.
 #' @param value A list of \code{\link[bigstatsr]{FBM}} objects.
 #' @return The updated \code{anglem} object.
-#' @examples
-#' \dontrun{
-#' # Set a new matrix list
-#' matrix_list(anglem_object) <- new_matrix_list
-#' }
 setGeneric(
   "matrix_list<-",
   function(object, value) standardGeneric("matrix_list<-")
@@ -168,11 +153,6 @@ setReplaceMethod("matrix_list", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A character string representing the dataset key.
-#' @examples
-#' \dontrun{
-#' # Get the dataset key
-#' dkey <- dataset_key(anglem_object)
-#' }
 #' @export
 setGeneric(
   "dataset_key",
@@ -186,11 +166,6 @@ setMethod("dataset_key", "anglem", function(object) object@dataset_key)
 #'
 #' @param object An \code{anglem} object.
 #' @return A character string representing the batch key.
-#' @examples
-#' \dontrun{
-#' # Get the batch key
-#' bkey <- batch_key(anglem_object)
-#' }
 #' @export
 setGeneric(
   "batch_key",
@@ -205,11 +180,6 @@ setMethod("batch_key", "anglem", function(object) object@batch_key)
 #'
 #' @param object An \code{anglem} object.
 #' @return A data frame containing dataset and batch information.
-#' @examples
-#' \dontrun{
-#' # Get data information
-#' info <- data_info(anglem_object)
-#' }
 #' @export
 setGeneric(
   "data_info",
@@ -224,11 +194,6 @@ setMethod("data_info", "anglem", function(object) object@data_info)
 #'
 #' @param object An \code{anglem} object.
 #' @return A named numeric vector of weights.
-#' @examples
-#' \dontrun{
-#' # Get weights
-#' wts <- weights(anglem_object)
-#' }
 #' @export
 setGeneric("weights", function(object) standardGeneric("weights"))
 setMethod("weights", "anglem", function(object) object@weights)
@@ -240,11 +205,6 @@ setMethod("weights", "anglem", function(object) object@weights)
 #' @param object An \code{anglem} object.
 #' @param value A named numeric vector of weights.
 #' @return The updated \code{anglem} object.
-#' @examples
-#' \dontrun{
-#' # Set new weights
-#' weights(anglem_object) <- c(batch1 = 0.5, batch2 = 0.5)
-#' }
 #' @export
 setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
 setReplaceMethod("weights", "anglem", function(object, value) {
@@ -265,11 +225,6 @@ setReplaceMethod("weights", "anglem", function(object, value) {
 #' @param object An \code{anglem} object.
 #' @return A list containing statistical matrices such as mean z-scores and SNR
 #'   z-scores.
-#' @examples
-#' \dontrun{
-#' # Get list statistics
-#' stats <- list_stats(anglem_object)
-#' }
 #' @export
 setGeneric("list_stats", function(object) standardGeneric("list_stats"))
 setMethod("list_stats", "anglem", function(object) object@list_stats)
@@ -281,11 +236,6 @@ setMethod("list_stats", "anglem", function(object) object@list_stats)
 #' @param object An \code{anglem} object.
 #' @param value A list containing statistical matrices.
 #' @return The updated \code{anglem} object.
-#' @examples
-#' \dontrun{
-#' # Set new list statistics
-#' list_stats(anglem_object) <- new_stats_list
-#' }
 #' @export
 setGeneric("list_stats<-", function(object, value) {
   standardGeneric("list_stats<-")
@@ -303,11 +253,6 @@ setReplaceMethod("list_stats", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A character vector of intersected gene names.
-#' @examples
-#' \dontrun{
-#' # Get intersected genes
-#' genes <- intersect_genes(anglem_object)
-#' }
 #' @export
 setGeneric(
   "intersect_genes",
@@ -324,11 +269,6 @@ setMethod("intersect_genes", "anglem", function(object) {
 #' @param object An \code{anglem} object.
 #' @param value A character vector of gene names.
 #' @return The updated \code{anglem} object.
-#' @examples
-#' \dontrun{
-#' # Set new intersected genes
-#' intersect_genes(anglem_object) <- new_gene_list
-#' }
 #' @export
 setGeneric("intersect_genes<-", function(object, value) {
   standardGeneric("intersect_genes<-")
@@ -345,11 +285,6 @@ setReplaceMethod("intersect_genes", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A character vector of integration gene names.
-#' @examples
-#' \dontrun{
-#' # Extract integration genes
-#' int_genes <- extract_integration_genes(anglem_object)
-#' }
 #' @export
 setGeneric(
   "extract_integration_genes",
@@ -379,18 +314,6 @@ setMethod("extract_integration_genes", "anglem", function(object) {
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
-#'
-#' @examples
-#' \dontrun{
-#' # Add a unique batch key to the Seurat object
-#' seurat_object <- add_unique_batch_key(
-#'   seurat_object,
-#'   dataset_key = "dataset",
-#'   batch_key = "batch",
-#'   new_unique_batch_key = "unique_batch"
-#' )
-#' }
-#'
 #' @export
 add_unique_batch_key <- function(
     seurat_object,
@@ -490,31 +413,6 @@ add_unique_batch_key <- function(
 #' \code{\link{add_unique_batch_key}},
 #' \code{\link{big_anglemanise}},
 #' \code{\link[bigstatsr]{FBM}}
-#'
-#' @examples
-#' \dontrun{
-#' # Load required libraries
-#' library(Seurat)
-#' library(SeuratObject)
-#' library(pbapply)
-#' library(dplyr)
-#'
-#' # Create a sample Seurat object
-#' se <- CreateSeuratObject(
-#'   counts = matrix(rpois(2000, lambda = 10), nrow = 200, ncol = 10)
-#' )
-#' se$Experiment <- rep(c("Exp1", "Exp2"), each = 5)
-#' se$Method <- rep(c("M1", "M2"), times = 5)
-#'
-#' # Create an anglem object
-#' anglem_object <- create_anglem(
-#'   seurat_object = se,
-#'   dataset_key = "Experiment",
-#'   batch_key = "Method",
-#'   min_cells_per_gene = 10
-#' )
-#' }
-#'
 #' @export
 create_anglem <- function(
     seurat_object,

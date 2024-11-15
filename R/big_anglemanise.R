@@ -59,9 +59,11 @@
 #'
 #' @examples
 #' \dontrun{
+#' 
 #' # Assuming you have an anglem_object already created
-#' anglem_object <- big_anglemanise(
-#'   anglem_object,
+#'
+#' angl <- big_anglemanise(
+#'   angl,
 #'   method = "pearson",
 #'   zscore_mean_threshold = 2,
 #'   zscore_sn_threshold = 2,
@@ -69,7 +71,7 @@
 #' )
 #'
 #' # Access the selected genes
-#' selected_genes <- anglem_object@integration_genes$genes
+#' selected_genes <- extract_integration_genes(angl)
 #' }
 #'
 #' @export

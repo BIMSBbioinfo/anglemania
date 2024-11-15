@@ -65,30 +65,6 @@
 #' \code{\link[Seurat]{IntegrateData}},
 #' \code{\link[Seurat]{FindIntegrationAnchors}}
 #'
-#' @examples
-#' \dontrun{
-#' # Load required libraries
-#' library(Seurat)
-#' library(pbapply)
-#'
-#' # Assume seurat_object is a Seurat object containing all samples/batches
-#' # and anglem_object is an anglem object with integration genes identified
-#'
-#' # Integrate the Seurat object using the anglem object
-#' integrated_seurat <- integrate_by_features(
-#'   seurat_object = seurat_object,
-#'   anglem_object = anglem_object,
-#'   process = TRUE,
-#'   verbose = TRUE
-#' )
-#'
-#' # Access the integrated assay
-#' DefaultAssay(integrated_seurat) # Should be "integrated"
-#'
-#' # Visualize UMAP embedding
-#' DimPlot(integrated_seurat, reduction = "umap", group.by = "batch")
-#' }
-#'
 #' @export
 integrate_by_features <- function(
     seurat_object,
@@ -184,30 +160,6 @@ integrate_by_features <- function(
 #' \code{\link[Seurat]{ScaleData}},
 #' \code{\link[Seurat]{RunPCA}},
 #' \code{\link[Seurat]{RunUMAP}}
-#'
-#' @examples
-#' \dontrun{
-#' # Load required libraries
-#' library(Seurat)
-#' library(pbapply)
-#'
-#' # Assume seurat_list is a list of Seurat objects representing different
-#' # samples and features is a vector of gene names used for integration
-#'
-#' # Integrate the Seurat list
-#' integrated_seurat <- integrate_seurat_list(
-#'   seurat_list = seurat_list,
-#'   features = features,
-#'   process = TRUE,
-#'   verbose = TRUE
-#' )
-#'
-#' # Access the integrated assay
-#' DefaultAssay(integrated_seurat) # Should be "integrated"
-#'
-#' # Visualize UMAP embedding
-#' DimPlot(integrated_seurat, reduction = "umap", group.by = "batch")
-#' }
 #'
 #' @export
 integrate_seurat_list <- function(
