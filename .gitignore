@@ -5,7 +5,6 @@
 /playground
 /snapshots
 /deprecated
-/vignettes
 cleanup*
 test.snapshots
 *Jansky*
@@ -20,7 +19,6 @@ prepare*
 external_packages.tsv*
 .Rhistory
 /renv
-*.Rmd
 test_speed.R
 Time_profile*
 archive/

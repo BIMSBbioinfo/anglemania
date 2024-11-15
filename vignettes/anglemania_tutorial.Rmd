@@ -1,0 +1,178 @@
+---
+title: "anglemania_tutorial"
+date: "`r Sys.Date()`"
+output:
+    github_document:
+        toc: yes
+        df_print: kable
+vignette: >
+  %\VignetteIndexEntry{anglemania tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, load libraries}
+.libPaths(.Library)
+library(ggplot2)
+library(Seurat)
+library(SeuratData)
+# SET THIS TO THE DIRECTORY WHERE THE COPIED ANGLEMANIA DIR IS LOCATED:
+devtools::load_all("./")
+library(dplyr)
+```
+
+
+# Create Seurat Object
+```{r}
+AvailableData()
+InstallData("pbmcsca")
+data("pbmcsca")
+pbmcsca <- UpdateSeuratObject(pbmcsca)
+se <- pbmcsca
+meta <- se[[]]
+```
+
+* some methods have really low number of cells and genes ==> just remove them
+```{r, explore the samples a bit}
+meta %>%
+  # dplyr::filter(Method != "Smart-seq2") %>%
+  ggplot(aes(x = CellType, fill = CellType)) +
+  geom_histogram(stat = "count") +
+  facet_wrap(~Method) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+# some methods have really low number of cells and genes ==> just remove them
+meta %>%
+  group_by(Experiment, Method) %>%
+  summarize(n = n())
+
+filtered_methods <- c("Smart-seq2", "CEL-Seq2", "Seq-well")
+
+se <- subset(se, subset = Method != "Smart-seq2" & Method != "CEL-Seq2" & Method != "Seq-Well")
+```
+
+
+## Filtering 
+```{r, class.source = 'fold-hide'}
+filtering <- function(seurat_object,
+                      cells_min_genes = 200,
+                      cells_min_counts = 10,
+                      cells_max_counts = 50000,
+                      pct_counts_mt = 20,
+                      genes_min_cells = 3,
+                      genes_min_counts = 10) {
+  # Calculate mitochondrial and ribosomal percentage
+  seurat_object[["percent.mt"]] <- PercentageFeatureSet(seurat_object, pattern = "^MT-")
+  seurat_object[["percent.ribo"]] <- PercentageFeatureSet(seurat_object, pattern = "^RP[SL]")
+
+  # Filter cells
+  seurat_object <- subset(seurat_object, subset = nFeature_RNA >= cells_min_genes &
+    nCount_RNA >= cells_min_counts &
+    nCount_RNA <= cells_max_counts &
+    percent.mt < pct_counts_mt)
+
+  # Filter genes
+  seurat_object <- subset(seurat_object, features = rownames(seurat_object)[
+    Matrix::rowSums(seurat_object@assays$RNA@counts > 0) >= genes_min_cells &
+    Matrix::rowSums(seurat_object@assays$RNA@counts) >= genes_min_counts
+  ])
+
+  # Remove mitochondrial, ribosomal, hemoglobin and MALAT1 genes
+  mito_genes <- grep("^MT-", rownames(seurat_object), value = TRUE)
+  hb_genes <- grep("^HB[^(P)]", rownames(seurat_object), value = TRUE)
+  malat1 <- grep("^MALAT1", rownames(seurat_object), value = TRUE)
+  ribo_genes <- grep("^RP[SL]", rownames(seurat_object), value = TRUE)
+
+  genes_to_keep <- setdiff(
+    rownames(seurat_object),
+    c(mito_genes, hb_genes, malat1, ribo_genes)
+  )
+  seurat_object <- subset(seurat_object, features = genes_to_keep)
+
+  return(seurat_object)
+}
+```
+
+
+### apply filters
+```{r, apply filters}
+se <- filtering(se)
+# make strings in Method column nicer
+se[[]] <- se[[]] %>%
+  mutate(
+    Method = gsub(" ", "_", Method),
+    Method = gsub("\\(", "", Method),
+    Method = gsub("\\)", "", Method),
+    exp_method = paste(Experiment, Method, sep = "_")
+  )
+Idents(se) <- se[[]]$exp_method %>% as.factor()
+sub_se <- subset(se, downsample = 200)
+se
+```
+
+# run anglemania
+## create anglem object
+```{r, create anglem object}
+head(se[[]] %>% select(Experiment, Method, CellType))
+# some different platforms/technologies that were used in the study
+batch_key <- "Method"
+# pbmc1, and pbmc2
+dataset_key <- "Experiment"
+
+
+angl <- create_anglem(sub_se,
+  batch_key = batch_key,
+  # you don't have to specify a dataset key,
+  # if there's only 1 dataset with multiple batches.
+  dataset_key = dataset_key,
+  # ==> This is just for when dataset A has 20 batches and dataset B has 10
+  # ==> then we weight the datasets so that they contribute
+  # equaly to some final score
+  min_cells_per_gene = 1
+) # to remove zero count genes from batches
+
+angl
+angl@dataset_key
+```
+
+## run anglemania
+```{r, run anglemania}
+angl <- big_anglemanise(angl,
+  zscore_mean_threshold = 2.5,
+  zscore_sn_threshold = 2.5,
+  max_n_genes = 5000 # optionally define a max number of genes. default is 2000
+)
+
+# Inspect the anglemania genes
+integration_genes <- extract_integration_genes(angl)
+head(integration_genes)
+length(integration_genes)
+```
+
+# integration
+* we implemented the easy-to-use integrate_by_features() function from the anglemania package which uses Seurat CCA integration
+* you can also just use the anglemania genes for other integration algorithms
+```{r, integration option 1}
+angl
+# if the Seurat FindIntegrationAnchors() function does not work,
+# change this to the specified size:
+options(future.globals.maxSize = 8000 * 1024^2)
+seurat_integrated_angl <- integrate_by_features(sub_se,
+  angl,
+  process = TRUE
+) # with process = TRUE you run scaling, PCA, and UMAP on the integrated dataset
+seurat_integrated_angl
+```
+
+
+# plot cool UMAPs and other things <3<3<3
+```{r}
+DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "batch")
+DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Experiment")
+DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Method")
+DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "CellType")
+```
