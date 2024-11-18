@@ -53,20 +53,6 @@ exceed the specified thresholds.
 with the selected genes and their statistics.
 }
 }
-\examples{
-\dontrun{
-# Assume anglem_object is already created and contains necessary statistical
-# matrices
-anglem_object <- select_genes(
-  anglem_object,
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2,
-  max_n_genes = 2000
-)
-# Inspect the selected genes and their statistics
-head(anglem_object@integration_genes$info)
-}
-}
 \seealso{
 \code{\link{extract_rows_for_unique_genes}},
 \code{\link{intersect_genes}}, \code{\link{list_stats}}

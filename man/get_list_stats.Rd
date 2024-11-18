@@ -17,9 +17,6 @@ A list containing three matrices: \code{mean_zscore},
 Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
 for each element across a list of FBMs in an \code{anglem} object.
 }
-\examples{
-stats_results <- get_list_stats(anglem_object)
-}
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 }

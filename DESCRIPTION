@@ -1,35 +1,33 @@
 Package: anglemania
 Title: Feature Extraction for scRNA-seq Dataset Integration
 Version: 0.0.0.9000
-Authors@R: c(
-    person("Aaron", "Kollotzek", , "aaron.kollotzek@mdc-berlin.de", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0009-7142-4015")),
-    person("Vedran", "Franke", , "vedran.franke@mdc-berlin.de", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-3606-6792")),
-    person("Artem", "Baranovskii", , "artem.baranowsky@gmail.com", role = c("aut", "cre")),
-    person("Altuna", "Akalin", , "altuna.akalin@mdc-berlin.de", role = "ctb")
-  )
 Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
+Authors@R: c(
+    person("Aaron", "Kollotzek", email = "aaron.kollotzek@mdc-berlin.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0009-7142-4015")),
+    person("Vedran", "Franke", email = "vedran.franke@mdc-berlin.de", role = c("aut"),
+           comment = c(ORCID = "0000-0003-3606-6792")),
+    person("Artem", "Baranovskii", email = "artem.baranowsky@gmail.com", role = c("aut")),
+    person("Altuna", "Akalin", email = "altuna.akalin@mdc-berlin.de", role = "aut")
+  )
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
-    Rcpp,
     Matrix,
+    checkmate,
     Seurat,
     SeuratObject,
     bigstatsr,
     dplyr,
     magrittr,
     tidyr,
-    glmGamPoi,
     pbapply
-LinkingTo: 
-    Rcpp,
-    RcppArmadillo
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+biocViews: SingleCell, BatchEffect, MultipleComparison
+BiocType: Software

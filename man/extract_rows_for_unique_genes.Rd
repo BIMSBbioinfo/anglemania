@@ -29,8 +29,8 @@ genes are returned.
 \examples{
 \dontrun{
 gene_pairs <- data.frame(
-  geneA = c("Gene1", "Gene2"),
-  geneB = c("Gene3", "Gene4")
+  geneA = c("Gene1", "Gene2", "Gene3", "Gene4"),
+  geneB = c("Gene3", "Gene4", "Gene5", "Gene6")
 )
 unique_genes <- extract_rows_for_unique_genes(
   gene_pairs,

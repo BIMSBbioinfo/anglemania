@@ -14,8 +14,7 @@ big_anglemanise(
 }
 \arguments{
 \item{anglem_object}{An \code{\link{anglem}} object containing gene
-expression
-data and associated metadata.}
+expression data and associated metadata.}
 
 \item{method}{Character string specifying the method to use for calculating
 the relationship between gene pairs. Default is \code{"pearson"}.
@@ -62,9 +61,11 @@ The computed statistics and selected genes are added to the
 }
 \examples{
 \dontrun{
+
 # Assuming you have an anglem_object already created
-anglem_object <- big_anglemanise(
-  anglem_object,
+
+angl <- big_anglemanise(
+  angl,
   method = "pearson",
   zscore_mean_threshold = 2,
   zscore_sn_threshold = 2,
@@ -72,7 +73,7 @@ anglem_object <- big_anglemanise(
 )
 
 # Access the selected genes
-selected_genes <- anglem_object@integration_genes$genes
+selected_genes <- extract_integration_genes(angl)
 }
 
 }

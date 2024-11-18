@@ -18,6 +18,3 @@ This function takes an \code{anglem} object containing a list of
 If the list is empty or the FBMs have different dimensions,
 it throws an error.
 }
-\examples{
-combined_matrix <- big_mat_list_mean(anglem_object)
-}

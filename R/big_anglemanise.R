@@ -30,8 +30,7 @@
 #' \code{anglem_object}, which is returned.
 #'
 #' @param anglem_object An \code{\link{anglem}} object containing gene
-#' expression
-#'   data and associated metadata.
+#' expression data and associated metadata.
 #' @param method Character string specifying the method to use for calculating
 #' the relationship between gene pairs. Default is \code{"pearson"}.
 #' Other options include \code{"diem"}

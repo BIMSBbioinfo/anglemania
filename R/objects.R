@@ -1,7 +1,6 @@
 # ---------------------------------------------------------------------------
 # Class definitions for the 'anglem' Package
 # ---------------------------------------------------------------------------
-
 #' Anglem Class for Storing and Processing Gene Expression Data
 #'
 #' The `anglem` class is designed to construct the correct input for the
@@ -28,8 +27,8 @@
 #' @slot integration_genes A list containing information about integration genes
 #'   and their statistics.
 #'
-#' @name anglem-class
-#' @rdname anglem-class
+#' @name anglem-methods
+#' @rdname anglem-methods
 #' @seealso \code{\link{create_anglem}}, \code{\link{big_anglemanise}}
 #' @exportClass anglem
 setClass(
@@ -47,7 +46,7 @@ setClass(
   ),
   prototype = list(
     matrix_list = list(),
-    dataset_key = NULL,
+    dataset_key = NA_character_,
     batch_key = NA_character_,
     data_info = data.frame(),
     weights = NA_real_,
@@ -73,25 +72,27 @@ setClass(
 #'
 #' @param object An \code{anglem} object.
 #' @return Prints a summary to the console.
-#' @importMethodsFrom methods show
+#' @importFrom checkmate testString
+#' @describeIn anglem-methods show anglem object info
 setMethod("show", "anglem", function(object) {
   cat("Anglem object\n")
   cat("--------------\n")
   cat("Dataset key:", object@dataset_key, "\n")
   cat("Batch key:", object@batch_key, "\n")
-  num_datasets <- ifelse(
-    is.na(object@dataset_key),
-    1,
-    nrow(unique(object@data_info[, object@dataset_key]))
-  )
-  cat("Number of datasets:", num_datasets, "\n")
-  if (is.character(object@dataset_key)) {
+
+  if (checkmate::testString(object@dataset_key)) {
+    num_datasets <- nrow(unique(object@data_info[, object@dataset_key, drop = FALSE]))
+    cat("Number of datasets:", num_datasets, "\n")
     cat(
       "Datasets:",
       paste(unique(object@data_info[, object@dataset_key]), collapse = ", "),
       "\n"
     )
+  } else {
+    num_datasets <- 1
+    cat("Number of datasets:", num_datasets, "\n")
   }
+
   cat("Total number of batches:", nrow(object@data_info), "\n")
   cat("Batches (showing first 5):\n")
   if (nrow(object@data_info) > 5) {
@@ -116,7 +117,7 @@ setMethod("show", "anglem", function(object) {
 # Accessor and Mutator Methods for the Anglem Class
 # ---------------------------------------------------------------------------
 
-#' Access the Matrix List from an Anglem Object
+#' Access the Matrix List from an anglem Object
 #'
 #' Retrieves the list of gene expression matrices stored in the \code{anglem}
 #' object.
@@ -124,6 +125,7 @@ setMethod("show", "anglem", function(object) {
 #' @param object An \code{anglem} object.
 #' @return A list of \code{\link[bigstatsr]{FBM}} objects containing gene
 #'   expression matrices.
+#' @describeIn anglem-methods Access matrix list
 #' @export
 setGeneric(
   "matrix_list",
@@ -131,13 +133,15 @@ setGeneric(
 )
 setMethod("matrix_list", "anglem", function(object) object@matrix_list)
 
-#' Set the Matrix List in an Anglem Object
+#' Set the Matrix List in an anglem Object
 #'
 #' Assigns a new list of gene expression matrices to the \code{anglem} object.
 #'
 #' @param object An \code{anglem} object.
 #' @param value A list of \code{\link[bigstatsr]{FBM}} objects.
 #' @return The updated \code{anglem} object.
+#' @describeIn anglem-methods set matrix list in anglem object
+#' @export
 setGeneric(
   "matrix_list<-",
   function(object, value) standardGeneric("matrix_list<-")
@@ -153,6 +157,7 @@ setReplaceMethod("matrix_list", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A character string representing the dataset key.
+#' @describeIn anglem-methods Access dataset key of anglem object
 #' @export
 setGeneric(
   "dataset_key",
@@ -166,6 +171,7 @@ setMethod("dataset_key", "anglem", function(object) object@dataset_key)
 #'
 #' @param object An \code{anglem} object.
 #' @return A character string representing the batch key.
+#' @describeIn anglem-methods Access batch key of anglem object
 #' @export
 setGeneric(
   "batch_key",
@@ -173,13 +179,14 @@ setGeneric(
 )
 setMethod("batch_key", "anglem", function(object) object@batch_key)
 
-#' Access Data Information from an Anglem Object
+#' Access Data Information from an anglem Object
 #'
-#' Retrieves the data frame summarizing datasets and batches within the
+#' Retrieves the data frame summarizing the selected anglemania gene pairs
 #' \code{anglem} object.
 #'
 #' @param object An \code{anglem} object.
 #' @return A data frame containing dataset and batch information.
+#' @describeIn anglem-methods Access info of selected gene pairs
 #' @export
 setGeneric(
   "data_info",
@@ -194,9 +201,10 @@ setMethod("data_info", "anglem", function(object) object@data_info)
 #'
 #' @param object An \code{anglem} object.
 #' @return A named numeric vector of weights.
+#' @describeIn anglem-methods Access weights
 #' @export
-setGeneric("weights", function(object) standardGeneric("weights"))
-setMethod("weights", "anglem", function(object) object@weights)
+setGeneric("angl_weights", function(object) standardGeneric("angl_weights"))
+setMethod("angl_weights", "anglem", function(object) object@weights)
 
 #' Set Weights in an Anglem Object
 #'
@@ -205,9 +213,10 @@ setMethod("weights", "anglem", function(object) object@weights)
 #' @param object An \code{anglem} object.
 #' @param value A named numeric vector of weights.
 #' @return The updated \code{anglem} object.
+#' @describeIn anglem-methods Set weights
 #' @export
-setGeneric("weights<-", function(object, value) standardGeneric("weights<-"))
-setReplaceMethod("weights", "anglem", function(object, value) {
+setGeneric("angl_weights<-", function(object, value) standardGeneric("angl_weights<-"))
+setReplaceMethod("angl_weights", "anglem", function(object, value) {
   if (!is.numeric(value)) stop("weights must be numeric")
   if (is.null(names(value))) stop("weights need to be a named vector")
   # Scale the weights so that the sum of weights is 1
@@ -224,7 +233,8 @@ setReplaceMethod("weights", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A list containing statistical matrices such as mean z-scores and SNR
-#'   z-scores.
+#'   z-scores
+#' @describeIn anglem-methods Access statistics of the gene-gene matrices
 #' @export
 setGeneric("list_stats", function(object) standardGeneric("list_stats"))
 setMethod("list_stats", "anglem", function(object) object@list_stats)
@@ -236,6 +246,7 @@ setMethod("list_stats", "anglem", function(object) object@list_stats)
 #' @param object An \code{anglem} object.
 #' @param value A list containing statistical matrices.
 #' @return The updated \code{anglem} object.
+#' @describeIn anglem-methods Set statistics of the gene-gene matrices
 #' @export
 setGeneric("list_stats<-", function(object, value) {
   standardGeneric("list_stats<-")
@@ -253,6 +264,7 @@ setReplaceMethod("list_stats", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A character vector of intersected gene names.
+#' @describeIn anglem-methods Access the intersection of genes of all batches
 #' @export
 setGeneric(
   "intersect_genes",
@@ -269,6 +281,7 @@ setMethod("intersect_genes", "anglem", function(object) {
 #' @param object An \code{anglem} object.
 #' @param value A character vector of gene names.
 #' @return The updated \code{anglem} object.
+#' @describeIn anglem-methods Set the intersection of genes of all batches
 #' @export
 setGeneric("intersect_genes<-", function(object, value) {
   standardGeneric("intersect_genes<-")
@@ -285,6 +298,7 @@ setReplaceMethod("intersect_genes", "anglem", function(object, value) {
 #'
 #' @param object An \code{anglem} object.
 #' @return A character vector of integration gene names.
+#' @describeIn anglem-methods Access the genes extracted by anglemania
 #' @export
 setGeneric(
   "extract_integration_genes",
@@ -303,7 +317,7 @@ setMethod("extract_integration_genes", "anglem", function(object) {
 #'
 #' @param seurat_object A \code{\link[Seurat]{Seurat}} object.
 #' @param dataset_key A character string specifying the column name in the
-#'   metadata that identifies the dataset. If \code{NULL}, only the
+#'   metadata that identifies the dataset. If \code{NA}, only the
 #'   \code{batch_key} is used.
 #' @param batch_key A character string specifying the column name in the
 #'   metadata that identifies the batch.
@@ -314,13 +328,14 @@ setMethod("extract_integration_genes", "anglem", function(object) {
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
+#' @describeIn anglem-methods Temporarily add a unique batch key to the dataset
 #' @export
 add_unique_batch_key <- function(
     seurat_object,
-    dataset_key = NULL,
+    dataset_key = NA_character_,
     batch_key,
     new_unique_batch_key = "batch") {
-  if (!is.null(dataset_key) && !is.na(dataset_key)) {
+  if (checkmate::testString(dataset_key)) {
     meta <- seurat_object[[]] %>%
       tidyr::unite(
         "batch",
@@ -363,7 +378,7 @@ add_unique_batch_key <- function(
 #'   single-cell RNA-seq data.
 #' @param dataset_key A character string indicating the column name in the
 #'   Seurat object metadata that identifies the dataset to which each cell
-#'   belongs. If \code{NULL}, all cells are assumed to belong to the same
+#'   belongs. If \code{NA}, all cells are assumed to belong to the same
 #'   dataset.
 #' @param batch_key A character string indicating the column name(s) in the
 #'   Seurat object metadata that identify the batch to which each cell belongs.
@@ -407,16 +422,17 @@ add_unique_batch_key <- function(
 #' @importFrom pbapply pblapply
 #' @importFrom dplyr select distinct group_by add_count mutate n_groups
 #' @importFrom bigstatsr nb_cores
+#' @importFrom checkmate testString
 #'
 #' @seealso
 #' \code{\link{anglem-class}},
 #' \code{\link{add_unique_batch_key}},
 #' \code{\link{big_anglemanise}},
 #' \code{\link[bigstatsr]{FBM}}
-#' @export
+#' @export create_anglem
 create_anglem <- function(
     seurat_object,
-    dataset_key = NULL,
+    dataset_key = NA_character_,
     batch_key,
     min_cells_per_gene = 1) {
   # Validate inputs
@@ -424,36 +440,30 @@ create_anglem <- function(
     stop("seurat_object needs to be a Seurat object")
   }
 
-  if (is.null(dataset_key)) {
-    message(
-      "No dataset_key specified.\n",
-      "Assuming that all samples belong to the same dataset ",
-      "and are separated by batch_key: ", batch_key
-    )
-  }
-
-  if (!is.null(dataset_key)) {
-    if (!is.character(dataset_key) || length(dataset_key) != 1) {
-      stop(
-        "dataset_key needs to be a character vector of length 1 ",
-        "corresponding to the column in the meta data of the Seurat ",
-        "object that indicates which dataset the cells belong to"
-      )
+  if (checkmate::testString(dataset_key)) {
+    if (length(dataset_key) != 1) {
+     stop(
+       "dataset_key needs to be a character string of length 1 ",
+       "corresponding to the column in the metadata of the Seurat ",
+       "object that indicates which dataset the cells belong to"
+     )
     }
-  }
-
-  if (is.null(batch_key)) {
-    stop(
-      "batch_key is not specified! batch_key needs to be a character ",
-      "vector indicating the batch key(s) in the meta data of the ",
-      "Seurat object"
+    message(
+      "Using dataset_key: ", dataset_key
     )
+  } else {
+      message(
+        "No dataset_key specified.\n",
+        "Assuming that all samples belong to the same dataset ",
+        "and are separated by batch_key: ", batch_key
+      )
   }
 
-  if (!is.character(batch_key)) {
+  if (!checkmate::testString(batch_key) || length(batch_key) != 1) {
     stop(
-      "batch_key needs to be a character vector indicating the batch ",
-      "key(s) in the meta data of the Seurat object"
+      "batch_key needs to be a character string of length 1 ",
+      "corresponding to the column in the metadata of the Seurat ",
+      "object that indicates which batch the cells belong to"
     )
   }
 
@@ -503,7 +513,7 @@ create_anglem <- function(
     cl = bigstatsr::nb_cores()
   )
 
-  if (!is.null(dataset_key)) {
+  if (checkmate::testString(dataset_key)) {
     data_info <- meta %>%
       dplyr::select(
         batch,
@@ -533,9 +543,9 @@ create_anglem <- function(
     "anglem",
     matrix_list = matrix_list,
     dataset_key = ifelse(
-      is.null(dataset_key),
-      NA_character_,
-      dataset_key
+      checkmate::testString(dataset_key),
+      dataset_key,
+      NA_character_
     ),
     batch_key = batch_key,
     data_info = data_info,

@@ -52,34 +52,6 @@ This process allows for the identification of invariant gene-gene
 relationships by comparing them to a null distribution derived from the
 permuted data.
 }
-\examples{
-\dontrun{
-# Load necessary packages
-library(bigstatsr)
-
-# Assume x_mat is a normalized and scaled FBM gene expression matrix
-# For example, create a random FBM for demonstration
-set.seed(123)
-n_genes <- 1000
-n_samples <- 500
-x_mat <- FBM(
-  n_genes,
-  n_samples,
-  init = rnorm(n_genes * n_samples)
-)
-
-# Run big_factorise
-zscore_matrix <- big_factorise(
-  x_mat = x_mat,
-  method = "pearson",
-  seed = 123
-)
-
-# View a portion of the z-score matrix
-zscore_submatrix <- zscore_matrix[1:5, 1:5]
-print(zscore_submatrix)
-}
-}
 \seealso{
 \code{\link{big_extract_corr}},
 \code{\link{get_dstat}},

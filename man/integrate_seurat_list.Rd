@@ -64,31 +64,6 @@ scales the data, runs PCA, and computes UMAP embeddings.
 The integration is performed using Seurat's CCA-based methods, and the
 function is designed to handle datasets with varying sizes efficiently.
 }
-\examples{
-\dontrun{
-# Load required libraries
-library(Seurat)
-library(pbapply)
-
-# Assume seurat_list is a list of Seurat objects representing different
-# samples and features is a vector of gene names used for integration
-
-# Integrate the Seurat list
-integrated_seurat <- integrate_seurat_list(
-  seurat_list = seurat_list,
-  features = features,
-  process = TRUE,
-  verbose = TRUE
-)
-
-# Access the integrated assay
-DefaultAssay(integrated_seurat) # Should be "integrated"
-
-# Visualize UMAP embedding
-DimPlot(integrated_seurat, reduction = "umap", group.by = "batch")
-}
-
-}
 \seealso{
 \code{\link{integrate_by_features}},
 \code{\link[Seurat]{IntegrateData}},

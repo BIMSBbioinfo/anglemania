@@ -66,31 +66,6 @@ compatibility with small sample sizes (e.g., metacells or SEACells). If
 \code{process = TRUE}, the function will also scale the data, run PCA,
 and compute UMAP embeddings.
 }
-\examples{
-\dontrun{
-# Load required libraries
-library(Seurat)
-library(pbapply)
-
-# Assume seurat_object is a Seurat object containing all samples/batches
-# and anglem_object is an anglem object with integration genes identified
-
-# Integrate the Seurat object using the anglem object
-integrated_seurat <- integrate_by_features(
-  seurat_object = seurat_object,
-  anglem_object = anglem_object,
-  process = TRUE,
-  verbose = TRUE
-)
-
-# Access the integrated assay
-DefaultAssay(integrated_seurat) # Should be "integrated"
-
-# Visualize UMAP embedding
-DimPlot(integrated_seurat, reduction = "umap", group.by = "batch")
-}
-
-}
 \seealso{
 \code{\link{create_anglem}},
 \code{\link{big_anglemanise}},

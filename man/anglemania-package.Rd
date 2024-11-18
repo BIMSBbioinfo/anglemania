@@ -4,7 +4,7 @@
 \name{anglemania-package}
 \alias{anglemania}
 \alias{anglemania-package}
-\title{anglemania: What the Package Does (One Line, Title Case)}
+\title{anglemania: Feature Extraction for scRNA-seq Dataset Integration}
 \description{
 anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
 }
@@ -15,6 +15,13 @@ The anglemania functions ...
 
 \author{
 \strong{Maintainer}: Aaron Kollotzek \email{aaron.kollotzek@mdc-berlin.de} (\href{https://orcid.org/0009-0009-7142-4015}{ORCID})
+
+Authors:
+\itemize{
+  \item Vedran Franke \email{vedran.franke@mdc-berlin.de} (\href{https://orcid.org/0000-0003-3606-6792}{ORCID})
+  \item Artem Baranovskii \email{artem.baranowsky@gmail.com}
+  \item Altuna Akalin \email{altuna.akalin@mdc-berlin.de}
+}
 
 }
 \keyword{internal}

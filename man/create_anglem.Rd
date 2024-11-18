@@ -6,7 +6,7 @@
 \usage{
 create_anglem(
   seurat_object,
-  dataset_key = NULL,
+  dataset_key = NA_character_,
   batch_key,
   min_cells_per_gene = 1
 )
@@ -17,7 +17,7 @@ single-cell RNA-seq data.}
 
 \item{dataset_key}{A character string indicating the column name in the
 Seurat object metadata that identifies the dataset to which each cell
-belongs. If \code{NULL}, all cells are assumed to belong to the same
+belongs. If \code{NA}, all cells are assumed to belong to the same
 dataset.}
 
 \item{batch_key}{A character string indicating the column name(s) in the
@@ -64,31 +64,6 @@ The function performs the following steps:
 \item Converts count matrices to \code{\link[bigstatsr]{FBM}} objects.
 \item Computes weights for each batch or dataset.
 }
-}
-\examples{
-\dontrun{
-# Load required libraries
-library(Seurat)
-library(SeuratObject)
-library(pbapply)
-library(dplyr)
-
-# Create a sample Seurat object
-se <- CreateSeuratObject(
-  counts = matrix(rpois(2000, lambda = 10), nrow = 200, ncol = 10)
-)
-se$Experiment <- rep(c("Exp1", "Exp2"), each = 5)
-se$Method <- rep(c("M1", "M2"), times = 5)
-
-# Create an anglem object
-anglem_object <- create_anglem(
-  seurat_object = se,
-  dataset_key = "Experiment",
-  batch_key = "Method",
-  min_cells_per_gene = 10
-)
-}
-
 }
 \seealso{
 \code{\link{anglem-class}},
