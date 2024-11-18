@@ -7,12 +7,12 @@ The repository carries the development version of the conceived "anglemania" R p
 **anglemania** is a new approach to the integration of scRNA-seq (and, potentially, others sc-omics) from **similar** biological entities.
 The novelty, as well as the cornerstone, of the proposed approach, is to use the conservation of [angles](https://arxiv.org/abs/1306.0256) between gene pairs across an assembly of datasets to be integrated. 
 
-<!-- badges: start -->
-  [![R-CMD-check](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml)
-[![Bioconductor Release](https://bioconductor.org/shields/years-in-bioc/anglemania.svg)](https://bioconductor.org/packages/anglemania)
-[![Bioconductor Downloads](https://bioconductor.org/shields/downloads/anglemania.svg)](https://bioconductor.org/packages/stats/bioc/anglemania)
-[![Build Status](https://github.com/BIMSBbioinfo/anglemania/workflows/R-CMD-check/badge.svg)](https://github.com/BIMSBbioinfo/anglemania/actions)
-<!-- badges: end -->
+|  |  | 
+| - | - |
+| Github | [![Github](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml) |
+| Bioc Release | [![Bioc Release](https://bioconductor.org/shields/years-in-bioc/anglemania.svg)](https://bioconductor.org/packages/anglemania)
+
+
 
 ## Installation
 
@@ -52,13 +52,14 @@ If you encounter issues or have questions:
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+Artistic License/GPL
 
 ## Citation
 
-If you use **YourPackageName** in your research, please cite:
+If you use **anglemania** in your research, please cite:
 
-> Your Name (2024). *YourPackageName: A Bioconductor Package for [purpose]*. R package version 1.0.0.
+> Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin(2024). *anglemania: Feature Extraction for scRNA-seq Dataset Integration. R package version 0.0.9000
+
 
 
 
