@@ -2,9 +2,12 @@
 title: "anglemania_tutorial"
 date: "`r Sys.Date()`"
 output:
-    github_document:
-        toc: yes
-        df_print: kable
+  html_document:
+    df_print: "paged"
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    theme: simplex
 vignette: >
   %\VignetteIndexEntry{anglemania tutorial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,10 +19,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, load libraries}
-# devtools::install_github("BIMSBbioinfo/anglemania")
-devtools::install("./", quiet = TRUE)
-library(anglemania)
-library(Seurat)
+suppressPackageStartupMessages({
+  library(anglemania)
+  library(dplyr)
+  library(Seurat)
+})
 ```
 
 # load data
@@ -45,7 +49,7 @@ DimPlot(se_unintegrated, reduction = "umap", group.by = "Group")
 head(se[[]])
 batch_key <- "Batch"
 
-angl <- create_anglem(se,
+angl <- create_anglemaniaObject(se,
   batch_key = batch_key,
   min_cells_per_gene = 1
 )
@@ -54,14 +58,14 @@ angl
 
 ## run anglemania
 ```{r, run anglemania}
-angl <- big_anglemanise(angl,
+angl <- anglemania(angl,
   zscore_mean_threshold = 2.5,
   zscore_sn_threshold = 2.5,
   max_n_genes = 3000 # optionally define a max number of genes. default is 2000
 )
 
 # Inspect the anglemania genes
-integration_genes <- extract_integration_genes(angl)
+integration_genes <- get_anglemania_genes(angl)
 head(integration_genes)
 length(integration_genes)
 ```

@@ -1,0 +1,44 @@
+url: ~
+template:
+  bootstrap: 3
+
+reference:
+  - title: Main
+    desc: >
+      The two functions for running anglemania.
+    contents:
+      - create_anglemaniaObject
+      - anglemania
+
+  - title: Computation of Statistics
+    desc: >
+      Functions that work behind the scenes of anglemania to get the statistics.
+    contents:
+      - factorise
+      - extract_angles
+
+  - title: Utilities
+    desc: >
+      anglemania utilities.
+    contents:
+      - sparse_to_fbm
+      - get_dstat
+      - big_mat_list_mean
+      - get_list_stats
+      - extract_rows_for_unique_genes
+      - select_genes
+      - integrate_by_features
+      - integrate_seurat_list
+
+  - title: Anglem Object Helpers
+    desc: >
+      Helper functions to access and set anglem object attributes.
+    contents:
+      - anglemaniaObject-methods
+
+articles:
+  - title: "Articles"
+    navbar: ~
+    contents:
+      - "anglemania_tutorial"
+

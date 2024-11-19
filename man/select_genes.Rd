@@ -2,17 +2,17 @@
 % Please edit documentation in R/anglemanise_utils.R
 \name{select_genes}
 \alias{select_genes}
-\title{Select Genes Based on Statistical Thresholds from an Anglem Object}
+\title{Select Genes Based on Statistical Thresholds from an anglemaniaObject}
 \usage{
 select_genes(
-  anglem_object,
+  anglemania_object,
   zscore_mean_threshold = 2,
   zscore_sn_threshold = 2,
   max_n_genes = NULL
 )
 }
 \arguments{
-\item{anglem_object}{An \code{\link{anglem}} object containing statistical
+\item{anglemania_object}{An \code{anglemaniaObject} containing statistical
 matrices such as mean z-scores and SNR z-scores.}
 
 \item{zscore_mean_threshold}{Numeric value specifying the threshold for the
@@ -26,21 +26,21 @@ If \code{NULL}, all genes that pass the thresholds are used. Default is
 \code{NULL}.}
 }
 \value{
-The input \code{\link{anglem}} object with the
+The input \code{anglemaniaObject} with the
 \code{integration_genes} slot updated to include the selected genes and
 their statistical information.
 }
 \description{
-Selects genes from an \code{\link{anglem}} object based on specified
+Selects genes from an \code{anglemaniaObject} based on specified
 thresholds for the absolute mean z-score and signal-to-noise ratio
 (SNR) z-score. It updates the \code{integration_genes} slot of the
-\code{\link{anglem}} object with the selected genes and associated
+\code{anglemaniaObject} with the selected genes and associated
 information.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item Checks if the input object is of class \code{\link{anglem}}.
+\item Checks if the input object is of class \code{\link{anglemaniaObject}}.
 \item If \code{max_n_genes} is not specified, it uses all genes that pass
 the thresholds.
 \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -49,7 +49,7 @@ exceed the specified thresholds.
 99th percentile values of the corresponding statistics and re-selects.
 \item Extracts unique genes from the selected gene pairs using
 \code{\link{extract_rows_for_unique_genes}}.
-\item Updates the \code{integration_genes} slot of the \code{anglem_object}
+\item Updates the \code{integration_genes} slot of the \code{anglemaniaObject}
 with the selected genes and their statistics.
 }
 }

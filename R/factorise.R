@@ -1,7 +1,7 @@
 #' Factorize Angle Matrices into Z-Scores
 #'
 #' @description
-#' `big_factorise` computes the angle matrix of the input gene expression
+#' `factorise` computes the angle matrix of the input gene expression
 #' matrix using the specified method, performs permutation to create a null
 #' distribution, and transforms the correlations into z-scores. This function
 #' is optimized for large datasets using the \pkg{bigstatsr} package.
@@ -12,7 +12,7 @@
 #'   \item **Permutation**: The input matrix is permuted column-wise to disrupt
 #'     existing angles, creating a null distribution.
 #'   \item **Angle Computation**: Computes the angle matrix for both the
-#'     original and permuted matrices using \code{\link{big_extract_corr}}.
+#'     original and permuted matrices using \code{\link{extract_angles}}.
 #'   \item **Method-Specific Processing**:
 #'   \itemize{
 #'     \item If \code{method = "diem"}, computes Euclidean distances and scales
@@ -45,13 +45,13 @@
 #' @importFrom bigstatsr FBM big_apply
 #'
 #' @seealso
-#' \code{\link{big_extract_corr}},
+#' \code{\link{extract_angles}},
 #' \code{\link{get_dstat}},
 #' \code{\link[bigstatsr]{big_apply}},
 #' \code{\link[bigstatsr]{FBM}}
 #'
 #' @export
-big_factorise <- function(
+factorise <- function(
     x_mat,
     method = "pearson",
     seed = 1) {
@@ -76,8 +76,8 @@ big_factorise <- function(
   )
 
   # Compute correlation matrix for both original and permuted matrix
-  x_mat_corr <- big_extract_corr(x_mat, method = method)
-  x_mat_perm_corr <- big_extract_corr(x_mat_perm, method = method)
+  x_mat_corr <- extract_angles(x_mat, method = method)
+  x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
 
   if (method == "diem") {
     bigstatsr::big_apply(

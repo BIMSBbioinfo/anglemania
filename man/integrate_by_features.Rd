@@ -3,11 +3,11 @@
 \name{integrate_by_features}
 \alias{integrate_by_features}
 \title{Integrate Samples in a Seurat Object Using Selected Features from
-\code{anglem_object} Object}
+\code{anglemaniaObject} Object}
 \usage{
 integrate_by_features(
   seurat_object,
-  anglem_object,
+  anglemania_object,
   int_order = NULL,
   process = TRUE,
   verbose = FALSE
@@ -16,11 +16,6 @@ integrate_by_features(
 \arguments{
 \item{seurat_object}{A \code{\link[Seurat]{Seurat}} object containing
 all samples or batches to be integrated.}
-
-\item{anglem_object}{An \code{\link{anglem}} object previously generated
-using \code{\link{create_anglem}} and \code{\link{big_anglemanise}}.
-It is important that the \code{dataset_key} and \code{batch_key} are
-correctly set in the \code{anglem_object}.}
 
 \item{int_order}{An optional data frame specifying the integration order
 of samples within the Seurat list. See the \code{sample.tree} argument
@@ -34,6 +29,11 @@ embeddings). Default is \code{TRUE}.}
 
 \item{verbose}{Logical value indicating whether to display progress
 messages during integration. Default is \code{FALSE}.}
+
+\item{anglem_object}{An \code{\link{anglemaniaObject}} previously generated
+using \code{\link{create_anglemaniaObject}} and \code{\link{anglemania}}.
+It is important that the \code{dataset_key} and \code{batch_key} are
+correctly set in the \code{anglemaniaObject}.}
 }
 \value{
 A \code{\link[Seurat]{Seurat}} object containing the integrated
@@ -42,7 +42,7 @@ data. The default assay is set to \code{"integrated"}.
 \description{
 \code{integrate_by_features} integrates samples or batches within a Seurat
 object using canonical correlation analysis (CCA) based on a set of
-selected features (genes). The function utilizes an \code{anglem} object to
+selected features (genes). The function utilizes an \code{anglemaniaObject} to
 extract integration genes and handles the integration process, including
 optional downstream processing steps such as scaling, PCA, and UMAP
 visualization.
@@ -52,12 +52,12 @@ The function performs the following steps:
 \enumerate{
 \item \strong{Batch Key Addition}: Adds a unique batch key to the Seurat
 object's metadata to distinguish different batches or samples. Batch
-key is set to the \code{anglem_object}'s \code{batch_key}.
+key is set to the \code{anglemaniaObject}'s \code{batch_key}.
 \item \strong{Splitting}: Splits the Seurat object into a list of Seurat
 objects based on the batch key.
 \item \strong{Integration}: Calls \code{\link{integrate_seurat_list}} to
 integrate the list of Seurat objects using the features extracted
-from the \code{anglem_object}.
+from the \code{anglemaniaObject}.
 }
 
 The integration is performed using Seurat's CCA-based methods, and
@@ -67,8 +67,8 @@ compatibility with small sample sizes (e.g., metacells or SEACells). If
 and compute UMAP embeddings.
 }
 \seealso{
-\code{\link{create_anglem}},
-\code{\link{big_anglemanise}},
+\code{\link{create_anglemaniaObject}},
+\code{\link{anglemania}},
 \code{\link{extract_integration_genes}},
 \code{\link{integrate_seurat_list}},
 \code{\link[Seurat]{IntegrateData}},

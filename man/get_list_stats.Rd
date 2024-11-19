@@ -4,10 +4,10 @@
 \alias{get_list_stats}
 \title{Calculate statistical measures from a list of FBMs}
 \usage{
-get_list_stats(anglem_object)
+get_list_stats(anglemania_object)
 }
 \arguments{
-\item{anglem_object}{An \code{anglem} object containing the list of FBMs.}
+\item{anglemania_object}{An \code{anglemaniaObject} containing the list of FBMs.}
 }
 \value{
 A list containing three matrices: \code{mean_zscore},
@@ -15,7 +15,7 @@ A list containing three matrices: \code{mean_zscore},
 }
 \description{
 Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
-for each element across a list of FBMs in an \code{anglem} object.
+for each element across a list of FBMs in an \code{anglemaniaObject}.
 }
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}

@@ -4,16 +4,16 @@
 \alias{big_mat_list_mean}
 \title{Calculates the mean for each element of a matrix from a list of FBMs}
 \usage{
-big_mat_list_mean(anglem_object)
+big_mat_list_mean(anglemania_object)
 }
 \arguments{
-\item{anglem_object}{An \code{anglem} object containing the list of FBMs.}
+\item{anglemania_object}{An \code{anglemaniaObject} containing the list of FBMs.}
 }
 \value{
 A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 }
 \description{
-This function takes an \code{anglem} object containing a list of
+This function takes an \code{anglemaniaObject} containing a list of
 \code{\link[bigstatsr]{FBM}}s and calculates the mean of every element.
 If the list is empty or the FBMs have different dimensions,
 it throws an error.

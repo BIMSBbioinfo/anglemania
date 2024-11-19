@@ -1,15 +1,15 @@
 # ---------------------------------------------------------------------------
 # Integrate Samples in \code{\link[SeuratObject]{SeuratObject}}
-# Using Selected Features from \code{anglem_object}
+# Using Selected Features from \code{anglemaniaObject}
 # ---------------------------------------------------------------------------
 
 #' Integrate Samples in a Seurat Object Using Selected Features from
-#' \code{anglem_object} Object
+#' \code{anglemaniaObject} Object
 #'
 #' @description
 #' `integrate_by_features` integrates samples or batches within a Seurat
 #' object using canonical correlation analysis (CCA) based on a set of
-#' selected features (genes). The function utilizes an `anglem` object to
+#' selected features (genes). The function utilizes an `anglemaniaObject` to
 #' extract integration genes and handles the integration process, including
 #' optional downstream processing steps such as scaling, PCA, and UMAP
 #' visualization.
@@ -19,12 +19,12 @@
 #' \enumerate{
 #'   \item **Batch Key Addition**: Adds a unique batch key to the Seurat
 #'     object's metadata to distinguish different batches or samples. Batch
-#'     key is set to the \code{anglem_object}'s \code{batch_key}.
+#'     key is set to the \code{anglemaniaObject}'s \code{batch_key}.
 #'   \item **Splitting**: Splits the Seurat object into a list of Seurat
 #'     objects based on the batch key.
 #'   \item **Integration**: Calls \code{\link{integrate_seurat_list}} to
 #'     integrate the list of Seurat objects using the features extracted
-#'     from the \code{anglem_object}.
+#'     from the \code{anglemaniaObject}.
 #' }
 #'
 #' The integration is performed using Seurat's CCA-based methods, and
@@ -35,10 +35,10 @@
 #'
 #' @param seurat_object A \code{\link[Seurat]{Seurat}} object containing
 #'   all samples or batches to be integrated.
-#' @param anglem_object An \code{\link{anglem}} object previously generated
-#'   using \code{\link{create_anglem}} and \code{\link{big_anglemanise}}.
+#' @param anglem_object An \code{\link{anglemaniaObject}} previously generated
+#'   using \code{\link{create_anglemaniaObject}} and \code{\link{anglemania}}.
 #'   It is important that the \code{dataset_key} and \code{batch_key} are
-#'   correctly set in the \code{anglem_object}.
+#'   correctly set in the \code{anglemaniaObject}.
 #' @param int_order An optional data frame specifying the integration order
 #'   of samples within the Seurat list. See the \code{sample.tree} argument
 #'   in \code{\link[Seurat]{IntegrateData}} for more details. If not
@@ -58,8 +58,8 @@
 #' @importFrom pbapply pblapply
 #'
 #' @seealso
-#' \code{\link{create_anglem}},
-#' \code{\link{big_anglemanise}},
+#' \code{\link{create_anglemaniaObject}},
+#' \code{\link{anglemania}},
 #' \code{\link{extract_integration_genes}},
 #' \code{\link{integrate_seurat_list}},
 #' \code{\link[Seurat]{IntegrateData}},
@@ -68,12 +68,12 @@
 #' @export
 integrate_by_features <- function(
     seurat_object,
-    anglem_object,
+    anglemania_object,
     int_order = NULL,
     process = TRUE, # Should scaling, PCA, and UMAP be performed?
     verbose = FALSE) {
-  dataset_key <- anglem_object@dataset_key
-  batch_key <- anglem_object@batch_key
+  dataset_key <- anglemania_object@dataset_key
+  batch_key <- anglemania_object@batch_key
   seurat_object <- add_unique_batch_key(
     seurat_object,
     dataset_key,
@@ -87,7 +87,7 @@ integrate_by_features <- function(
 
   seurat_combined <- integrate_seurat_list(
     seurat_list = seurat_list,
-    features = extract_integration_genes(anglem_object),
+    features = get_anglemania_genes(anglemania_object),
     int_order = int_order,
     process = process,
     verbose = verbose

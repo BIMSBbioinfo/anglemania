@@ -1,12 +1,12 @@
 # ---------------------------------------------------------------------------
-# Compute Critical Angles Between Genes Across Samples in an Anglem Object
+# Compute Critical Angles Between Genes Across Samples in an anglemaniaObject
 # ---------------------------------------------------------------------------
 
-#' Compute Critical Angles Between Genes Across Samples in an Anglem Object
+#' Compute Critical Angles Between Genes Across Samples in an anglemaniaObject
 #'
 #' @description
-#' `big_anglemanise` computes critical angles between genes across all samples
-#' provided in an \code{\link{anglem}} object. It calculates angles,
+#' `anglemania` computes critical angles between genes across all samples
+#' provided in an \code{\link{anglemaniaObject}}. It calculates angles,
 #' transforms them to z-scores, computes statistical measures, and selects
 #' genes based on specified thresholds.
 #'
@@ -14,22 +14,19 @@
 #' This function performs the following steps:
 #' \enumerate{
 #'   \item Computes angles between genes for each sample in the
-#'     \code{anglem_object} using the specified \code{method}, via
-#'     \code{\link{big_factorise}}.
+#'     \code{anglemania_object} using the specified \code{method}, via
+#'     \code{\link{factorise}}.
 #'   \item Transforms the angles to z-scores.
 #'   \item Computes statistical measures (mean z-score, signal-to-noise ratio)
 #'     across samples using \code{\link{get_list_stats}}.
 #'   \item Selects genes based on specified z-score thresholds using
 #'     \code{\link{select_genes}}.
 #' }
-#' The function uses \code{\link[pbapply]{pblapply}} for parallel processing to
-#' improve computation speed. The data in the \code{anglem_object} must be
-#' scaled prior to computation.
 #'
 #' The computed statistics and selected genes are added to the
-#' \code{anglem_object}, which is returned.
+#' \code{anglemania_object}, which is returned.
 #'
-#' @param anglem_object An \code{\link{anglem}} object containing gene
+#' @param anglemania_object An \code{\link{anglemaniaObject}} containing gene
 #' expression data and associated metadata.
 #' @param method Character string specifying the method to use for calculating
 #' the relationship between gene pairs. Default is \code{"pearson"}.
@@ -42,26 +39,26 @@
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #'   Default is \code{2000}.
 #'
-#' @return An updated \code{\link{anglem}} object with computed statistics and
+#' @return An updated \code{\link{anglemaniaObject}} with computed statistics and
 #'   selected genes based on the specified thresholds.
 #'
 #' @importFrom pbapply pblapply
 #' @importFrom pbapply pboptions
 #'
 #' @seealso
-#'   \code{\link{create_anglem}},
+#'   \code{\link{create_anglemaniaObject}},
 #'   \code{\link{get_list_stats}},
 #'   \code{\link{select_genes}},
-#'   \code{\link{big_factorise}},
+#'   \code{\link{factorise}},
 #'   \code{\link[bigstatsr]{big_apply}},
 #'   \url{https://arxiv.org/abs/1306.0256}
 #'
 #' @examples
 #' \dontrun{
 #' 
-#' # Assuming you have an anglem_object already created
+#' # Assuming you have an anglemania_object already created
 #'
-#' angl <- big_anglemanise(
+#' angl <- anglemania(
 #'   angl,
 #'   method = "pearson",
 #'   zscore_mean_threshold = 2,
@@ -74,18 +71,18 @@
 #' }
 #'
 #' @export
-big_anglemanise <- function(
-    anglem_object,
+anglemania <- function(
+    anglemania_object,
     method = "pearson",
     zscore_mean_threshold = 2.5,
     zscore_sn_threshold = 2.5,
     max_n_genes = 2000) {
   # Validate inputs
-  if (!inherits(anglem_object, "anglem")) {
-    stop("anglem_object needs to be an anglem object")
+  if (!inherits(anglemania_object, "anglemaniaObject")) {
+    stop("anglemania_object needs to be an anglemaniaObject")
   }
 
-  # dataset_key and batch_key are checked in create_anglem!
+  # dataset_key and batch_key are checked in create_anglemaniaObject!
 
   if (!is.numeric(zscore_mean_threshold) || zscore_mean_threshold < 0) {
     stop("zscore_mean_threshold has to be a non-negative number")
@@ -103,13 +100,13 @@ big_anglemanise <- function(
     type = "timer",
     style = 1,
     char = "=",
-    title = "big_anglemanise"
+    title = "anglemania"
   )
   message("Computing angles and transforming to z-scores...")
-  matrix_list(anglem_object) <- pbapply::pblapply(
-    matrix_list(anglem_object),
+  matrix_list(anglemania_object) <- pbapply::pblapply(
+    matrix_list(anglemania_object),
     function(x) {
-      big_factorise(
+      factorise(
         x_mat = x,
         method = method,
         seed = 1
@@ -118,16 +115,16 @@ big_anglemanise <- function(
   )
 
   message("Computing statistics...")
-  list_stats(anglem_object) <- get_list_stats(anglem_object)
+  list_stats(anglemania_object) <- get_list_stats(anglemania_object)
   invisible(gc())
 
   message("Filtering features...")
-  anglem_object <- select_genes(
-    anglem_object,
+  anglemania_object <- select_genes(
+    anglemania_object,
     zscore_mean_threshold = zscore_mean_threshold,
     zscore_sn_threshold = zscore_sn_threshold,
     max_n_genes = max_n_genes
   )
 
-  return(anglem_object)
+  return(anglemania_object)
 }

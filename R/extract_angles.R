@@ -19,7 +19,7 @@
 #'       correlation.
 #'     \item \code{"diem"}: Computes the Dimension Insensitive Euclidean
 #'       Metric between genes. Note that this is done in the
-#'       \code{\link{big_factorise}} function.
+#'       \code{\link{factorise}} function.
 #'   }
 #'
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the gene-gene
@@ -33,10 +33,10 @@
 #' \code{\link[bigstatsr]{big_apply}},
 #' \code{\link[bigstatsr]{big_cor}},
 #' \code{\link[bigstatsr]{FBM}},
-#' \code{\link{big_factorise}}
+#' \code{\link{factorise}}
 #'
 #' @export
-big_extract_corr <- function(
+extract_angles <- function(
     x_mat,
     method = "pearson") {
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {

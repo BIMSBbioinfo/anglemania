@@ -1,10 +1,10 @@
 # ---------------------------------------------------------------------------
-# Class definitions for the 'anglem' Package
+# Class definitions for the 'anglemania' Package
 # ---------------------------------------------------------------------------
-#' Anglem Class for Storing and Processing Gene Expression Data
+#' anglemaniaObject - Class for Storing and Processing Gene Expression Data
 #'
-#' The `anglem` class is designed to construct the correct input for the
-#' `anglemanise` function from a \code{\link[Seurat]{Seurat}} object and store
+#' The `anglemaniaObject` class is designed to construct the correct input for the
+#' `anglemania` function from a \code{\link[Seurat]{Seurat}} object and store
 #' the results of the analysis. It encapsulates the data and metadata required
 #' for processing gene expression data across multiple datasets and batches.
 #'
@@ -27,12 +27,12 @@
 #' @slot integration_genes A list containing information about integration genes
 #'   and their statistics.
 #'
-#' @name anglem-methods
-#' @rdname anglem-methods
-#' @seealso \code{\link{create_anglem}}, \code{\link{big_anglemanise}}
-#' @exportClass anglem
+#' @name anglemaniaObject-methods
+#' @rdname anglemaniaObject-methods
+#' @seealso \code{\link{create_anglemaniaObject}}, \code{\link{anglemania}}
+#' @exportClass anglemaniaObject
 setClass(
-  "anglem",
+  "anglemaniaObject",
   slots = c(
     matrix_list = "list",
     dataset_key = "character",
@@ -61,21 +61,21 @@ setClass(
 )
 
 # ---------------------------------------------------------------------------
-# Display Summary Information for an Anglem Object
+# Display Summary Information for an anglemaniaObject
 # ---------------------------------------------------------------------------
 
-#' Display Summary Information for an Anglem Object
+#' Display Summary Information for an anglemaniaObject
 #'
-#' This method provides a concise summary of an \code{anglem} object, including
+#' This method provides a concise summary of an \code{anglemaniaObject}, including
 #' dataset and batch information, the number of intersected genes, and other
 #' relevant details.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return Prints a summary to the console.
 #' @importFrom checkmate testString
-#' @describeIn anglem-methods show anglem object info
-setMethod("show", "anglem", function(object) {
-  cat("Anglem object\n")
+#' @describeIn anglemaniaObject-methods show anglemaniaObject info
+setMethod("show", "anglemaniaObject", function(object) {
+  cat("anglemaniaObject\n")
   cat("--------------\n")
   cat("Dataset key:", object@dataset_key, "\n")
   cat("Batch key:", object@batch_key, "\n")
@@ -114,109 +114,108 @@ setMethod("show", "anglem", function(object) {
 })
 
 # ---------------------------------------------------------------------------
-# Accessor and Mutator Methods for the Anglem Class
+# Accessor and Mutator Methods for the anglemaniaObject Class
 # ---------------------------------------------------------------------------
 
-#' Access the Matrix List from an anglem Object
+#' Access the Matrix List from an anglemaniaObject
 #'
-#' Retrieves the list of gene expression matrices stored in the \code{anglem}
+#' Retrieves the list of gene expression matrices stored in the \code{anglemaniaObject}
 #' object.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject} object.
 #' @return A list of \code{\link[bigstatsr]{FBM}} objects containing gene
 #'   expression matrices.
-#' @describeIn anglem-methods Access matrix list
+#' @describeIn anglemaniaObject-methods Access matrix list
 #' @export
 setGeneric(
   "matrix_list",
   function(object) standardGeneric("matrix_list")
 )
-setMethod("matrix_list", "anglem", function(object) object@matrix_list)
+setMethod("matrix_list", "anglemaniaObject", function(object) object@matrix_list)
 
-#' Set the Matrix List in an anglem Object
+#' Set the Matrix List in an anglemaniaObject
 #'
-#' Assigns a new list of gene expression matrices to the \code{anglem} object.
+#' Assigns a new list of gene expression matrices to the \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @param value A list of \code{\link[bigstatsr]{FBM}} objects.
-#' @return The updated \code{anglem} object.
-#' @describeIn anglem-methods set matrix list in anglem object
+#' @return The updated \code{anglemaniaObject}.
+#' @describeIn anglemaniaObject-methods set matrix list in anglemaniaObject
 #' @export
 setGeneric(
   "matrix_list<-",
   function(object, value) standardGeneric("matrix_list<-")
 )
-setReplaceMethod("matrix_list", "anglem", function(object, value) {
+setReplaceMethod("matrix_list", "anglemaniaObject", function(object, value) {
   object@matrix_list <- value
   object
 })
 
-#' Access the Dataset Key from an Anglem Object
+#' Access the Dataset Key from an anglemaniaObject
 #'
-#' Retrieves the dataset key used in the \code{anglem} object.
+#' Retrieves the dataset key used in the \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A character string representing the dataset key.
-#' @describeIn anglem-methods Access dataset key of anglem object
+#' @describeIn anglemaniaObject-methods Access dataset key of anglemaniaObject
 #' @export
 setGeneric(
   "dataset_key",
   function(object) standardGeneric("dataset_key")
 )
-setMethod("dataset_key", "anglem", function(object) object@dataset_key)
+setMethod("dataset_key", "anglemaniaObject", function(object) object@dataset_key)
 
-#' Access the Batch Key from an Anglem Object
+#' Access the Batch Key from an anglemaniaObject
 #'
-#' Retrieves the batch key used in the \code{anglem} object.
+#' Retrieves the batch key used in the \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A character string representing the batch key.
-#' @describeIn anglem-methods Access batch key of anglem object
+#' @describeIn anglemaniaObject-methods Access batch key of anglemaniaObject
 #' @export
 setGeneric(
   "batch_key",
   function(object) standardGeneric("batch_key")
 )
-setMethod("batch_key", "anglem", function(object) object@batch_key)
+setMethod("batch_key", "anglemaniaObject", function(object) object@batch_key)
 
-#' Access Data Information from an anglem Object
+#' Access Data Information from an anglemaniaObject Object
 #'
 #' Retrieves the data frame summarizing the selected anglemania gene pairs
-#' \code{anglem} object.
+#' \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A data frame containing dataset and batch information.
-#' @describeIn anglem-methods Access info of selected gene pairs
+#' @describeIn anglemaniaObject-methods Access info of selected gene pairs
 #' @export
 setGeneric(
   "data_info",
   function(object) standardGeneric("data_info")
 )
-setMethod("data_info", "anglem", function(object) object@data_info)
+setMethod("data_info", "anglemaniaObject", function(object) object@data_info)
 
-#' Access Weights from an Anglem Object
+#' Access Weights from an anglemaniaObject
 #'
-#' Retrieves the weights assigned to each dataset or batch in the \code{anglem}
-#' object.
+#' Retrieves the weights assigned to each dataset or batch in the \code{anglemaniaObject}
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A named numeric vector of weights.
-#' @describeIn anglem-methods Access weights
+#' @describeIn anglemaniaObject-methods Access weights
 #' @export
 setGeneric("angl_weights", function(object) standardGeneric("angl_weights"))
-setMethod("angl_weights", "anglem", function(object) object@weights)
+setMethod("angl_weights", "anglemaniaObject", function(object) object@weights)
 
-#' Set Weights in an Anglem Object
+#' Set Weights in an anglemaniaObject
 #'
-#' Assigns new weights to the datasets or batches in the \code{anglem} object.
+#' Assigns new weights to the datasets or batches in the \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @param value A named numeric vector of weights.
-#' @return The updated \code{anglem} object.
-#' @describeIn anglem-methods Set weights
+#' @return The updated \code{anglemaniaObject}.
+#' @describeIn anglemaniaObject-methods Set weights
 #' @export
 setGeneric("angl_weights<-", function(object, value) standardGeneric("angl_weights<-"))
-setReplaceMethod("angl_weights", "anglem", function(object, value) {
+setReplaceMethod("angl_weights", "anglemaniaObject", function(object, value) {
   if (!is.numeric(value)) stop("weights must be numeric")
   if (is.null(names(value))) stop("weights need to be a named vector")
   # Scale the weights so that the sum of weights is 1
@@ -226,85 +225,84 @@ setReplaceMethod("angl_weights", "anglem", function(object, value) {
   object
 })
 
-#' Access Statistical Measures from an Anglem Object
+#' Access Statistical Measures from an anglemaniaObject
 #'
 #' Retrieves the list of statistical measures computed across datasets in the
-#' \code{anglem} object.
+#' \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A list containing statistical matrices such as mean z-scores and SNR
 #'   z-scores
-#' @describeIn anglem-methods Access statistics of the gene-gene matrices
+#' @describeIn anglemaniaObject-methods Access statistics of the gene-gene matrices
 #' @export
 setGeneric("list_stats", function(object) standardGeneric("list_stats"))
-setMethod("list_stats", "anglem", function(object) object@list_stats)
+setMethod("list_stats", "anglemaniaObject", function(object) object@list_stats)
 
-#' Set Statistical Measures in an Anglem Object
+#' Set Statistical Measures in an anglemaniaObject
 #'
-#' Assigns a new list of statistical measures to the \code{anglem} object.
+#' Assigns a new list of statistical measures to the \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @param value A list containing statistical matrices.
-#' @return The updated \code{anglem} object.
-#' @describeIn anglem-methods Set statistics of the gene-gene matrices
+#' @return The updated \code{anglemaniaObject}.
+#' @describeIn anglemaniaObject-methods Set statistics of the gene-gene matrices
 #' @export
 setGeneric("list_stats<-", function(object, value) {
   standardGeneric("list_stats<-")
 })
-setReplaceMethod("list_stats", "anglem", function(object, value) {
+setReplaceMethod("list_stats", "anglemaniaObject", function(object, value) {
   if (!is.list(value)) stop("list_stats must be a list")
   object@list_stats <- value
   object
 })
 
-#' Access Intersected Genes from an Anglem Object
+#' Access Intersected Genes from an anglemaniaObject
 #'
 #' Retrieves the vector of genes that are expressed in at least the specified
 #' number of cells across all batches.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A character vector of intersected gene names.
-#' @describeIn anglem-methods Access the intersection of genes of all batches
+#' @describeIn anglemaniaObject-methods Access the intersection of genes of all batches
 #' @export
 setGeneric(
   "intersect_genes",
   function(object) standardGeneric("intersect_genes")
 )
-setMethod("intersect_genes", "anglem", function(object) {
+setMethod("intersect_genes", "anglemaniaObject", function(object) {
   object@intersect_genes
 })
 
-#' Set Intersected Genes in an Anglem Object
+#' Set Intersected Genes in an anglemaniaObject
 #'
-#' Assigns a new vector of intersected genes to the \code{anglem} object.
+#' Assigns a new vector of intersected genes to the \code{anglemaniaObject}.
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @param value A character vector of gene names.
-#' @return The updated \code{anglem} object.
-#' @describeIn anglem-methods Set the intersection of genes of all batches
+#' @return The updated \code{anglemaniaObject} object.
+#' @describeIn anglemaniaObject-methods Set the intersection of genes of all batches
 #' @export
 setGeneric("intersect_genes<-", function(object, value) {
   standardGeneric("intersect_genes<-")
 })
-setReplaceMethod("intersect_genes", "anglem", function(object, value) {
+setReplaceMethod("intersect_genes", "anglemaniaObject", function(object, value) {
   object@intersect_genes <- value
   object
 })
 
-#' Extract Integration Genes from an Anglem Object
+#' Extract Integration Genes from an anglemaniaObject
 #'
-#' Retrieves the list of genes selected for integration from the \code{anglem}
-#' object.
+#' Retrieves the list of genes selected for integration from the \code{anglemaniaObject}
 #'
-#' @param object An \code{anglem} object.
+#' @param object An \code{anglemaniaObject}.
 #' @return A character vector of integration gene names.
-#' @describeIn anglem-methods Access the genes extracted by anglemania
+#' @describeIn anglemaniaObject-methods Access the genes extracted by anglemania
 #' @export
 setGeneric(
-  "extract_integration_genes",
-  function(object) standardGeneric("extract_integration_genes")
+  "get_anglemania_genes",
+  function(object) standardGeneric("get_anglemania_genes")
 )
-setMethod("extract_integration_genes", "anglem", function(object) {
+setMethod("get_anglemania_genes", "anglemaniaObject", function(object) {
   object@integration_genes$genes
 })
 
@@ -328,7 +326,7 @@ setMethod("extract_integration_genes", "anglem", function(object) {
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
-#' @describeIn anglem-methods Temporarily add a unique batch key to the dataset
+#' @describeIn anglemaniaObject-methods Temporarily add a unique batch key to the dataset
 #' @export
 add_unique_batch_key <- function(
     seurat_object,
@@ -363,12 +361,12 @@ add_unique_batch_key <- function(
 }
 
 # ---------------------------------------------------------------------------
-# Create an Anglem Object from a Seurat Object
+# Create an anglemaniaObject from a Seurat Object
 # ---------------------------------------------------------------------------
 
-#' Create an Anglem Object from a Seurat Object
+#' Create an anglemaniaObject from a Seurat Object
 #'
-#' Constructs an \code{\link{anglem}} object from a given
+#' Constructs an \code{\link{anglemaniaObject}} from a given
 #' \code{\link[Seurat]{Seurat}} object. This includes extracting and processing
 #' count matrices, filtering genes based on expression in a minimum number of
 #' cells, and storing results along with dataset and batch information. It also
@@ -386,7 +384,7 @@ add_unique_batch_key <- function(
 #'   cells in which a gene must be expressed to be included in the analysis.
 #'   Default is \code{1}.
 #'
-#' @return An \code{\link{anglem}} object containing:
+#' @return An \code{\link{anglemaniaObject}} containing:
 #' \describe{
 #'   \item{\code{matrix_list}}{A list of filtered count matrices for each unique
 #'     batch.}
@@ -425,12 +423,12 @@ add_unique_batch_key <- function(
 #' @importFrom checkmate testString
 #'
 #' @seealso
-#' \code{\link{anglem-class}},
+#' \code{\link{anglemaniaObject-class}},
 #' \code{\link{add_unique_batch_key}},
-#' \code{\link{big_anglemanise}},
+#' \code{\link{anglemania}},
 #' \code{\link[bigstatsr]{FBM}}
-#' @export create_anglem
-create_anglem <- function(
+#' @export create_anglemaniaObject
+create_anglemaniaObject <- function(
     seurat_object,
     dataset_key = NA_character_,
     batch_key,
@@ -540,7 +538,7 @@ create_anglem <- function(
 
   # Create anglem object
   anglem_object <- new(
-    "anglem",
+    "anglemaniaObject",
     matrix_list = matrix_list,
     dataset_key = ifelse(
       checkmate::testString(dataset_key),

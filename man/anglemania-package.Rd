@@ -2,7 +2,6 @@
 % Please edit documentation in R/anglemania-package.R
 \docType{package}
 \name{anglemania-package}
-\alias{anglemania}
 \alias{anglemania-package}
 \title{anglemania: Feature Extraction for scRNA-seq Dataset Integration}
 \description{
