@@ -49,7 +49,8 @@ exceed the specified thresholds.
 99th percentile values of the corresponding statistics and re-selects.
 \item Extracts unique genes from the selected gene pairs using
 \code{\link{extract_rows_for_unique_genes}}.
-\item Updates the \code{integration_genes} slot of the \code{anglemaniaObject}
+\item Updates the \code{integration_genes} slot of the
+\code{anglemaniaObject}
 with the selected genes and their statistics.
 }
 }

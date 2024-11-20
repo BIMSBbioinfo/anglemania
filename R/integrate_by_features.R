@@ -56,6 +56,7 @@
 #' @importFrom Seurat SplitObject NormalizeData FindIntegrationAnchors
 #'   IntegrateData ScaleData RunPCA RunUMAP DefaultAssay
 #' @importFrom pbapply pblapply
+#' @importFrom checkmate assertClass assertLogical testFALSE
 #'
 #' @seealso
 #' \code{\link{create_anglemaniaObject}},
@@ -80,6 +81,19 @@ integrate_by_features <- function(
     batch_key
   ) # Temporarily adds unique batch key "batch" to metadata
 
+  # validate inputs
+  checkmate::assertClass(seurat_object, "Seurat")
+  checkmate::assertClass(anglemania_object, "anglemaniaObject")
+  checkmate::assertLogical(process)
+  checkmate::assertLogical(verbose)
+  if (checkmate::testFALSE(length(get_anglemania_genes(anglemania_object)) > 0)){
+    stop(
+      "No integration genes found in anglemania_object ",
+      "please run anglemania() first or if you have already run anglemania() ",
+      "run select_genes(anglemania_object) with lower zscore and sn thresholds"
+    )
+  }
+  
   seurat_list <- Seurat::SplitObject(
     seurat_object,
     split.by = "batch"
@@ -151,6 +165,7 @@ integrate_by_features <- function(
 #' @importFrom Seurat NormalizeData FindIntegrationAnchors IntegrateData
 #'   ScaleData RunPCA RunUMAP DefaultAssay
 #' @importFrom pbapply pblapply
+#' @importFrom checkmate assertClass assertCharacter assertLogical
 #'
 #' @seealso
 #' \code{\link{integrate_by_features}},
@@ -168,12 +183,24 @@ integrate_seurat_list <- function(
     int_order = NULL,
     process = TRUE, # Should scaling, PCA, and UMAP be performed?
     verbose = FALSE) {
+  # validate inputs
+  checkmate::assertClass(seurat_list, "list")
+  checkmate::assertTRUE(length(seurat_list) > 1)
+  checkmate::assertCharacter(features)
+  checkmate::assertTRUE(
+    all(sapply(seurat_list, function(x) { all(features %in% rownames(x))}))
+  )
+  checkmate::assertLogical(process)
+  checkmate::assertLogical(verbose)
+
   message("Log normalizing data...")
   seurat_list <- pbapply::pblapply(
     seurat_list,
     Seurat::NormalizeData,
     verbose = verbose
   )
+
+  
 
   # Adjust parameters based on the smallest dataset
   smallest_DS <- min(sapply(seurat_list, function(x) ncol(x)))

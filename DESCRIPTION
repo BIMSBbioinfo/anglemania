@@ -27,7 +27,10 @@ Imports:
 Suggests:
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr,
+    DT
 VignetteBuilder: knitr
 biocViews: SingleCell, BatchEffect, MultipleComparison
 BiocType: Software
+Config/testthat/edition: 3

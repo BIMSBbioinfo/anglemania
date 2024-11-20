@@ -43,6 +43,7 @@
 #'   z-score-transformed angle matrix.
 #'
 #' @importFrom bigstatsr FBM big_apply
+#' @importFrom checkmate assertClass assertString assertChoice
 #'
 #' @seealso
 #' \code{\link{extract_angles}},
@@ -60,7 +61,10 @@ factorise <- function(
     nrow = nrow(x_mat),
     ncol = ncol(x_mat)
   )
-
+  # Validate input
+  checkmate::assertClass(x_mat, "FBM")
+  checkmate::assertString(method)
+  checkmate::assertChoice(method, c("pearson", "spearman", "diem"))
   # Permute matrix
   set.seed(seed)
   bigstatsr::big_apply(

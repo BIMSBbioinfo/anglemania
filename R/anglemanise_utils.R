@@ -12,6 +12,7 @@
 #' @return An \code{\link[bigstatsr]{FBM}} object from the \pkg{bigstatsr}
 #'  package.
 #' @importFrom bigstatsr FBM
+#' @export
 sparse_to_fbm <- function(s_mat) {
   n <- nrow(s_mat)
   p <- ncol(s_mat)
@@ -41,6 +42,7 @@ sparse_to_fbm <- function(s_mat) {
 #'   \code{var}, \code{sn}, \code{min}, and \code{max}.
 #' @importFrom bigstatsr big_apply
 #' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
+#' @export
 get_dstat <- function(corr_matrix) {
   # Check if FBM is used as input
   if (!inherits(corr_matrix, "FBM")) {
@@ -74,7 +76,7 @@ get_dstat <- function(corr_matrix) {
       sum(
         (X[, ind, drop = FALSE] - mean_value)^2,
         na.rm = TRUE
-      ) / (n - 1)
+      ) / (n - 2) # minus 2 because it's a symmetric matrix!!
     },
     a.combine = "sum",
     block.size = 1000
@@ -124,8 +126,10 @@ get_dstat <- function(corr_matrix) {
 #' it throws an error.
 #'
 #' @param anglemania_object An \code{anglemaniaObject} containing the list of FBMs.
+#'  In this case, the FBMs are the angle matrices computed in \code{factorise}.
 #' @return A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 #' @importFrom bigstatsr FBM
+#' @export
 big_mat_list_mean <- function(anglemania_object) {
   if (!inherits(anglemania_object, "anglemaniaObject")) {
     stop("anglemania_object needs to be an anglemaniaObject")
@@ -286,6 +290,7 @@ get_list_stats <- function(anglemania_object) {
 #' print(unique_genes)
 #' }
 #' @seealso \code{\link{select_genes}}
+#' @export
 extract_rows_for_unique_genes <- function(dt, max_n_genes) {
   unique_genes <- unique(as.vector(rbind(dt$geneA, dt$geneB)))
   max_genes <- ifelse(
@@ -321,16 +326,17 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'   \item Checks if the input object is of class \code{\link{anglemaniaObject}}.
-#'   \item If \code{max_n_genes} is not specified, it uses all genes that pass
+#'  \item Checks if the input object is of class \code{\link{anglemaniaObject}}.
+#'  \item If \code{max_n_genes} is not specified, it uses all genes that pass
 #'     the thresholds.
-#'   \item Identifies gene pairs where both the mean z-score and SNR z-score
+#'  \item Identifies gene pairs where both the mean z-score and SNR z-score
 #'     exceed the specified thresholds.
-#'   \item If no gene pairs meet the criteria, it adjusts the thresholds to the
+#'  \item If no gene pairs meet the criteria, it adjusts the thresholds to the
 #'     99th percentile values of the corresponding statistics and re-selects.
-#'   \item Extracts unique genes from the selected gene pairs using
+#'  \item Extracts unique genes from the selected gene pairs using
 #'     \code{\link{extract_rows_for_unique_genes}}.
-#'   \item Updates the \code{integration_genes} slot of the \code{anglemaniaObject}
+#'  \item Updates the \code{integration_genes} slot of the
+#'   \code{anglemaniaObject}
 #'     with the selected genes and their statistics.
 #' }
 #' @seealso \code{\link{extract_rows_for_unique_genes}},
@@ -362,19 +368,19 @@ select_genes <- function(
     message("No genes passed the cutoff.")
     quantile95mean <- quantile(
       abs(list_stats(anglemania_object)$mean_zscore),
-      0.99,
+      0.95,
       na.rm = TRUE
     )
     quantile95sn <- quantile(
       list_stats(anglemania_object)$sn_zscore,
-      0.99,
+      0.95,
       na.rm = TRUE
     )
     if (quantile95mean < zscore_mean_threshold) {
       zscore_mean_threshold <- quantile95mean
       message(
         paste0(
-          "zscore_mean_threshold is lower than the 99% quantile of the ",
+          "zscore_mean_threshold is lower than the 95% quantile of the ",
           "absolute mean z-scores. Setting zscore_mean_threshold to: ",
           zscore_mean_threshold
         )
@@ -384,7 +390,7 @@ select_genes <- function(
       zscore_sn_threshold <- quantile95sn
       message(
         paste0(
-          "zscore_sn_threshold is higher than 99% quantile. Setting ",
+          "zscore_sn_threshold is higher than 95% quantile. Setting ",
           "zscore_sn_threshold to: ",
           round(zscore_sn_threshold, 2)
         )
@@ -413,8 +419,8 @@ select_genes <- function(
       "max_n_genes = 2000)"
     )
     message(
-      "Please inspect integration_genes(anglemania_object)$info for info on the ",
-      "scores of the selected gene pairs."
+      "Please inspect get_anglemania_genes(anglemania_object)$info",
+      " for info on the scores of the selected gene pairs."
     )
   }
 
@@ -429,9 +435,8 @@ select_genes <- function(
   top_n <- top_n[order(abs(top_n$zscore), decreasing = TRUE), ]
   anglemania_object@integration_genes$info <- top_n
   selected_genes <- extract_rows_for_unique_genes(top_n, max_n_genes)
-  anglemania_object@integration_genes$genes <- intersect_genes(anglemania_object)[
-    selected_genes
-  ]
+  anglemania_object@integration_genes$genes <- 
+    intersect_genes(anglemania_object)[selected_genes]
 
   return(anglemania_object)
 }

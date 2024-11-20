@@ -66,7 +66,7 @@ The function performs the following steps:
 }
 }
 \seealso{
-\code{\link{anglemaniaObject-class}},
+\code{\link{anglemaniaObject}},
 \code{\link{add_unique_batch_key}},
 \code{\link{anglemania}},
 \code{\link[bigstatsr]{FBM}}

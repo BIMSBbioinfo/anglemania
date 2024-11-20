@@ -423,7 +423,7 @@ add_unique_batch_key <- function(
 #' @importFrom checkmate testString
 #'
 #' @seealso
-#' \code{\link{anglemaniaObject-class}},
+#' \code{\link{anglemaniaObject}},
 #' \code{\link{add_unique_batch_key}},
 #' \code{\link{anglemania}},
 #' \code{\link[bigstatsr]{FBM}}
@@ -444,17 +444,29 @@ create_anglemaniaObject <- function(
        "dataset_key needs to be a character string of length 1 ",
        "corresponding to the column in the metadata of the Seurat ",
        "object that indicates which dataset the cells belong to"
-     )
+     ) 
+    } else if (!(dataset_key %in% colnames(seurat_object[[]]))) {
+       stop(
+         "dataset_key needs to be a column in the metadata of the Seurat ",
+         "object that indicates which dataset the cells belong to"
+       )
     }
     message(
       "Using dataset_key: ", dataset_key
     )
-  } else {
+  } else if (checkmate::testScalarNA(dataset_key, null.ok = TRUE)) {
       message(
         "No dataset_key specified.\n",
         "Assuming that all samples belong to the same dataset ",
         "and are separated by batch_key: ", batch_key
       )
+  }
+  else {
+    stop(
+      "dataset_key needs to be NA/NULL or a character string of length 1 ",
+      "corresponding to the column in the metadata of the Seurat ",
+      "object that indicates which dataset the cells belong to"
+    )
   }
 
   if (!checkmate::testString(batch_key) || length(batch_key) != 1) {

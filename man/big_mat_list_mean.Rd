@@ -7,7 +7,8 @@
 big_mat_list_mean(anglemania_object)
 }
 \arguments{
-\item{anglemania_object}{An \code{anglemaniaObject} containing the list of FBMs.}
+\item{anglemania_object}{An \code{anglemaniaObject} containing the list of FBMs.
+In this case, the FBMs are the angle matrices computed in \code{factorise}.}
 }
 \value{
 A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
