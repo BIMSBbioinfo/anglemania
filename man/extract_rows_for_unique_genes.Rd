@@ -27,7 +27,7 @@ unique gene names, and returns the first \code{max_n_genes} genes. If
 genes are returned.
 }
 \examples{
-\dontrun{
+\donttest{
 gene_pairs <- data.frame(
   geneA = c("Gene1", "Gene2", "Gene3", "Gene4"),
   geneB = c("Gene3", "Gene4", "Gene5", "Gene6")

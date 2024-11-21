@@ -54,6 +54,16 @@ exceed the specified thresholds.
 with the selected genes and their statistics.
 }
 }
+\examples{
+\donttest{
+angl <- select_genes(angl,
+                      zscore_mean_threshold = 2,
+                     zscore_sn_threshold = 2,
+                     max_n_genes = 2000)
+anglemania_genes <- get_anglemania_genes(angl)
+# View the selected genes and use for integration
+}
+}
 \seealso{
 \code{\link{extract_rows_for_unique_genes}},
 \code{\link{intersect_genes}}, \code{\link{list_stats}}

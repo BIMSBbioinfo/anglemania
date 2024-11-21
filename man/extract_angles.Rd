@@ -38,6 +38,28 @@ metrics.
 The function returns the gene-gene angle matrix as an
 \code{\link[bigstatsr]{FBM}} object.
 }
+\examples{
+\donttest{
+mat <- matrix(
+ c(
+     5, 3, 0, 0,
+     0, 0, 0, 3,
+     2, 1, 3, 4,
+     0, 0, 1, 0,
+     1, 2, 1, 2,
+     3, 4, 3, 4
+   ),
+   nrow = 6, # 6 genes
+   ncol = 4, # 4 cells
+   byrow = TRUE
+)
+
+mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
+
+angle_mat <- extract_angles(mat)
+angle_mat[]
+}
+}
 \seealso{
 \code{\link[bigstatsr]{big_apply}},
 \code{\link[bigstatsr]{big_cor}},

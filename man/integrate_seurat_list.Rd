@@ -64,6 +64,15 @@ scales the data, runs PCA, and computes UMAP embeddings.
 The integration is performed using Seurat's CCA-based methods, and the
 function is designed to handle datasets with varying sizes efficiently.
 }
+\examples{
+\donttest{
+# Integrate a list of seurat object using selected 
+#  features (e.g. anglemania genes or HVGs)
+#  and CCA integration method
+seurat_list <- list(seurat_object1, seurat_object2)
+integrated_seurat <- integrate_seurat_list(seurat_list, features)
+}
+}
 \seealso{
 \code{\link{integrate_by_features}},
 \code{\link[Seurat]{IntegrateData}},

@@ -12,6 +12,11 @@
 #' @return An \code{\link[bigstatsr]{FBM}} object from the \pkg{bigstatsr}
 #'  package.
 #' @importFrom bigstatsr FBM
+#' @examples
+#' s_mat <- Matrix::rsparsematrix(nrow = 10, ncol = 5, density = 0.3)
+#' # Convert the sparse matrix to an FBM using your function
+#' fbm_mat <- sparse_to_fbm(s_mat)
+#' fbm_mat
 #' @export
 sparse_to_fbm <- function(s_mat) {
   n <- nrow(s_mat)
@@ -41,6 +46,13 @@ sparse_to_fbm <- function(s_mat) {
 #' @return A list with statistical measures including \code{mean}, \code{sd},
 #'   \code{var}, \code{sn}, \code{min}, and \code{max}.
 #' @importFrom bigstatsr big_apply
+#' @examples
+#' s_mat <- Matrix::rsparsematrix(nrow = 10, ncol = 5, density = 0.3)
+#' # Convert the sparse matrix to an FBM using your function
+#' fbm_mat <- sparse_to_fbm(s_mat)
+#' result <- get_dstat(fbm_mat)
+#' str(result)
+#' result
 #' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 #' @export
 get_dstat <- function(corr_matrix) {
@@ -129,6 +141,29 @@ get_dstat <- function(corr_matrix) {
 #'  In this case, the FBMs are the angle matrices computed in \code{factorise}.
 #' @return A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 #' @importFrom bigstatsr FBM
+#' @examples
+#' \donttest{
+#' # Create FBMs
+#' mat1 <- matrix(1:9, nrow = 3)
+#' mat2 <- matrix(1:3, nrow = 3)
+#'
+#' fbm1 <- bigstatsr::FBM(nrow = nrow(mat1), ncol = ncol(mat1), init = mat1)
+#' fbm2 <- bigstatsr::FBM(nrow = nrow(mat2), ncol = ncol(mat2), init = mat2)
+#'
+#' # Create weights
+#' weights <- c(batch1 = 0.5, batch2 = 0.5)
+#'
+#' # Create the list of FBMs
+#' fbm_list <- list(batch1 = fbm1, batch2 = fbm2)
+#'
+#' # Construct the anglemaniaObject
+#' anglemania_object <- new(
+#'   "anglemaniaObject",
+#'   weights = weights,
+#'   matrix_list = fbm_list
+#' )
+#' big_mat_list_mean(anglemania_object)
+#' }
 #' @export
 big_mat_list_mean <- function(anglemania_object) {
   if (!inherits(anglemania_object, "anglemaniaObject")) {
@@ -186,6 +221,18 @@ big_mat_list_mean <- function(anglemania_object) {
 #' @return A list containing three matrices: \code{mean_zscore},
 #'   \code{sds_zscore}, and \code{sn_zscore}.
 #' @importFrom bigstatsr FBM big_apply
+#' @examples
+#' \donttest{
+#' load(system.file(
+#' "extdata",
+#'  "seurat_splatter_sim.RData",
+#'  package = "anglemania")
+#' )
+#' anglemania_object <- create_anglemaniaObject(se, batch_key = "Batch")
+#' anglemania_object <- anglemania(anglemania_object)
+#' list_stats(anglemania_object) <- get_list_stats(anglemania_object)
+#' str(list_stats(anglemania_object))
+#' }
 #' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 #' @export
 get_list_stats <- function(anglemania_object) {
@@ -278,7 +325,7 @@ get_list_stats <- function(anglemania_object) {
 #' \code{max_n_genes} exceeds the number of unique genes available, all unique
 #' genes are returned.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' gene_pairs <- data.frame(
 #'   geneA = c("Gene1", "Gene2", "Gene3", "Gene4"),
 #'   geneB = c("Gene3", "Gene4", "Gene5", "Gene6")
@@ -323,6 +370,7 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #' @return The input \code{anglemaniaObject} with the
 #'   \code{integration_genes} slot updated to include the selected genes and
 #'   their statistical information.
+#' @importFrom stats quantile
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
@@ -338,6 +386,15 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'  \item Updates the \code{integration_genes} slot of the
 #'   \code{anglemaniaObject}
 #'     with the selected genes and their statistics.
+#' }
+#' @examples
+#' \donttest{
+#' angl <- select_genes(angl,
+#'                       zscore_mean_threshold = 2,
+#'                      zscore_sn_threshold = 2,
+#'                      max_n_genes = 2000)
+#' anglemania_genes <- get_anglemania_genes(angl)
+#' # View the selected genes and use for integration
 #' }
 #' @seealso \code{\link{extract_rows_for_unique_genes}},
 #'   \code{\link{intersect_genes}}, \code{\link{list_stats}}
@@ -366,12 +423,12 @@ select_genes <- function(
   # Adjust thresholds if no genes passed the cutoff
   if (nrow(gene_ind) == 0) {
     message("No genes passed the cutoff.")
-    quantile95mean <- quantile(
+    quantile95mean <- stats::quantile(
       abs(list_stats(anglemania_object)$mean_zscore),
       0.95,
       na.rm = TRUE
     )
-    quantile95sn <- quantile(
+    quantile95sn <- stats::quantile(
       list_stats(anglemania_object)$sn_zscore,
       0.95,
       na.rm = TRUE

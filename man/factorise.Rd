@@ -52,6 +52,29 @@ This process allows for the identification of invariant gene-gene
 relationships by comparing them to a null distribution derived from the
 permuted data.
 }
+\examples{
+\donttest{
+mat <- matrix(
+ c(
+     5, 3, 0, 0,
+     0, 0, 0, 3,
+     2, 1, 3, 4,
+     0, 0, 1, 0,
+     1, 2, 1, 2,
+     3, 4, 3, 4
+   ),
+   nrow = 6, # 6 genes
+   ncol = 4, # 4 cells
+   byrow = TRUE
+)
+
+mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
+
+# Run factorise with method "pearson" and a fixed seed
+result_fbm <- factorise(mat, method = "pearson", seed = 1)
+result_fbm[]
+}
+}
 \seealso{
 \code{\link{extract_angles}},
 \code{\link{get_dstat}},

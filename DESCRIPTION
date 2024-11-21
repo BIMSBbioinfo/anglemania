@@ -1,6 +1,6 @@
 Package: anglemania
 Title: Feature Extraction for scRNA-seq Dataset Integration
-Version: 0.0.0.9000
+Version: 0.99.0
 Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
 Authors@R: c(
     person("Aaron", "Kollotzek", email = "aaron.kollotzek@mdc-berlin.de", role = c("aut", "cre"),
@@ -16,6 +16,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
     Matrix,
+    stats,
     checkmate,
     Seurat,
     SeuratObject,
@@ -31,6 +32,6 @@ Suggests:
     covr,
     DT
 VignetteBuilder: knitr
-biocViews: SingleCell, BatchEffect, MultipleComparison
+biocViews: SingleCell, BatchEffect, MultipleComparison, FeatureExtraction
 BiocType: Software
 Config/testthat/edition: 3

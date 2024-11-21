@@ -38,7 +38,7 @@ se_unintegrated <- se_unintegrated %>%
   FindVariableFeatures() %>%
   ScaleData() %>%
   RunPCA() %>%
-  RunUMAP(dims = 1:30)
+  RunUMAP(dims = 1:30, verbose = FALSE)
 DimPlot(se_unintegrated, reduction = "umap", group.by = "Batch")
 DimPlot(se_unintegrated, reduction = "umap", group.by = "Group")
 ```
@@ -61,7 +61,7 @@ angl
 angl <- anglemania(angl,
   zscore_mean_threshold = 2.5,
   zscore_sn_threshold = 2.5,
-  max_n_genes = 3000 # optionally define a max number of genes. default is 2000
+  max_n_genes = 2000 # optionally define a max number of genes. default is 2000
 )
 
 # Inspect the anglemania genes
@@ -77,10 +77,12 @@ length(integration_genes)
 # if the Seurat FindIntegrationAnchors() function does not work,
 # change this to the specified size:
 options(future.globals.maxSize = 8000 * 1024^2)
-seurat_integrated_angl <- integrate_by_features(se,
-  angl,
-  process = TRUE
-)
+suppressWarnings({
+  seurat_integrated_angl <- integrate_by_features(se,
+    angl,
+    process = TRUE
+  )
+})
 seurat_integrated_angl
 ```
 
@@ -101,10 +103,12 @@ hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 2000)
 
 ## integration
 ```{r, integration option 2}
-seurat_integrated_hvg <- integrate_seurat_list(se_list,
-  features = hvg_features,
-  process = TRUE
-)
+suppressWarnings({
+  seurat_integrated_hvg <- integrate_seurat_list(se_list,
+    features = hvg_features,
+    process = TRUE
+  )
+})
 seurat_integrated_hvg
 ```
 

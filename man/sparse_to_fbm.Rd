@@ -18,3 +18,9 @@ package.
 Converts a sparse matrix into an \code{\link[bigstatsr]{FBM}} with efficient
 memory usage.
 }
+\examples{
+s_mat <- Matrix::rsparsematrix(nrow = 10, ncol = 5, density = 0.3)
+# Convert the sparse matrix to an FBM using your function
+fbm_mat <- sparse_to_fbm(s_mat)
+fbm_mat
+}

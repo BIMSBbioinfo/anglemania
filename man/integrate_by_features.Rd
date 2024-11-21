@@ -17,6 +17,11 @@ integrate_by_features(
 \item{seurat_object}{A \code{\link[Seurat]{Seurat}} object containing
 all samples or batches to be integrated.}
 
+\item{anglemania_object}{An \code{\link{anglemaniaObject}} previously generated
+using \code{\link{create_anglemaniaObject}} and \code{\link{anglemania}}.
+It is important that the \code{dataset_key} and \code{batch_key} are
+correctly set in the \code{anglemaniaObject}.}
+
 \item{int_order}{An optional data frame specifying the integration order
 of samples within the Seurat list. See the \code{sample.tree} argument
 in \code{\link[Seurat]{IntegrateData}} for more details. If not
@@ -29,11 +34,6 @@ embeddings). Default is \code{TRUE}.}
 
 \item{verbose}{Logical value indicating whether to display progress
 messages during integration. Default is \code{FALSE}.}
-
-\item{anglem_object}{An \code{\link{anglemaniaObject}} previously generated
-using \code{\link{create_anglemaniaObject}} and \code{\link{anglemania}}.
-It is important that the \code{dataset_key} and \code{batch_key} are
-correctly set in the \code{anglemaniaObject}.}
 }
 \value{
 A \code{\link[Seurat]{Seurat}} object containing the integrated
@@ -43,7 +43,7 @@ data. The default assay is set to \code{"integrated"}.
 \code{integrate_by_features} integrates samples or batches within a Seurat
 object using canonical correlation analysis (CCA) based on a set of
 selected features (genes). The function utilizes an \code{anglemaniaObject} to
-extract integration genes and handles the integration process, including
+extract anglemania genes and handles the integration process, including
 optional downstream processing steps such as scaling, PCA, and UMAP
 visualization.
 }
@@ -66,10 +66,20 @@ compatibility with small sample sizes (e.g., metacells or SEACells). If
 \code{process = TRUE}, the function will also scale the data, run PCA,
 and compute UMAP embeddings.
 }
+\examples{
+\donttest{
+# Integrate samples using anglemaniaObject 
+# Automatically reads the batch key from anglemaniaObject
+#  splits the seurat object into batches and integrates them
+#  using CCA integration and anglemania genes previously extracted
+#  with anglemania() or select_genes()
+integrated_object <- integrate_by_features(seurat_object, anglemania_object)
+}
+}
 \seealso{
 \code{\link{create_anglemaniaObject}},
 \code{\link{anglemania}},
-\code{\link{extract_integration_genes}},
+\code{\link{get_anglemania_genes}},
 \code{\link{integrate_seurat_list}},
 \code{\link[Seurat]{IntegrateData}},
 \code{\link[Seurat]{FindIntegrationAnchors}}

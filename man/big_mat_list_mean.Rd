@@ -19,3 +19,27 @@ This function takes an \code{anglemaniaObject} containing a list of
 If the list is empty or the FBMs have different dimensions,
 it throws an error.
 }
+\examples{
+\donttest{
+# Create FBMs
+mat1 <- matrix(1:9, nrow = 3)
+mat2 <- matrix(1:3, nrow = 3)
+
+fbm1 <- bigstatsr::FBM(nrow = nrow(mat1), ncol = ncol(mat1), init = mat1)
+fbm2 <- bigstatsr::FBM(nrow = nrow(mat2), ncol = ncol(mat2), init = mat2)
+
+# Create weights
+weights <- c(batch1 = 0.5, batch2 = 0.5)
+
+# Create the list of FBMs
+fbm_list <- list(batch1 = fbm1, batch2 = fbm2)
+
+# Construct the anglemaniaObject
+anglemania_object <- new(
+  "anglemaniaObject",
+  weights = weights,
+  matrix_list = fbm_list
+)
+big_mat_list_mean(anglemania_object)
+}
+}

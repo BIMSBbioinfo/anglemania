@@ -92,7 +92,8 @@ z-scores
 
 The updated \code{anglemaniaObject}.
 
-A character vector of intersected gene names.
+A character vector of intersected gene
+names from multiple Seurat objects.
 
 The updated \code{anglemaniaObject} object.
 
@@ -206,6 +207,131 @@ cells in which a gene must be expressed to be included in the analysis.}
 and their statistics.}
 }}
 
+\examples{
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
+anglemania_object <- create_anglemaniaObject(
+  se,
+  dataset_key = "Dataset",
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+anglemania_object
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+show(anglemania_object)
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+str(matrix_list(anglemania_object))
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+dataset_key(anglemania_object)
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+batch_key(anglemania_object)
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+data_info(anglemania_object)
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+angl_weights(anglemania_object)
+\donttest{
+# list_stats extracts the statistical measures from the anglemaniaObject
+# after running anglemania()
+stats <- list_stats(anglemania_object)
+}
+load(system.file(
+  "extdata",
+  "seurat_splatter_sim.RData",
+  package = "anglemania"
+))
+
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "Batch",
+  min_cells_per_gene = 1
+)
+intersect_genes(anglemania_object)
+\donttest{
+# extract the genes identified by anglemania()
+anglemania_genes <- get_anglemania_genes(anglemania_object)
+}
+load(system.file(
+ "extdata",
+ "seurat_splatter_sim.RData",
+ package = "anglemania"))
+
+se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se)/2)
+seurat_object <- add_unique_batch_key(
+  seurat_object = se,
+  dataset_key = "Dataset",
+  batch_key = "Batch",
+  new_unique_batch_key = "batch" 
+  )
+head(seurat_object[[]])
+}
 \seealso{
 \code{\link{create_anglemaniaObject}}, \code{\link{anglemania}}
+
+\code{\link{anglemania}} \code{\link{get_list_stats}}
 }
+\keyword{internal}

@@ -17,6 +17,19 @@ A list containing three matrices: \code{mean_zscore},
 Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
 for each element across a list of FBMs in an \code{anglemaniaObject}.
 }
+\examples{
+\donttest{
+load(system.file(
+"extdata",
+ "seurat_splatter_sim.RData",
+ package = "anglemania")
+)
+anglemania_object <- create_anglemaniaObject(se, batch_key = "Batch")
+anglemania_object <- anglemania(anglemania_object)
+list_stats(anglemania_object) <- get_list_stats(anglemania_object)
+str(list_stats(anglemania_object))
+}
+}
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 }

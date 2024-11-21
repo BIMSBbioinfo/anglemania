@@ -54,9 +54,16 @@
 #'   \url{https://arxiv.org/abs/1306.0256}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' load(system.file(
+#'  "extdata",
+#'  "seurat_splatter_sim.RData",
+#'  package = "anglemania"))
 #' 
-#' # Assuming you have an anglemania_object already created
+#' angl <- create_anglemaniaObject(se,
+#'  batch_key = batch_key,
+#'  min_cells_per_gene = 1
+#'  )
 #'
 #' angl <- anglemania(
 #'   angl,
@@ -67,9 +74,9 @@
 #' )
 #'
 #' # Access the selected genes
-#' selected_genes <- extract_integration_genes(angl)
+#' selected_genes <- get_anglemania_genes(angl)
 #' }
-#'
+#' selected_genes[1:10]
 #' @export
 anglemania <- function(
     anglemania_object,

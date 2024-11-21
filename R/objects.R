@@ -29,6 +29,21 @@
 #'
 #' @name anglemaniaObject-methods
 #' @rdname anglemaniaObject-methods
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   dataset_key = "Dataset",
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' anglemania_object
 #' @seealso \code{\link{create_anglemaniaObject}}, \code{\link{anglemania}}
 #' @exportClass anglemaniaObject
 setClass(
@@ -73,6 +88,19 @@ setClass(
 #' @param object An \code{anglemaniaObject}.
 #' @return Prints a summary to the console.
 #' @importFrom checkmate testString
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' show(anglemania_object)
 #' @describeIn anglemaniaObject-methods show anglemaniaObject info
 setMethod("show", "anglemaniaObject", function(object) {
   cat("anglemaniaObject\n")
@@ -125,6 +153,19 @@ setMethod("show", "anglemaniaObject", function(object) {
 #' @param object An \code{anglemaniaObject} object.
 #' @return A list of \code{\link[bigstatsr]{FBM}} objects containing gene
 #'   expression matrices.
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' str(matrix_list(anglemania_object))
 #' @describeIn anglemaniaObject-methods Access matrix list
 #' @export
 setGeneric(
@@ -141,7 +182,7 @@ setMethod("matrix_list", "anglemaniaObject", function(object) object@matrix_list
 #' @param value A list of \code{\link[bigstatsr]{FBM}} objects.
 #' @return The updated \code{anglemaniaObject}.
 #' @describeIn anglemaniaObject-methods set matrix list in anglemaniaObject
-#' @export
+#' @keywords internal
 setGeneric(
   "matrix_list<-",
   function(object, value) standardGeneric("matrix_list<-")
@@ -157,6 +198,19 @@ setReplaceMethod("matrix_list", "anglemaniaObject", function(object, value) {
 #'
 #' @param object An \code{anglemaniaObject}.
 #' @return A character string representing the dataset key.
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' dataset_key(anglemania_object)
 #' @describeIn anglemaniaObject-methods Access dataset key of anglemaniaObject
 #' @export
 setGeneric(
@@ -171,6 +225,19 @@ setMethod("dataset_key", "anglemaniaObject", function(object) object@dataset_key
 #'
 #' @param object An \code{anglemaniaObject}.
 #' @return A character string representing the batch key.
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' batch_key(anglemania_object)
 #' @describeIn anglemaniaObject-methods Access batch key of anglemaniaObject
 #' @export
 setGeneric(
@@ -186,6 +253,19 @@ setMethod("batch_key", "anglemaniaObject", function(object) object@batch_key)
 #'
 #' @param object An \code{anglemaniaObject}.
 #' @return A data frame containing dataset and batch information.
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' data_info(anglemania_object)
 #' @describeIn anglemaniaObject-methods Access info of selected gene pairs
 #' @export
 setGeneric(
@@ -200,6 +280,19 @@ setMethod("data_info", "anglemaniaObject", function(object) object@data_info)
 #'
 #' @param object An \code{anglemaniaObject}.
 #' @return A named numeric vector of weights.
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' angl_weights(anglemania_object)
 #' @describeIn anglemaniaObject-methods Access weights
 #' @export
 setGeneric("angl_weights", function(object) standardGeneric("angl_weights"))
@@ -213,7 +306,7 @@ setMethod("angl_weights", "anglemaniaObject", function(object) object@weights)
 #' @param value A named numeric vector of weights.
 #' @return The updated \code{anglemaniaObject}.
 #' @describeIn anglemaniaObject-methods Set weights
-#' @export
+#' @keywords internal
 setGeneric("angl_weights<-", function(object, value) standardGeneric("angl_weights<-"))
 setReplaceMethod("angl_weights", "anglemaniaObject", function(object, value) {
   if (!is.numeric(value)) stop("weights must be numeric")
@@ -233,7 +326,14 @@ setReplaceMethod("angl_weights", "anglemaniaObject", function(object, value) {
 #' @param object An \code{anglemaniaObject}.
 #' @return A list containing statistical matrices such as mean z-scores and SNR
 #'   z-scores
+#' @examples
+#' \donttest{
+#' # list_stats extracts the statistical measures from the anglemaniaObject
+#' # after running anglemania()
+#' stats <- list_stats(anglemania_object)
+#' }
 #' @describeIn anglemaniaObject-methods Access statistics of the gene-gene matrices
+#' @seealso \code{\link{anglemania}} \code{\link{get_list_stats}}
 #' @export
 setGeneric("list_stats", function(object) standardGeneric("list_stats"))
 setMethod("list_stats", "anglemaniaObject", function(object) object@list_stats)
@@ -246,7 +346,7 @@ setMethod("list_stats", "anglemaniaObject", function(object) object@list_stats)
 #' @param value A list containing statistical matrices.
 #' @return The updated \code{anglemaniaObject}.
 #' @describeIn anglemaniaObject-methods Set statistics of the gene-gene matrices
-#' @export
+#' @keywords internal
 setGeneric("list_stats<-", function(object, value) {
   standardGeneric("list_stats<-")
 })
@@ -262,8 +362,23 @@ setReplaceMethod("list_stats", "anglemaniaObject", function(object, value) {
 #' number of cells across all batches.
 #'
 #' @param object An \code{anglemaniaObject}.
-#' @return A character vector of intersected gene names.
-#' @describeIn anglemaniaObject-methods Access the intersection of genes of all batches
+#' @return A character vector of intersected gene 
+#'  names from multiple Seurat objects.
+#' @examples
+#' load(system.file(
+#'   "extdata",
+#'   "seurat_splatter_sim.RData",
+#'   package = "anglemania"
+#' ))
+#'
+#' anglemania_object <- create_anglemaniaObject(
+#'   se,
+#'   batch_key = "Batch",
+#'   min_cells_per_gene = 1
+#' )
+#' intersect_genes(anglemania_object)
+#' @describeIn anglemaniaObject-methods 
+#' Access the intersection of genes of all batches
 #' @export
 setGeneric(
   "intersect_genes",
@@ -280,8 +395,9 @@ setMethod("intersect_genes", "anglemaniaObject", function(object) {
 #' @param object An \code{anglemaniaObject}.
 #' @param value A character vector of gene names.
 #' @return The updated \code{anglemaniaObject} object.
-#' @describeIn anglemaniaObject-methods Set the intersection of genes of all batches
-#' @export
+#' @describeIn anglemaniaObject-methods 
+#' Set the intersection of genes of all batches
+#' @keywords internal
 setGeneric("intersect_genes<-", function(object, value) {
   standardGeneric("intersect_genes<-")
 })
@@ -296,6 +412,11 @@ setReplaceMethod("intersect_genes", "anglemaniaObject", function(object, value) 
 #'
 #' @param object An \code{anglemaniaObject}.
 #' @return A character vector of integration gene names.
+#' @examples
+#' \donttest{
+#' # extract the genes identified by anglemania()
+#' anglemania_genes <- get_anglemania_genes(anglemania_object)
+#' }
 #' @describeIn anglemaniaObject-methods Access the genes extracted by anglemania
 #' @export
 setGeneric(
@@ -326,6 +447,20 @@ setMethod("get_anglemania_genes", "anglemaniaObject", function(object) {
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
+#' @examples 
+#' load(system.file(
+#'  "extdata",
+#'  "seurat_splatter_sim.RData",
+#'  package = "anglemania"))
+#' 
+#' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se)/2)
+#' seurat_object <- add_unique_batch_key(
+#'   seurat_object = se,
+#'   dataset_key = "Dataset",
+#'   batch_key = "Batch",
+#'   new_unique_batch_key = "batch" 
+#'   )
+#' head(seurat_object[[]])
 #' @describeIn anglemaniaObject-methods Temporarily add a unique batch key to the dataset
 #' @export
 add_unique_batch_key <- function(
@@ -427,6 +562,17 @@ add_unique_batch_key <- function(
 #' \code{\link{add_unique_batch_key}},
 #' \code{\link{anglemania}},
 #' \code{\link[bigstatsr]{FBM}}
+#' @examples
+#' load(system.file(
+#'  "extdata",
+#'  "seurat_splatter_sim.RData",
+#'  package = "anglemania"))
+#'
+#' angl <- create_anglemaniaObject(se,
+#'  batch_key = batch_key,
+#'  min_cells_per_gene = 1
+#'  )
+#'  angl
 #' @export create_anglemaniaObject
 create_anglemaniaObject <- function(
     seurat_object,

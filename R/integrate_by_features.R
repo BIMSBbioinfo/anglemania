@@ -10,7 +10,7 @@
 #' `integrate_by_features` integrates samples or batches within a Seurat
 #' object using canonical correlation analysis (CCA) based on a set of
 #' selected features (genes). The function utilizes an `anglemaniaObject` to
-#' extract integration genes and handles the integration process, including
+#' extract anglemania genes and handles the integration process, including
 #' optional downstream processing steps such as scaling, PCA, and UMAP
 #' visualization.
 #'
@@ -35,7 +35,7 @@
 #'
 #' @param seurat_object A \code{\link[Seurat]{Seurat}} object containing
 #'   all samples or batches to be integrated.
-#' @param anglem_object An \code{\link{anglemaniaObject}} previously generated
+#' @param anglemania_object An \code{\link{anglemaniaObject}} previously generated
 #'   using \code{\link{create_anglemaniaObject}} and \code{\link{anglemania}}.
 #'   It is important that the \code{dataset_key} and \code{batch_key} are
 #'   correctly set in the \code{anglemaniaObject}.
@@ -57,11 +57,19 @@
 #'   IntegrateData ScaleData RunPCA RunUMAP DefaultAssay
 #' @importFrom pbapply pblapply
 #' @importFrom checkmate assertClass assertLogical testFALSE
-#'
+#' @examples 
+#' \donttest{
+#' # Integrate samples using anglemaniaObject 
+#' # Automatically reads the batch key from anglemaniaObject
+#' #  splits the seurat object into batches and integrates them
+#' #  using CCA integration and anglemania genes previously extracted
+#' #  with anglemania() or select_genes()
+#' integrated_object <- integrate_by_features(seurat_object, anglemania_object)
+#' }
 #' @seealso
 #' \code{\link{create_anglemaniaObject}},
 #' \code{\link{anglemania}},
-#' \code{\link{extract_integration_genes}},
+#' \code{\link{get_anglemania_genes}},
 #' \code{\link{integrate_seurat_list}},
 #' \code{\link[Seurat]{IntegrateData}},
 #' \code{\link[Seurat]{FindIntegrationAnchors}}
@@ -166,7 +174,14 @@ integrate_by_features <- function(
 #'   ScaleData RunPCA RunUMAP DefaultAssay
 #' @importFrom pbapply pblapply
 #' @importFrom checkmate assertClass assertCharacter assertLogical
-#'
+#' @examples 
+#' \donttest{
+#' # Integrate a list of seurat object using selected 
+#' #  features (e.g. anglemania genes or HVGs)
+#' #  and CCA integration method
+#' seurat_list <- list(seurat_object1, seurat_object2)
+#' integrated_seurat <- integrate_seurat_list(seurat_list, features)
+#' }
 #' @seealso
 #' \code{\link{integrate_by_features}},
 #' \code{\link[Seurat]{IntegrateData}},

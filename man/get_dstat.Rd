@@ -17,6 +17,14 @@ A list with statistical measures including \code{mean}, \code{sd},
 Computes the mean and standard deviation of the correlation matrix using the
 \code{big_apply} function.
 }
+\examples{
+s_mat <- Matrix::rsparsematrix(nrow = 10, ncol = 5, density = 0.3)
+# Convert the sparse matrix to an FBM using your function
+fbm_mat <- sparse_to_fbm(s_mat)
+result <- get_dstat(fbm_mat)
+str(result)
+result
+}
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 }

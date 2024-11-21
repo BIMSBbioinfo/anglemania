@@ -11,6 +11,7 @@ The novelty, as well as the cornerstone, of the proposed approach, is to use the
 | - | - |
 | Github | [![Github](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml) |
 | Bioc Release | [![Bioc Release](https://bioconductor.org/shields/years-in-bioc/anglemania.svg)](https://bioconductor.org/packages/anglemania)
+| Coverage | [![Codecov test coverage](https://codecov.io/gh/BIMSBbioinfo/anglemania/graph/badge.svg)](https://app.codecov.io/gh/BIMSBbioinfo/anglemania)
 
 
 
