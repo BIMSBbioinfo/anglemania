@@ -29,7 +29,7 @@
 #'
 #' @importFrom bigstatsr FBM big_apply big_transpose big_cor
 #' @examples 
-#' \donttest{
+#'
 #' mat <- matrix(
 #'  c(
 #'      5, 3, 0, 0,
@@ -48,7 +48,6 @@
 #'
 #' angle_mat <- extract_angles(mat)
 #' angle_mat[]
-#' }
 #' @seealso
 #' \code{\link[bigstatsr]{big_apply}},
 #' \code{\link[bigstatsr]{big_cor}},

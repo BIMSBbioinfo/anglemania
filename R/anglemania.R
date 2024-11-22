@@ -39,7 +39,7 @@
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #'   Default is \code{2000}.
 #'
-#' @return An updated \code{\link{anglemaniaObject}} with computed statistics and
+#' @return An updated \code{\link{anglemaniaObject-class}} with computed statistics and
 #'   selected genes based on the specified thresholds.
 #'
 #' @importFrom pbapply pblapply
@@ -54,19 +54,18 @@
 #'   \url{https://arxiv.org/abs/1306.0256}
 #'
 #' @examples
-#' \donttest{
 #' load(system.file(
 #'  "extdata",
 #'  "seurat_splatter_sim.RData",
 #'  package = "anglemania"))
-#' 
-#' angl <- create_anglemaniaObject(se,
+#' batch_key <- "Batch"
+#' anglemania_object <- create_anglemaniaObject(se,
 #'  batch_key = batch_key,
 #'  min_cells_per_gene = 1
 #'  )
 #'
-#' angl <- anglemania(
-#'   angl,
+#' anglemania_object <- anglemania(
+#'   anglemania_object,
 #'   method = "pearson",
 #'   zscore_mean_threshold = 2,
 #'   zscore_sn_threshold = 2,
@@ -74,8 +73,7 @@
 #' )
 #'
 #' # Access the selected genes
-#' selected_genes <- get_anglemania_genes(angl)
-#' }
+#' selected_genes <- get_anglemania_genes(anglemania_object)
 #' selected_genes[1:10]
 #' @export
 anglemania <- function(

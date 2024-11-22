@@ -70,15 +70,15 @@ load(system.file(
  "extdata",
  "seurat_splatter_sim.RData",
  package = "anglemania"))
-
-angl <- create_anglemaniaObject(se,
+batch_key = "Batch"
+anglemania_object <- create_anglemaniaObject(se,
  batch_key = batch_key,
  min_cells_per_gene = 1
  )
- angl
+ anglemania_object
 }
 \seealso{
-\code{\link{anglemaniaObject}},
+\code{\link{anglemaniaObject-class}},
 \code{\link{add_unique_batch_key}},
 \code{\link{anglemania}},
 \code{\link[bigstatsr]{FBM}}

@@ -20,10 +20,9 @@ If the list is empty or the FBMs have different dimensions,
 it throws an error.
 }
 \examples{
-\donttest{
 # Create FBMs
 mat1 <- matrix(1:9, nrow = 3)
-mat2 <- matrix(1:3, nrow = 3)
+mat2 <- matrix(1:9, nrow = 3)
 
 fbm1 <- bigstatsr::FBM(nrow = nrow(mat1), ncol = ncol(mat1), init = mat1)
 fbm2 <- bigstatsr::FBM(nrow = nrow(mat2), ncol = ncol(mat2), init = mat2)
@@ -41,5 +40,4 @@ anglemania_object <- new(
   matrix_list = fbm_list
 )
 big_mat_list_mean(anglemania_object)
-}
 }

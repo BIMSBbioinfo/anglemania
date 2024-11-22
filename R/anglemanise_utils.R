@@ -142,10 +142,9 @@ get_dstat <- function(corr_matrix) {
 #' @return A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 #' @importFrom bigstatsr FBM
 #' @examples
-#' \donttest{
 #' # Create FBMs
 #' mat1 <- matrix(1:9, nrow = 3)
-#' mat2 <- matrix(1:3, nrow = 3)
+#' mat2 <- matrix(1:9, nrow = 3)
 #'
 #' fbm1 <- bigstatsr::FBM(nrow = nrow(mat1), ncol = ncol(mat1), init = mat1)
 #' fbm2 <- bigstatsr::FBM(nrow = nrow(mat2), ncol = ncol(mat2), init = mat2)
@@ -163,7 +162,6 @@ get_dstat <- function(corr_matrix) {
 #'   matrix_list = fbm_list
 #' )
 #' big_mat_list_mean(anglemania_object)
-#' }
 #' @export
 big_mat_list_mean <- function(anglemania_object) {
   if (!inherits(anglemania_object, "anglemaniaObject")) {
@@ -222,7 +220,6 @@ big_mat_list_mean <- function(anglemania_object) {
 #'   \code{sds_zscore}, and \code{sn_zscore}.
 #' @importFrom bigstatsr FBM big_apply
 #' @examples
-#' \donttest{
 #' load(system.file(
 #' "extdata",
 #'  "seurat_splatter_sim.RData",
@@ -232,7 +229,6 @@ big_mat_list_mean <- function(anglemania_object) {
 #' anglemania_object <- anglemania(anglemania_object)
 #' list_stats(anglemania_object) <- get_list_stats(anglemania_object)
 #' str(list_stats(anglemania_object))
-#' }
 #' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 #' @export
 get_list_stats <- function(anglemania_object) {
@@ -325,7 +321,6 @@ get_list_stats <- function(anglemania_object) {
 #' \code{max_n_genes} exceeds the number of unique genes available, all unique
 #' genes are returned.
 #' @examples
-#' \donttest{
 #' gene_pairs <- data.frame(
 #'   geneA = c("Gene1", "Gene2", "Gene3", "Gene4"),
 #'   geneB = c("Gene3", "Gene4", "Gene5", "Gene6")
@@ -335,7 +330,6 @@ get_list_stats <- function(anglemania_object) {
 #'   max_n_genes = 3
 #' )
 #' print(unique_genes)
-#' }
 #' @seealso \code{\link{select_genes}}
 #' @export
 extract_rows_for_unique_genes <- function(dt, max_n_genes) {
@@ -352,7 +346,7 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 # ---------------------------------------------------------------------------
 #' Select Genes Based on Statistical Thresholds from an anglemaniaObject
 #'
-#' Selects genes from an \code{anglemaniaObject} based on specified
+#' Selects genes from an \code{\link{anglemaniaObject-class}} based on specified
 #' thresholds for the absolute mean z-score and signal-to-noise ratio
 #' (SNR) z-score. It updates the \code{integration_genes} slot of the
 #' \code{anglemaniaObject} with the selected genes and associated
@@ -374,7 +368,7 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'  \item Checks if the input object is of class \code{\link{anglemaniaObject}}.
+#'  \item Checks if the input object is of class \code{\link{anglemaniaObject-class}}.
 #'  \item If \code{max_n_genes} is not specified, it uses all genes that pass
 #'     the thresholds.
 #'  \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -388,14 +382,29 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'     with the selected genes and their statistics.
 #' }
 #' @examples
-#' \donttest{
-#' angl <- select_genes(angl,
-#'                       zscore_mean_threshold = 2,
-#'                      zscore_sn_threshold = 2,
+#' load(system.file(
+#'  "extdata",
+#'  "seurat_splatter_sim.RData",
+#'  package = "anglemania"))
+#' 
+#' anglemania_object <- create_anglemaniaObject(se,
+#'  batch_key = batch_key,
+#'  min_cells_per_gene = 1
+#'  )
+#'
+#' anglemania_object <- anglemania(
+#'   anglemania_object,
+#'   method = "pearson",
+#'   zscore_mean_threshold = 2,
+#'   zscore_sn_threshold = 2,
+#'   max_n_genes = 2000
+#' )
+#' anglemania_object <- select_genes(anglemania_object,
+#'                       zscore_mean_threshold = 2.5,
+#'                      zscore_sn_threshold = 2.5,
 #'                      max_n_genes = 2000)
-#' anglemania_genes <- get_anglemania_genes(angl)
+#' anglemania_genes <- get_anglemania_genes(anglemania_object)
 #' # View the selected genes and use for integration
-#' }
 #' @seealso \code{\link{extract_rows_for_unique_genes}},
 #'   \code{\link{intersect_genes}}, \code{\link{list_stats}}
 #' @export

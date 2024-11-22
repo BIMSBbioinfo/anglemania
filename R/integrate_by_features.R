@@ -35,7 +35,7 @@
 #'
 #' @param seurat_object A \code{\link[Seurat]{Seurat}} object containing
 #'   all samples or batches to be integrated.
-#' @param anglemania_object An \code{\link{anglemaniaObject}} previously generated
+#' @param anglemania_object An \code{\link{anglemaniaObject-class}} previously generated
 #'   using \code{\link{create_anglemaniaObject}} and \code{\link{anglemania}}.
 #'   It is important that the \code{dataset_key} and \code{batch_key} are
 #'   correctly set in the \code{anglemaniaObject}.
@@ -58,14 +58,29 @@
 #' @importFrom pbapply pblapply
 #' @importFrom checkmate assertClass assertLogical testFALSE
 #' @examples 
-#' \donttest{
 #' # Integrate samples using anglemaniaObject 
 #' # Automatically reads the batch key from anglemaniaObject
 #' #  splits the seurat object into batches and integrates them
 #' #  using CCA integration and anglemania genes previously extracted
 #' #  with anglemania() or select_genes()
+#' load(system.file(
+#'  "extdata",
+#'  "seurat_splatter_sim.RData",
+#'  package = "anglemania"))
+#' 
+#' anglemania_object <- create_anglemaniaObject(se,
+#'  batch_key = batch_key,
+#'  min_cells_per_gene = 1
+#'  )
+#'
+#' anglemania_object <- anglemania(
+#'   anglemania_object,
+#'   method = "pearson",
+#'   zscore_mean_threshold = 2,
+#'   zscore_sn_threshold = 2,
+#'   max_n_genes = 2000
+#' )
 #' integrated_object <- integrate_by_features(seurat_object, anglemania_object)
-#' }
 #' @seealso
 #' \code{\link{create_anglemaniaObject}},
 #' \code{\link{anglemania}},

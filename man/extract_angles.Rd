@@ -39,7 +39,7 @@ The function returns the gene-gene angle matrix as an
 \code{\link[bigstatsr]{FBM}} object.
 }
 \examples{
-\donttest{
+
 mat <- matrix(
  c(
      5, 3, 0, 0,
@@ -58,7 +58,6 @@ mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
 angle_mat <- extract_angles(mat)
 angle_mat[]
-}
 }
 \seealso{
 \code{\link[bigstatsr]{big_apply}},

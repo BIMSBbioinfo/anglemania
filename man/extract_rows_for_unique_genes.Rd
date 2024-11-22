@@ -27,7 +27,6 @@ unique gene names, and returns the first \code{max_n_genes} genes. If
 genes are returned.
 }
 \examples{
-\donttest{
 gene_pairs <- data.frame(
   geneA = c("Gene1", "Gene2", "Gene3", "Gene4"),
   geneB = c("Gene3", "Gene4", "Gene5", "Gene6")
@@ -37,7 +36,6 @@ unique_genes <- extract_rows_for_unique_genes(
   max_n_genes = 3
 )
 print(unique_genes)
-}
 }
 \seealso{
 \code{\link{select_genes}}

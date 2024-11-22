@@ -27,8 +27,8 @@
 #' @slot integration_genes A list containing information about integration genes
 #'   and their statistics.
 #'
-#' @name anglemaniaObject-methods
-#' @rdname anglemaniaObject-methods
+#' @name anglemaniaObject-class
+#' @rdname anglemaniaObject-class
 #' @examples
 #' load(system.file(
 #'   "extdata",
@@ -327,11 +327,11 @@ setReplaceMethod("angl_weights", "anglemaniaObject", function(object, value) {
 #' @return A list containing statistical matrices such as mean z-scores and SNR
 #'   z-scores
 #' @examples
-#' \donttest{
+#'
 #' # list_stats extracts the statistical measures from the anglemaniaObject
 #' # after running anglemania()
 #' stats <- list_stats(anglemania_object)
-#' }
+#'
 #' @describeIn anglemaniaObject-methods Access statistics of the gene-gene matrices
 #' @seealso \code{\link{anglemania}} \code{\link{get_list_stats}}
 #' @export
@@ -413,10 +413,10 @@ setReplaceMethod("intersect_genes", "anglemaniaObject", function(object, value) 
 #' @param object An \code{anglemaniaObject}.
 #' @return A character vector of integration gene names.
 #' @examples
-#' \donttest{
+#'
 #' # extract the genes identified by anglemania()
 #' anglemania_genes <- get_anglemania_genes(anglemania_object)
-#' }
+#'
 #' @describeIn anglemaniaObject-methods Access the genes extracted by anglemania
 #' @export
 setGeneric(
@@ -558,7 +558,7 @@ add_unique_batch_key <- function(
 #' @importFrom checkmate testString
 #'
 #' @seealso
-#' \code{\link{anglemaniaObject}},
+#' \code{\link{anglemaniaObject-class}},
 #' \code{\link{add_unique_batch_key}},
 #' \code{\link{anglemania}},
 #' \code{\link[bigstatsr]{FBM}}
@@ -567,12 +567,12 @@ add_unique_batch_key <- function(
 #'  "extdata",
 #'  "seurat_splatter_sim.RData",
 #'  package = "anglemania"))
-#'
-#' angl <- create_anglemaniaObject(se,
+#' batch_key = "Batch"
+#' anglemania_object <- create_anglemaniaObject(se,
 #'  batch_key = batch_key,
 #'  min_cells_per_gene = 1
 #'  )
-#'  angl
+#'  anglemania_object
 #' @export create_anglemaniaObject
 create_anglemaniaObject <- function(
     seurat_object,

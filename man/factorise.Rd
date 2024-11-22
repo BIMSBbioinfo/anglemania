@@ -53,7 +53,6 @@ relationships by comparing them to a null distribution derived from the
 permuted data.
 }
 \examples{
-\donttest{
 mat <- matrix(
  c(
      5, 3, 0, 0,
@@ -73,7 +72,6 @@ mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 # Run factorise with method "pearson" and a fixed seed
 result_fbm <- factorise(mat, method = "pearson", seed = 1)
 result_fbm[]
-}
 }
 \seealso{
 \code{\link{extract_angles}},

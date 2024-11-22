@@ -31,7 +31,7 @@ The input \code{anglemaniaObject} with the
 their statistical information.
 }
 \description{
-Selects genes from an \code{anglemaniaObject} based on specified
+Selects genes from an \code{\link{anglemaniaObject-class}} based on specified
 thresholds for the absolute mean z-score and signal-to-noise ratio
 (SNR) z-score. It updates the \code{integration_genes} slot of the
 \code{anglemaniaObject} with the selected genes and associated
@@ -40,7 +40,7 @@ information.
 \details{
 The function performs the following steps:
 \enumerate{
-\item Checks if the input object is of class \code{\link{anglemaniaObject}}.
+\item Checks if the input object is of class \code{\link{anglemaniaObject-class}}.
 \item If \code{max_n_genes} is not specified, it uses all genes that pass
 the thresholds.
 \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -55,14 +55,29 @@ with the selected genes and their statistics.
 }
 }
 \examples{
-\donttest{
-angl <- select_genes(angl,
-                      zscore_mean_threshold = 2,
-                     zscore_sn_threshold = 2,
+load(system.file(
+ "extdata",
+ "seurat_splatter_sim.RData",
+ package = "anglemania"))
+
+anglemania_object <- create_anglemaniaObject(se,
+ batch_key = batch_key,
+ min_cells_per_gene = 1
+ )
+
+anglemania_object <- anglemania(
+  anglemania_object,
+  method = "pearson",
+  zscore_mean_threshold = 2,
+  zscore_sn_threshold = 2,
+  max_n_genes = 2000
+)
+anglemania_object <- select_genes(anglemania_object,
+                      zscore_mean_threshold = 2.5,
+                     zscore_sn_threshold = 2.5,
                      max_n_genes = 2000)
-anglemania_genes <- get_anglemania_genes(angl)
+anglemania_genes <- get_anglemania_genes(anglemania_object)
 # View the selected genes and use for integration
-}
 }
 \seealso{
 \code{\link{extract_rows_for_unique_genes}},
