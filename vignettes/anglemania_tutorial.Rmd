@@ -23,22 +23,52 @@ suppressPackageStartupMessages({
   library(anglemania)
   library(dplyr)
   library(Seurat)
+  library(splatter)
 })
 ```
 
-# load data
-## unintegrated data
-```{r, load data}
-load(system.file("extdata", "seurat_splatter_sim.RData", package = "anglemania"))
+# Create simulated data
+```{r, create simulated data}
+batch.facLoc <- 0.4
+de.facLoc <- 0.1
+nBatches <- 4
+nGroups <- 3
+nGenes <- 5000
+groupCells <- 800
+
+sim <- splatSimulate(
+    batchCells = rep(300 * nGroups, nBatches),
+    batch.facLoc = batch.facLoc,
+    group.prob = rep(1/nGroups, nGroups),
+    nGenes = nGenes,
+    batch.facScale = 0.1,
+    method = "groups",
+    verbose = FALSE,
+    out.prob    = 0.001,
+    de.prob     = 0.1, # mild 
+    de.facLoc   = de.facLoc,
+    de.facScale = 0.1,
+    bcv.common  = 0.1
+)
+
+se <- CreateSeuratObject(counts = counts(sim), meta.data = as.data.frame(colData(sim)))
+rm(sim)
 se
 head(se[[]])
+```
+
+## unintegrated data
+```{r}
+
 se_unintegrated <- se
-se_unintegrated <- se_unintegrated %>%
+suppressWarnings({
+  se_unintegrated <- se_unintegrated %>%
   NormalizeData() %>%
   FindVariableFeatures() %>%
   ScaleData() %>%
   RunPCA() %>%
   RunUMAP(dims = 1:30, verbose = FALSE)
+})
 DimPlot(se_unintegrated, reduction = "umap", group.by = "Batch")
 DimPlot(se_unintegrated, reduction = "umap", group.by = "Group")
 ```
@@ -59,11 +89,13 @@ angl
 ## run anglemania
 ```{r, run anglemania}
 angl <- anglemania(angl,
-  zscore_mean_threshold = 2.5,
-  zscore_sn_threshold = 2.5,
+  zscore_mean_threshold = 2,
+  zscore_sn_threshold = 2,
   max_n_genes = 2000 # optionally define a max number of genes. default is 2000
 )
-
+angl <- select_genes(angl,
+                     zscore_mean_threshold = 2.5,
+                     zscore_sn_threshold = 2.5)
 # Inspect the anglemania genes
 integration_genes <- get_anglemania_genes(angl)
 head(integration_genes)
@@ -76,7 +108,7 @@ length(integration_genes)
 ```{r, integration option 1}
 # if the Seurat FindIntegrationAnchors() function does not work,
 # change this to the specified size:
-options(future.globals.maxSize = 8000 * 1024^2)
+options(future.globals.maxSize = 4000 * 1024^2)
 suppressWarnings({
   seurat_integrated_angl <- integrate_by_features(se,
     angl,
@@ -98,7 +130,9 @@ Seurat::DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Group")
 ```{r, get HVGs}
 se_list <- SplitObject(se, split.by = batch_key)
 se_list <- lapply(se_list, NormalizeData)
-hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 2000)
+hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 350) 
+# anglemania chose only 334 genes based on the thresholds
+#   to make it comparable we only choose 350 highly variable genes
 ```
 
 ## integration
@@ -117,3 +151,10 @@ seurat_integrated_hvg
 Seurat::DimPlot(seurat_integrated_hvg, reduction = "umap", group.by = "Batch")
 Seurat::DimPlot(seurat_integrated_hvg, reduction = "umap", group.by = "Group")
 ```
+
+```{r}
+sessionInfo()
+```
+
+
+

@@ -1,8 +1,7 @@
 # load example seurat object
-load(system.file("extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
+# pbmc_scmall does not have any "batches" from multiple experiments
+#   but we'll just treat it like the "groups" column are the batches
+se <- SeuratObject::pbmc_small
 se_raw <- se
 
 # Should check if all the slots are correctly
@@ -11,7 +10,7 @@ se_raw <- se
 ## unique batch key "batch" is added
 test_that("unique batch key is added", {
   se <- se_raw
-  batch_key <- "Batch"
+  batch_key <- "groups"
   dataset_key <- "Dataset"
   dataset_col <- data.frame(
     Dataset = rep(c("Dataset1", "Dataset2"), ncol(se) / 2),
@@ -33,7 +32,7 @@ test_that("unique batch key is added", {
 ## matrix_list
 test_that("matrix list is correctly constructed", {
   library(Seurat)
-  batch_key <- "Batch"
+  batch_key <- "groups"
   matrices <- Seurat::SplitObject(se, split.by = batch_key) |>
     lapply(SeuratObject::LayerData, layer = "counts")
   matrices <- lapply(matrices, function(x) {
@@ -42,16 +41,16 @@ test_that("matrix list is correctly constructed", {
   })
 
   anglemania_object <- create_anglemaniaObject(se, batch_key = batch_key)
-  expect_true(length(matrix_list(anglemania_object)) == 4)
+  expect_true(length(matrix_list(anglemania_object)) == 2)
   expect_s4_class(matrix_list(anglemania_object)[[1]], "FBM")
 })
 
 test_that("data_info and weights correctly constructed 
 in case of no dataset_key", {
   se <- se_raw
-  batch_key <- "Batch"
+  batch_key <- "groups"
   data_info_df <- se[[]] %>%
-    dplyr::mutate(batch = Batch) %>%
+    dplyr::mutate(batch = groups) %>%
     dplyr::select(batch, all_of(batch_key)) %>%
     dplyr::distinct() %>%
     dplyr::mutate(weight = 1 / nrow(.))
@@ -76,7 +75,7 @@ test_that(
   existing dataset_key",
   {
     se <- se_raw
-    batch_key <- "Batch"
+    batch_key <- "groups"
     dataset_key <- "Dataset"
     dataset_col <- data.frame(
       Dataset = rep(c("Dataset1", "Dataset2"), ncol(se) / 2),
@@ -114,7 +113,7 @@ test_that("anglemaniaObject is correct in case of incorrect dataset_key", {
   library(Seurat)
   library(dplyr)
   se <- se_raw
-  batch_key <- "Batch"
+  batch_key <- "groups"
   dataset_key <- "false"
   expect_error(create_anglemaniaObject(se,
     batch_key = batch_key,

@@ -28,7 +28,7 @@ cells in which a gene must be expressed to be included in the analysis.
 Default is \code{1}.}
 }
 \value{
-An \code{\link{anglemaniaObject}} containing:
+An \code{\link{anglemaniaObject-class}} containing:
 \describe{
 \item{\code{matrix_list}}{A list of filtered count matrices for each unique
 batch.}
@@ -47,7 +47,7 @@ threshold used for filtering.}
 }
 }
 \description{
-Constructs an \code{\link{anglemaniaObject}} from a given
+Constructs an \code{\link{anglemaniaObject-class}} from a given
 \code{\link[Seurat]{Seurat}} object. This includes extracting and processing
 count matrices, filtering genes based on expression in a minimum number of
 cells, and storing results along with dataset and batch information. It also
@@ -66,15 +66,12 @@ The function performs the following steps:
 }
 }
 \examples{
-load(system.file(
- "extdata",
- "seurat_splatter_sim.RData",
- package = "anglemania"))
-batch_key = "Batch"
-anglemania_object <- create_anglemaniaObject(se,
- batch_key = batch_key,
- min_cells_per_gene = 1
- )
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "groups",
+  min_cells_per_gene = 1
+)
  anglemania_object
 }
 \seealso{

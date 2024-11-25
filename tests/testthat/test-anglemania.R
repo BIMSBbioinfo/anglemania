@@ -1,12 +1,12 @@
-load(system.file("extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
+# load example seurat object
+# pbmc_scmall does not have any "batches" from multiple experiments
+#   but we'll just treat it like the "groups" column are the batches
+se <- SeuratObject::pbmc_small
 se_raw <- se
 
 test_that("anglemania works correctly with method pearson", {
   se <- se_raw
-  anglemania_object <- create_anglemaniaObject(se, batch_key = "Batch")
+  anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
   anglemania_object <- anglemania(anglemania_object, method = "pearson")
 
   # check that list_stats is not empty

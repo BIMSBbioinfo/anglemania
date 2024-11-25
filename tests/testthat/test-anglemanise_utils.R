@@ -1,7 +1,7 @@
-load(system.file("extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
+# load example seurat object
+# pbmc_scmall does not have any "batches" from multiple experiments
+#   but we'll just treat it like the "groups" column are the batches
+se <- SeuratObject::pbmc_small
 se_raw <- se
 
 test_that("sparse_to_fbm converts sparse matrix to FBM correctly", {
@@ -82,7 +82,7 @@ test_that("get_dstat throws an error when corr_matrix is not an FBM", {
 
 test_that("big_mat_list_mean computes the weighted mean correctly", {
   se <- se_raw
-  batch_key <- "Batch"
+  batch_key <- "groups"
   anglemania_object <- create_anglemaniaObject(
     se,
     batch_key = batch_key
@@ -95,11 +95,8 @@ test_that("big_mat_list_mean computes the weighted mean correctly", {
   result_matrix <- result_fbm[1:100, 1:100]
 
   # Manually compute the expected weighted mean ==> only use a subset
-
-  expected_matrix <- anglemania_object@matrix_list$Batch1[1:100, 1:100] * 0.25 +
-    anglemania_object@matrix_list$Batch2[1:100, 1:100] * 0.25 +
-    anglemania_object@matrix_list$Batch3[1:100, 1:100] * 0.25 +
-    anglemania_object@matrix_list$Batch4[1:100, 1:100] * 0.25
+  expected_matrix <- anglemania_object@matrix_list$g1[1:100, 1:100] * 0.5 +
+    anglemania_object@matrix_list$g2[1:100, 1:100] * 0.5
 
 
   # Compare the result with the expected matrix

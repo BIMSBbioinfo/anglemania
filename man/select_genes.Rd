@@ -55,23 +55,9 @@ with the selected genes and their statistics.
 }
 }
 \examples{
-load(system.file(
- "extdata",
- "seurat_splatter_sim.RData",
- package = "anglemania"))
-
-anglemania_object <- create_anglemaniaObject(se,
- batch_key = batch_key,
- min_cells_per_gene = 1
- )
-
-anglemania_object <- anglemania(
-  anglemania_object,
-  method = "pearson",
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2,
-  max_n_genes = 2000
-)
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
+anglemania_object <- anglemania(anglemania_object)
 anglemania_object <- select_genes(anglemania_object,
                       zscore_mean_threshold = 2.5,
                      zscore_sn_threshold = 2.5,

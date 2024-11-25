@@ -65,7 +65,7 @@ The integration is performed using Seurat's CCA-based methods, and the
 function is designed to handle datasets with varying sizes efficiently.
 }
 \examples{
-\donttest{
+\dontrun{
 # Integrate a list of seurat object using selected 
 #  features (e.g. anglemania genes or HVGs)
 #  and CCA integration method

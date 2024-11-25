@@ -44,6 +44,7 @@
 #'
 #' @importFrom bigstatsr FBM big_apply
 #' @importFrom checkmate assertClass assertString assertChoice
+#' @importFrom withr with_seed
 #'
 #' @examples
 #' mat <- matrix(
@@ -86,17 +87,18 @@ factorise <- function(
   checkmate::assertString(method)
   checkmate::assertChoice(method, c("pearson", "spearman", "diem"))
   # Permute matrix
-  set.seed(seed)
-  bigstatsr::big_apply(
-    x_mat,
-    a.FUN = function(X, ind) {
-      X.sub <- X[, ind, drop = FALSE]
-      X.sub <- apply(X.sub, 2, sample)
-      x_mat_perm[, ind] <- X.sub
-      NULL
-    },
-    a.combine = "c",
-    block.size = 1000
+  withr::with_seed(seed,
+    bigstatsr::big_apply(
+      x_mat,
+      a.FUN = function(X, ind) {
+        X.sub <- X[, ind, drop = FALSE]
+        X.sub <- apply(X.sub, 2, sample)
+        x_mat_perm[, ind] <- X.sub
+        NULL
+      },
+      a.combine = "c",
+      block.size = 1000
+    )
   )
 
   # Compute correlation matrix for both original and permuted matrix

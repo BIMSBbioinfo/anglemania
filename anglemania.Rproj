@@ -14,8 +14,7 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackageInstallArgs: --no-multiarch --with-keep.source --no-examples
-PackageBuildArgs: --no-examples
-PackageBuildBinaryArgs: --no-examples
-PackageCheckArgs: --as-cran --no-examples
+PackageInstallArgs: --no-tests --no-build-vignettes
+PackageBuildArgs: --no-tests --no-build-vignettes
+PackageCheckArgs: --as-cran --no-tests --no-build-vignettes
 PackageRoxygenize: rd,collate,namespace,vignette

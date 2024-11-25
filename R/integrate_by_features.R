@@ -63,24 +63,11 @@
 #' #  splits the seurat object into batches and integrates them
 #' #  using CCA integration and anglemania genes previously extracted
 #' #  with anglemania() or select_genes()
-#' load(system.file(
-#'  "extdata",
-#'  "seurat_splatter_sim.RData",
-#'  package = "anglemania"))
-#' 
-#' anglemania_object <- create_anglemaniaObject(se,
-#'  batch_key = batch_key,
-#'  min_cells_per_gene = 1
-#'  )
-#'
-#' anglemania_object <- anglemania(
-#'   anglemania_object,
-#'   method = "pearson",
-#'   zscore_mean_threshold = 2,
-#'   zscore_sn_threshold = 2,
-#'   max_n_genes = 2000
-#' )
-#' integrated_object <- integrate_by_features(seurat_object, anglemania_object)
+#' se <- SeuratObject::pbmc_small
+#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
+#' anglemania_object <- anglemania(anglemania_object)
+#' options(future.globals.maxSize = 4000 * 1024^2)
+#' integrated_object <- integrate_by_features(se, anglemania_object)
 #' @seealso
 #' \code{\link{create_anglemaniaObject}},
 #' \code{\link{anglemania}},
@@ -190,7 +177,7 @@ integrate_by_features <- function(
 #' @importFrom pbapply pblapply
 #' @importFrom checkmate assertClass assertCharacter assertLogical
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #' # Integrate a list of seurat object using selected 
 #' #  features (e.g. anglemania genes or HVGs)
 #' #  and CCA integration method

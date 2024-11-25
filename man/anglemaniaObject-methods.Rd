@@ -3,17 +3,41 @@
 \name{show,anglemaniaObject-method}
 \alias{show,anglemaniaObject-method}
 \alias{matrix_list}
+\alias{matrix_list,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,matrix_list}
 \alias{matrix_list<-}
+\alias{matrix_list<-,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,matrix_list<-}
 \alias{dataset_key}
+\alias{dataset_key,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,dataset_key}
 \alias{batch_key}
+\alias{batch_key,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,batch_key}
 \alias{data_info}
+\alias{data_info,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,data_info}
 \alias{angl_weights}
+\alias{angl_weights,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,angl_weights}
 \alias{angl_weights<-}
+\alias{angl_weights<-,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,angl_weights<-}
 \alias{list_stats}
+\alias{list_stats,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,list_stats}
 \alias{list_stats<-}
+\alias{list_stats<-,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,list_stats<-}
 \alias{intersect_genes}
+\alias{intersect_genes,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,intersect_genes}
 \alias{intersect_genes<-}
+\alias{intersect_genes<-,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,intersect_genes<-}
 \alias{get_anglemania_genes}
+\alias{get_anglemania_genes,anglemaniaObject-method}
+\alias{anglemaniaObject-methods,get_anglemania_genes}
 \alias{add_unique_batch_key}
 \title{Display Summary Information for an anglemaniaObject}
 \usage{
@@ -21,27 +45,51 @@
 
 matrix_list(object)
 
+\S4method{matrix_list}{anglemaniaObject}(object)
+
 matrix_list(object) <- value
+
+\S4method{matrix_list}{anglemaniaObject}(object) <- value
 
 dataset_key(object)
 
+\S4method{dataset_key}{anglemaniaObject}(object)
+
 batch_key(object)
+
+\S4method{batch_key}{anglemaniaObject}(object)
 
 data_info(object)
 
+\S4method{data_info}{anglemaniaObject}(object)
+
 angl_weights(object)
+
+\S4method{angl_weights}{anglemaniaObject}(object)
 
 angl_weights(object) <- value
 
+\S4method{angl_weights}{anglemaniaObject}(object) <- value
+
 list_stats(object)
+
+\S4method{list_stats}{anglemaniaObject}(object)
 
 list_stats(object) <- value
 
+\S4method{list_stats}{anglemaniaObject}(object) <- value
+
 intersect_genes(object)
+
+\S4method{intersect_genes}{anglemaniaObject}(object)
 
 intersect_genes(object) <- value
 
+\S4method{intersect_genes}{anglemaniaObject}(object) <- value
+
 get_anglemania_genes(object)
+
+\S4method{get_anglemania_genes}{anglemaniaObject}(object)
 
 add_unique_batch_key(
   seurat_object,
@@ -170,114 +218,82 @@ analysis.
 
 }}
 \examples{
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
-anglemania_object <- create_anglemaniaObject(
-  se,
-  batch_key = "Batch",
-  min_cells_per_gene = 1
-)
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
+anglemania_object <- anglemania(anglemania_object)
 show(anglemania_object)
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
-anglemania_object <- create_anglemaniaObject(
-  se,
-  batch_key = "Batch",
-  min_cells_per_gene = 1
-)
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
+anglemania_object <- anglemania(anglemania_object)
 str(matrix_list(anglemania_object))
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
+se <- SeuratObject::pbmc_small
+se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
 anglemania_object <- create_anglemaniaObject(
   se,
-  batch_key = "Batch",
+  dataset_key = "Dataset",
+  batch_key = "groups",
   min_cells_per_gene = 1
 )
 dataset_key(anglemania_object)
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
+se <- SeuratObject::pbmc_small
 anglemania_object <- create_anglemaniaObject(
   se,
-  batch_key = "Batch",
+  batch_key = "groups",
   min_cells_per_gene = 1
 )
 batch_key(anglemania_object)
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
+se <- SeuratObject::pbmc_small
 anglemania_object <- create_anglemaniaObject(
   se,
-  batch_key = "Batch",
+  batch_key = "groups",
   min_cells_per_gene = 1
 )
-data_info(anglemania_object)
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
+batch_key(anglemania_object)
+se <- SeuratObject::pbmc_small
 anglemania_object <- create_anglemaniaObject(
   se,
-  batch_key = "Batch",
+  batch_key = "groups",
   min_cells_per_gene = 1
 )
+batch_key(anglemania_object)
 angl_weights(anglemania_object)
-
-# list_stats extracts the statistical measures from the anglemaniaObject
-# after running anglemania()
-stats <- list_stats(anglemania_object)
-
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
+se <- SeuratObject::pbmc_small
 anglemania_object <- create_anglemaniaObject(
   se,
-  batch_key = "Batch",
+  batch_key = "groups",
+  min_cells_per_gene = 1
+)
+anglemania_object <- anglemania(anglemania_object)
+stats <- list_stats(anglemania_object)
+str(stats)
+
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "groups",
   min_cells_per_gene = 1
 )
 intersect_genes(anglemania_object)
-
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(
+  se,
+  batch_key = "groups",
+  min_cells_per_gene = 1
+)
+anglemania_object <- anglemania(anglemania_object)
 # extract the genes identified by anglemania()
 anglemania_genes <- get_anglemania_genes(anglemania_object)
 
-load(system.file(
- "extdata",
- "seurat_splatter_sim.RData",
- package = "anglemania"))
-
+se <- SeuratObject::pbmc_small
 se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se)/2)
-seurat_object <- add_unique_batch_key(
+se <- add_unique_batch_key(
   seurat_object = se,
   dataset_key = "Dataset",
-  batch_key = "Batch",
+  batch_key = "groups",
   new_unique_batch_key = "batch" 
   )
-head(seurat_object[[]])
+head(se[[]])
 }
 \seealso{
 \code{\link{anglemania}} \code{\link{get_list_stats}}
 }
-\keyword{internal}

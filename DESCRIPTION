@@ -24,7 +24,8 @@ Imports:
     dplyr,
     magrittr,
     tidyr,
-    pbapply
+    pbapply,
+    withr
 Suggests:
     testthat (>= 3.0.0),
     knitr,

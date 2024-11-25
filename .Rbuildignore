@@ -19,3 +19,5 @@ R/flippitise.R
 ^pkgdown$
 ^tmp_bm
 ^playground
+^doc$
+^Meta$

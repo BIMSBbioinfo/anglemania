@@ -3,7 +3,11 @@
 \docType{class}
 \name{anglemaniaObject-class}
 \alias{anglemaniaObject-class}
+\alias{anglemaniaObject}
 \title{anglemaniaObject - Class for Storing and Processing Gene Expression Data}
+\value{
+An object of class 'anglemaniaObject'
+}
 \description{
 The \code{anglemaniaObject} class is designed to construct the correct input for the
 \code{anglemania} function from a \code{\link[Seurat]{Seurat}} object and store
@@ -42,17 +46,12 @@ and their statistics.}
 }}
 
 \examples{
-load(system.file(
-  "extdata",
-  "seurat_splatter_sim.RData",
-  package = "anglemania"
-))
-
+se <- SeuratObject::pbmc_small
 se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
 anglemania_object <- create_anglemaniaObject(
   se,
   dataset_key = "Dataset",
-  batch_key = "Batch",
+  batch_key = "groups",
   min_cells_per_gene = 1
 )
 anglemania_object

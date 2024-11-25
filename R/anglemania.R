@@ -6,7 +6,7 @@
 #'
 #' @description
 #' `anglemania` computes critical angles between genes across all samples
-#' provided in an \code{\link{anglemaniaObject}}. It calculates angles,
+#' provided in an \code{\link{anglemaniaObject-class}}. It calculates angles,
 #' transforms them to z-scores, computes statistical measures, and selects
 #' genes based on specified thresholds.
 #'
@@ -26,7 +26,7 @@
 #' The computed statistics and selected genes are added to the
 #' \code{anglemania_object}, which is returned.
 #'
-#' @param anglemania_object An \code{\link{anglemaniaObject}} containing gene
+#' @param anglemania_object An \code{\link{anglemaniaObject-class}} containing gene
 #' expression data and associated metadata.
 #' @param method Character string specifying the method to use for calculating
 #' the relationship between gene pairs. Default is \code{"pearson"}.
@@ -54,16 +54,8 @@
 #'   \url{https://arxiv.org/abs/1306.0256}
 #'
 #' @examples
-#' load(system.file(
-#'  "extdata",
-#'  "seurat_splatter_sim.RData",
-#'  package = "anglemania"))
-#' batch_key <- "Batch"
-#' anglemania_object <- create_anglemaniaObject(se,
-#'  batch_key = batch_key,
-#'  min_cells_per_gene = 1
-#'  )
-#'
+#' se <- SeuratObject::pbmc_small
+#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
 #' anglemania_object <- anglemania(
 #'   anglemania_object,
 #'   method = "pearson",

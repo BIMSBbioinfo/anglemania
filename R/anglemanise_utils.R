@@ -220,12 +220,8 @@ big_mat_list_mean <- function(anglemania_object) {
 #'   \code{sds_zscore}, and \code{sn_zscore}.
 #' @importFrom bigstatsr FBM big_apply
 #' @examples
-#' load(system.file(
-#' "extdata",
-#'  "seurat_splatter_sim.RData",
-#'  package = "anglemania")
-#' )
-#' anglemania_object <- create_anglemaniaObject(se, batch_key = "Batch")
+#' se <- SeuratObject::pbmc_small
+#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
 #' anglemania_object <- anglemania(anglemania_object)
 #' list_stats(anglemania_object) <- get_list_stats(anglemania_object)
 #' str(list_stats(anglemania_object))
@@ -382,23 +378,9 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'     with the selected genes and their statistics.
 #' }
 #' @examples
-#' load(system.file(
-#'  "extdata",
-#'  "seurat_splatter_sim.RData",
-#'  package = "anglemania"))
-#' 
-#' anglemania_object <- create_anglemaniaObject(se,
-#'  batch_key = batch_key,
-#'  min_cells_per_gene = 1
-#'  )
-#'
-#' anglemania_object <- anglemania(
-#'   anglemania_object,
-#'   method = "pearson",
-#'   zscore_mean_threshold = 2,
-#'   zscore_sn_threshold = 2,
-#'   max_n_genes = 2000
-#' )
+#' se <- SeuratObject::pbmc_small
+#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
+#' anglemania_object <- anglemania(anglemania_object)
 #' anglemania_object <- select_genes(anglemania_object,
 #'                       zscore_mean_threshold = 2.5,
 #'                      zscore_sn_threshold = 2.5,

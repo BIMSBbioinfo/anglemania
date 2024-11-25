@@ -18,12 +18,8 @@ Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
 for each element across a list of FBMs in an \code{anglemaniaObject}.
 }
 \examples{
-load(system.file(
-"extdata",
- "seurat_splatter_sim.RData",
- package = "anglemania")
-)
-anglemania_object <- create_anglemaniaObject(se, batch_key = "Batch")
+se <- SeuratObject::pbmc_small
+anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
 anglemania_object <- anglemania(anglemania_object)
 list_stats(anglemania_object) <- get_list_stats(anglemania_object)
 str(list_stats(anglemania_object))
