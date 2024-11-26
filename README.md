@@ -1,4 +1,4 @@
-<img src="graphical_abstract.png" align="center" alt="logo" width="2000" style = "border: none; float: center ;">
+<img src="man/figures/graphical_abstract.png" align="center" alt="logo" width="2000" style = "border: none; float: center ;">
 
 # anglemania
 The repository carries the development version of the conceived "anglemania" R package.
@@ -59,7 +59,7 @@ Artistic License/GPL
 
 If you use **anglemania** in your research, please cite:
 
-> Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin(2024). *anglemania: Feature Extraction for scRNA-seq Dataset Integration. R package version 0.0.9000
+> Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin(2024). *anglemania: Feature Extraction for scRNA-seq Dataset Integration. R package version 0.99.0
 
 
 

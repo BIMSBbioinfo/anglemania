@@ -1,4 +1,4 @@
-url: ~
+url: "https://bioinformatics.mdc-berlin.de/anglemania"
 template:
   bootstrap: 5
 
@@ -7,7 +7,7 @@ reference:
     desc: >
       The two functions for running anglemania.
     contents:
-      - create_anglemaniaObject
+      - create_anglemania_object
       - anglemania
 
   - title: Computation of Statistics
@@ -34,7 +34,20 @@ reference:
     desc: >
       Helper functions to access and set anglem object attributes.
     contents:
-      - anglemaniaObject-methods
+      - anglemania_object-class
+      - matrix_list
+      - "matrix_list<-"
+      - dataset_key
+      - batch_key
+      - data_info
+      - angl_weights
+      - "angl_weights<-"
+      - list_stats
+      - "list_stats<-"
+      - intersect_genes
+      - "intersect_genes<-"
+      - get_anglemania_genes
+      - add_unique_batch_key
 
 articles:
   - title: "Articles"
