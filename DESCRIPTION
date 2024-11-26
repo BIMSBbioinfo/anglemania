@@ -1,4 +1,5 @@
 Package: anglemania
+URL: https://bioinformatics.mdc-berlin.de/anglemania, https://github.com/BIMSBbioinfo/anglemania/
 Title: Feature Extraction for scRNA-seq Dataset Integration
 Version: 0.99.0
 Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
@@ -27,6 +28,7 @@ Imports:
     pbapply,
     withr
 Suggests:
+    splatter,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,

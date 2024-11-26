@@ -2,17 +2,17 @@
 % Please edit documentation in R/anglemanise_utils.R
 \name{select_genes}
 \alias{select_genes}
-\title{Select Genes Based on Statistical Thresholds from an anglemaniaObject}
+\title{Select Genes Based on Statistical Thresholds from an anglemania_object}
 \usage{
 select_genes(
-  anglemania_object,
+  angl,
   zscore_mean_threshold = 2,
   zscore_sn_threshold = 2,
   max_n_genes = NULL
 )
 }
 \arguments{
-\item{anglemania_object}{An \code{anglemaniaObject} containing statistical
+\item{angl}{An \code{anglemania_object} containing statistical
 matrices such as mean z-scores and SNR z-scores.}
 
 \item{zscore_mean_threshold}{Numeric value specifying the threshold for the
@@ -26,21 +26,21 @@ If \code{NULL}, all genes that pass the thresholds are used. Default is
 \code{NULL}.}
 }
 \value{
-The input \code{anglemaniaObject} with the
+The input \code{anglemania_object} with the
 \code{integration_genes} slot updated to include the selected genes and
 their statistical information.
 }
 \description{
-Selects genes from an \code{\link{anglemaniaObject-class}} based on specified
+Selects genes from an \code{\link{anglemania_object-class}} based on specified
 thresholds for the absolute mean z-score and signal-to-noise ratio
 (SNR) z-score. It updates the \code{integration_genes} slot of the
-\code{anglemaniaObject} with the selected genes and associated
+\code{anglemania_object} with the selected genes and associated
 information.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item Checks if the input object is of class \code{\link{anglemaniaObject-class}}.
+\item Checks if the input object is of class \code{\link{anglemania_object-class}}.
 \item If \code{max_n_genes} is not specified, it uses all genes that pass
 the thresholds.
 \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -50,19 +50,19 @@ exceed the specified thresholds.
 \item Extracts unique genes from the selected gene pairs using
 \code{\link{extract_rows_for_unique_genes}}.
 \item Updates the \code{integration_genes} slot of the
-\code{anglemaniaObject}
+\code{anglemania_object}
 with the selected genes and their statistics.
 }
 }
 \examples{
 se <- SeuratObject::pbmc_small
-anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-anglemania_object <- anglemania(anglemania_object)
-anglemania_object <- select_genes(anglemania_object,
+angl <- create_anglemania_object(se, batch_key = "groups")
+angl <- anglemania(angl)
+angl <- select_genes(angl,
                       zscore_mean_threshold = 2.5,
                      zscore_sn_threshold = 2.5,
                      max_n_genes = 2000)
-anglemania_genes <- get_anglemania_genes(anglemania_object)
+anglemania_genes <- get_anglemania_genes(angl)
 # View the selected genes and use for integration
 }
 \seealso{

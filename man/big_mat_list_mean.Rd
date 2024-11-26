@@ -4,17 +4,17 @@
 \alias{big_mat_list_mean}
 \title{Calculates the mean for each element of a matrix from a list of FBMs}
 \usage{
-big_mat_list_mean(anglemania_object)
+big_mat_list_mean(angl)
 }
 \arguments{
-\item{anglemania_object}{An \code{anglemaniaObject} containing the list of FBMs.
+\item{angl}{An \code{anglemania_object} containing the list of FBMs.
 In this case, the FBMs are the angle matrices computed in \code{factorise}.}
 }
 \value{
 A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 }
 \description{
-This function takes an \code{anglemaniaObject} containing a list of
+This function takes an \code{anglemania_object} containing a list of
 \code{\link[bigstatsr]{FBM}}s and calculates the mean of every element.
 If the list is empty or the FBMs have different dimensions,
 it throws an error.
@@ -33,11 +33,11 @@ weights <- c(batch1 = 0.5, batch2 = 0.5)
 # Create the list of FBMs
 fbm_list <- list(batch1 = fbm1, batch2 = fbm2)
 
-# Construct the anglemaniaObject
-anglemania_object <- new(
-  "anglemaniaObject",
+# Construct the anglemania_object
+angl <- new(
+  "anglemania_object",
   weights = weights,
   matrix_list = fbm_list
 )
-big_mat_list_mean(anglemania_object)
+big_mat_list_mean(angl)
 }

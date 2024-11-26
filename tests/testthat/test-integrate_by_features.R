@@ -6,13 +6,13 @@ se_raw <- se
 
 test_that("integrate_by_features integrates Seurat objects correctly using selected features", {
   se <- se_raw
-  anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-  anglemania_object <- anglemania(anglemania_object, method = "pearson")
+  angl <- create_anglemania_object(se, batch_key = "groups")
+  angl <- anglemania(angl, method = "pearson")
 
   # Integrate samples using selected features
   options(future.globals.maxSize = 5000 * 1024^2)
   suppressWarnings({
-    se_integrated <- integrate_by_features(se, anglemania_object)
+    se_integrated <- integrate_by_features(se, angl)
   })
   # Seurat gave too many unnecessary warnings.. Annoying in R-CMD-check
   

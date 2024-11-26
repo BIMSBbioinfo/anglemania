@@ -2,10 +2,10 @@
 % Please edit documentation in R/anglemania.R
 \name{anglemania}
 \alias{anglemania}
-\title{Compute Critical Angles Between Genes Across Samples in an anglemaniaObject}
+\title{Compute Critical Angles Between Genes Across Samples in an anglemania_object}
 \usage{
 anglemania(
-  anglemania_object,
+  angl,
   method = "pearson",
   zscore_mean_threshold = 2.5,
   zscore_sn_threshold = 2.5,
@@ -13,7 +13,7 @@ anglemania(
 )
 }
 \arguments{
-\item{anglemania_object}{An \code{\link{anglemaniaObject-class}} containing gene
+\item{angl}{An \code{\link{anglemania_object-class}} containing gene
 expression data and associated metadata.}
 
 \item{method}{Character string specifying the method to use for calculating
@@ -31,12 +31,12 @@ signal-to-noise z-score. Default is \code{2.5}.}
 Default is \code{2000}.}
 }
 \value{
-An updated \code{\link{anglemaniaObject-class}} with computed statistics and
+An updated \code{\link{anglemania_object-class}} with computed statistics and
 selected genes based on the specified thresholds.
 }
 \description{
 \code{anglemania} computes critical angles between genes across all samples
-provided in an \code{\link{anglemaniaObject-class}}. It calculates angles,
+provided in an \code{\link{anglemania_object-class}}. It calculates angles,
 transforms them to z-scores, computes statistical measures, and selects
 genes based on specified thresholds.
 }
@@ -44,7 +44,7 @@ genes based on specified thresholds.
 This function performs the following steps:
 \enumerate{
 \item Computes angles between genes for each sample in the
-\code{anglemania_object} using the specified \code{method}, via
+\code{angl} using the specified \code{method}, via
 \code{\link{factorise}}.
 \item Transforms the angles to z-scores.
 \item Computes statistical measures (mean z-score, signal-to-noise ratio)
@@ -54,13 +54,13 @@ across samples using \code{\link{get_list_stats}}.
 }
 
 The computed statistics and selected genes are added to the
-\code{anglemania_object}, which is returned.
+\code{angl}, which is returned.
 }
 \examples{
 se <- SeuratObject::pbmc_small
-anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-anglemania_object <- anglemania(
-  anglemania_object,
+angl <- create_anglemania_object(se, batch_key = "groups")
+angl <- anglemania(
+  angl,
   method = "pearson",
   zscore_mean_threshold = 2,
   zscore_sn_threshold = 2,
@@ -68,11 +68,11 @@ anglemania_object <- anglemania(
 )
 
 # Access the selected genes
-selected_genes <- get_anglemania_genes(anglemania_object)
+selected_genes <- get_anglemania_genes(angl)
 selected_genes[1:10]
 }
 \seealso{
-\code{\link{create_anglemaniaObject}},
+\code{\link{create_anglemania_object}},
 \code{\link{get_list_stats}},
 \code{\link{select_genes}},
 \code{\link{factorise}},

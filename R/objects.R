@@ -1,9 +1,9 @@
 # ---------------------------------------------------------------------------
 # Class definitions for the 'anglemania' Package
 # ---------------------------------------------------------------------------
-#' anglemaniaObject - Class for Storing and Processing Gene Expression Data
+#' anglemania_object - Class for Storing and Processing Gene Expression Data
 #'
-#' The `anglemaniaObject` class is designed to construct the correct input for the
+#' The `anglemania_object` class is designed to construct the correct input for the
 #' `anglemania` function from a \code{\link[Seurat]{Seurat}} object and store
 #' the results of the analysis. It encapsulates the data and metadata required
 #' for processing gene expression data across multiple datasets and batches.
@@ -26,25 +26,25 @@
 #'   cells in which a gene must be expressed to be included in the analysis.
 #' @slot integration_genes A list containing information about integration genes
 #'   and their statistics.
-#' @return An object of class 'anglemaniaObject'
-#' @name anglemaniaObject-class
-#' @aliases anglemaniaObject
+#' @return An object of class 'anglemania_object'
+#' @name anglemania_object-class
+#' @aliases anglemania_object
 #' @docType class
-#' @rdname anglemaniaObject-class
+#' @rdname anglemania_object-class
 #' @examples
 #' se <- SeuratObject::pbmc_small
 #' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   dataset_key = "Dataset",
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' anglemania_object
-#' @seealso \code{\link{create_anglemaniaObject}}, \code{\link{anglemania}}
+#' angl
+#' @seealso \code{\link{create_anglemania_object}}, \code{\link{anglemania}}
 #' @export
 setClass(
-  "anglemaniaObject",
+  "anglemania_object",
   slots = c(
     matrix_list = "list",
     dataset_key = "character",
@@ -73,26 +73,26 @@ setClass(
 )
 
 # ---------------------------------------------------------------------------
-# Display Summary Information for an anglemaniaObject
+# Display Summary Information for an anglemania_object
 # ---------------------------------------------------------------------------
 
-#' Display Summary Information for an anglemaniaObject
+#' Display Summary Information for an anglemania_object
 #'
-#' This method provides a concise summary of an \code{anglemaniaObject}, including
+#' This method provides a concise summary of an \code{anglemania_object}, including
 #' dataset and batch information, the number of intersected genes, and other
 #' relevant details.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return Prints a summary to the console.
 #' @importFrom checkmate testString
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-#' anglemania_object <- anglemania(anglemania_object)
-#' show(anglemania_object)
-#' @describeIn anglemaniaObject-methods show anglemaniaObject info
-setMethod("show", "anglemaniaObject", function(object) {
-  cat("anglemaniaObject\n")
+#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' angl <- anglemania(angl)
+#' show(angl)
+#' @describeIn anglemania_object-methods show anglemania_object info
+setMethod("show", "anglemania_object", function(object) {
+  cat("anglemania_object\n")
   cat("--------------\n")
   cat("Dataset key:", object@dataset_key, "\n")
   cat("Batch key:", object@batch_key, "\n")
@@ -131,169 +131,169 @@ setMethod("show", "anglemaniaObject", function(object) {
 })
 
 # ---------------------------------------------------------------------------
-# Accessor and Mutator Methods for the anglemaniaObject Class
+# Accessor and Mutator Methods for the anglemania_object Class
 # ---------------------------------------------------------------------------
 
-#' Access the Matrix List from an anglemaniaObject
+#' Access the Matrix List from an anglemania_object
 #'
-#' Retrieves the list of gene expression matrices stored in the \code{anglemaniaObject}
+#' Retrieves the list of gene expression matrices stored in the \code{anglemania_object}
 #' object.
 #'
-#' @param object An \code{anglemaniaObject} object.
+#' @param object An \code{anglemania_object} object.
 #' @return A list of \code{\link[bigstatsr]{FBM}} objects containing gene
 #'   expression matrices.
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-#' anglemania_object <- anglemania(anglemania_object)
-#' str(matrix_list(anglemania_object))
-#' @describeIn anglemaniaObject-methods Access matrix list
+#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' angl <- anglemania(angl)
+#' str(matrix_list(angl))
+#' @describeIn anglemania_object-methods Access matrix list
 #' @export
 setGeneric(
   "matrix_list",
   function(object) standardGeneric("matrix_list")
 )
 
-#' @aliases anglemaniaObject-methods,matrix_list
-#' @rdname anglemaniaObject-methods
-setMethod("matrix_list", "anglemaniaObject", function(object) object@matrix_list)
+#' @aliases anglemania_object-methods,matrix_list
+#' @rdname anglemania_object-methods
+setMethod("matrix_list", "anglemania_object", function(object) object@matrix_list)
 
-#' Set the Matrix List in an anglemaniaObject
+#' Set the Matrix List in an anglemania_object
 #'
-#' Assigns a new list of gene expression matrices to the \code{anglemaniaObject}.
+#' Assigns a new list of gene expression matrices to the \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @param value A list of \code{\link[bigstatsr]{FBM}} objects.
-#' @return The updated \code{anglemaniaObject}.
-#' @describeIn anglemaniaObject-methods set matrix list in anglemaniaObject
+#' @return The updated \code{anglemania_object}.
+#' @describeIn anglemania_object-methods set matrix list in anglemania_object
 #' @export
 setGeneric(
   "matrix_list<-",
   function(object, value) standardGeneric("matrix_list<-")
 )
 
-#' @aliases anglemaniaObject-methods,matrix_list<-
-#' @rdname anglemaniaObject-methods
-setReplaceMethod("matrix_list", "anglemaniaObject", function(object, value) {
+#' @aliases anglemania_object-methods,matrix_list<-
+#' @rdname anglemania_object-methods
+setReplaceMethod("matrix_list", "anglemania_object", function(object, value) {
   object@matrix_list <- value
   object
 })
 
-#' Access the Dataset Key from an anglemaniaObject
+#' Access the Dataset Key from an anglemania_object
 #'
-#' Retrieves the dataset key used in the \code{anglemaniaObject}.
+#' Retrieves the dataset key used in the \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A character string representing the dataset key.
 #' @examples
 #' se <- SeuratObject::pbmc_small
 #' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   dataset_key = "Dataset",
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' dataset_key(anglemania_object)
-#' @describeIn anglemaniaObject-methods Access dataset key of anglemaniaObject
+#' dataset_key(angl)
+#' @describeIn anglemania_object-methods Access dataset key of anglemania_object
 #' @export
 setGeneric(
   "dataset_key",
   function(object) standardGeneric("dataset_key")
 )
 
-#' @aliases anglemaniaObject-methods,dataset_key
-#' @rdname anglemaniaObject-methods
-setMethod("dataset_key", "anglemaniaObject", function(object) object@dataset_key)
+#' @aliases anglemania_object-methods,dataset_key
+#' @rdname anglemania_object-methods
+setMethod("dataset_key", "anglemania_object", function(object) object@dataset_key)
 
-#' Access the Batch Key from an anglemaniaObject
+#' Access the Batch Key from an anglemania_object
 #'
-#' Retrieves the batch key used in the \code{anglemaniaObject}.
+#' Retrieves the batch key used in the \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A character string representing the batch key.
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' batch_key(anglemania_object)
-#' @describeIn anglemaniaObject-methods Access batch key of anglemaniaObject
+#' batch_key(angl)
+#' @describeIn anglemania_object-methods Access batch key of anglemania_object
 #' @export
 setGeneric(
   "batch_key",
   function(object) standardGeneric("batch_key")
 )
 
-#' @aliases anglemaniaObject-methods,batch_key
-#' @rdname anglemaniaObject-methods
-setMethod("batch_key", "anglemaniaObject", function(object) object@batch_key)
+#' @aliases anglemania_object-methods,batch_key
+#' @rdname anglemania_object-methods
+setMethod("batch_key", "anglemania_object", function(object) object@batch_key)
 
-#' Access Data Information from an anglemaniaObject Object
+#' Access Data Information from an anglemania_object Object
 #'
 #' Retrieves the data frame summarizing the selected anglemania gene pairs
-#' \code{anglemaniaObject}.
+#' \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A data frame containing dataset and batch information.
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' batch_key(anglemania_object)
-#' @describeIn anglemaniaObject-methods Access info of selected gene pairs
+#' batch_key(angl)
+#' @describeIn anglemania_object-methods Access info of selected gene pairs
 #' @export
 setGeneric(
   "data_info",
   function(object) standardGeneric("data_info")
 )
 
-#' @aliases anglemaniaObject-methods,data_info
-#' @rdname anglemaniaObject-methods
-setMethod("data_info", "anglemaniaObject", function(object) object@data_info)
+#' @aliases anglemania_object-methods,data_info
+#' @rdname anglemania_object-methods
+setMethod("data_info", "anglemania_object", function(object) object@data_info)
 
-#' Access Weights from an anglemaniaObject
+#' Access Weights from an anglemania_object
 #'
-#' Retrieves the weights assigned to each dataset or batch in the \code{anglemaniaObject}
+#' Retrieves the weights assigned to each dataset or batch in the \code{anglemania_object}
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A named numeric vector of weights.
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' batch_key(anglemania_object)
-#' angl_weights(anglemania_object)
-#' @describeIn anglemaniaObject-methods Access weights
+#' batch_key(angl)
+#' angl_weights(angl)
+#' @describeIn anglemania_object-methods Access weights
 #' @export
 setGeneric("angl_weights", function(object) standardGeneric("angl_weights"))
 
-#' @aliases anglemaniaObject-methods,angl_weights
-#' @rdname anglemaniaObject-methods
-setMethod("angl_weights", "anglemaniaObject", function(object) object@weights)
+#' @aliases anglemania_object-methods,angl_weights
+#' @rdname anglemania_object-methods
+setMethod("angl_weights", "anglemania_object", function(object) object@weights)
 
-#' Set Weights in an anglemaniaObject
+#' Set Weights in an anglemania_object
 #'
-#' Assigns new weights to the datasets or batches in the \code{anglemaniaObject}.
+#' Assigns new weights to the datasets or batches in the \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @param value A named numeric vector of weights.
-#' @return The updated \code{anglemaniaObject}.
-#' @describeIn anglemaniaObject-methods Set weights
+#' @return The updated \code{anglemania_object}.
+#' @describeIn anglemania_object-methods Set weights
 #' @export
 setGeneric("angl_weights<-", function(object, value) standardGeneric("angl_weights<-"))
 
-#' @aliases anglemaniaObject-methods,angl_weights<-
-#' @rdname anglemaniaObject-methods
-setReplaceMethod("angl_weights", "anglemaniaObject", function(object, value) {
+#' @aliases anglemania_object-methods,angl_weights<-
+#' @rdname anglemania_object-methods
+setReplaceMethod("angl_weights", "anglemania_object", function(object, value) {
   if (!is.numeric(value)) stop("weights must be numeric")
   if (is.null(names(value))) stop("weights need to be a named vector")
   # Scale the weights so that the sum of weights is 1
@@ -303,72 +303,72 @@ setReplaceMethod("angl_weights", "anglemaniaObject", function(object, value) {
   object
 })
 
-#' Access Statistical Measures from an anglemaniaObject
+#' Access Statistical Measures from an anglemania_object
 #'
 #' Retrieves the list of statistical measures computed across datasets in the
-#' \code{anglemaniaObject}.
+#' \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A list containing statistical matrices such as mean z-scores and SNR
 #'   z-scores
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' anglemania_object <- anglemania(anglemania_object)
-#' stats <- list_stats(anglemania_object)
+#' angl <- anglemania(angl)
+#' stats <- list_stats(angl)
 #' str(stats)
 #'
-#' @describeIn anglemaniaObject-methods Access statistics of the gene-gene matrices
+#' @describeIn anglemania_object-methods Access statistics of the gene-gene matrices
 #' @seealso \code{\link{anglemania}} \code{\link{get_list_stats}}
 #' @export
 setGeneric("list_stats", function(object) standardGeneric("list_stats"))
 
-#' @aliases anglemaniaObject-methods,list_stats
-#' @rdname anglemaniaObject-methods
-setMethod("list_stats", "anglemaniaObject", function(object) object@list_stats)
+#' @aliases anglemania_object-methods,list_stats
+#' @rdname anglemania_object-methods
+setMethod("list_stats", "anglemania_object", function(object) object@list_stats)
 
-#' Set Statistical Measures in an anglemaniaObject
+#' Set Statistical Measures in an anglemania_object
 #'
-#' Assigns a new list of statistical measures to the \code{anglemaniaObject}.
+#' Assigns a new list of statistical measures to the \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @param value A list containing statistical matrices.
-#' @return The updated \code{anglemaniaObject}.
-#' @describeIn anglemaniaObject-methods Set statistics of the gene-gene matrices
+#' @return The updated \code{anglemania_object}.
+#' @describeIn anglemania_object-methods Set statistics of the gene-gene matrices
 #' @export
 setGeneric("list_stats<-", function(object, value) {
   standardGeneric("list_stats<-")
 })
 
-#' @aliases anglemaniaObject-methods,list_stats<-
-#' @rdname anglemaniaObject-methods
-setReplaceMethod("list_stats", "anglemaniaObject", function(object, value) {
+#' @aliases anglemania_object-methods,list_stats<-
+#' @rdname anglemania_object-methods
+setReplaceMethod("list_stats", "anglemania_object", function(object, value) {
   if (!is.list(value)) stop("list_stats must be a list")
   object@list_stats <- value
   object
 })
 
-#' Access Intersected Genes from an anglemaniaObject
+#' Access Intersected Genes from an anglemania_object
 #'
 #' Retrieves the vector of genes that are expressed in at least the specified
 #' number of cells across all batches.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A character vector of intersected gene 
 #'  names from multiple Seurat objects.
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' intersect_genes(anglemania_object)
-#' @describeIn anglemaniaObject-methods 
+#' intersect_genes(angl)
+#' @describeIn anglemania_object-methods 
 #' Access the intersection of genes of all batches
 #' @export
 setGeneric(
@@ -376,60 +376,60 @@ setGeneric(
   function(object) standardGeneric("intersect_genes")
 )
 
-#' @aliases anglemaniaObject-methods,intersect_genes
-#' @rdname anglemaniaObject-methods
-setMethod("intersect_genes", "anglemaniaObject", function(object) {
+#' @aliases anglemania_object-methods,intersect_genes
+#' @rdname anglemania_object-methods
+setMethod("intersect_genes", "anglemania_object", function(object) {
   object@intersect_genes
 })
 
-#' Set Intersected Genes in an anglemaniaObject
+#' Set Intersected Genes in an anglemania_object
 #'
-#' Assigns a new vector of intersected genes to the \code{anglemaniaObject}.
+#' Assigns a new vector of intersected genes to the \code{anglemania_object}.
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @param value A character vector of gene names.
-#' @return The updated \code{anglemaniaObject} object.
-#' @describeIn anglemaniaObject-methods 
+#' @return The updated \code{anglemania_object} object.
+#' @describeIn anglemania_object-methods 
 #' Set the intersection of genes of all batches
 #' @export
 setGeneric("intersect_genes<-", function(object, value) {
   standardGeneric("intersect_genes<-")
 })
 
-#' @aliases anglemaniaObject-methods,intersect_genes<-
-#' @rdname anglemaniaObject-methods
-setReplaceMethod("intersect_genes", "anglemaniaObject", function(object, value) {
+#' @aliases anglemania_object-methods,intersect_genes<-
+#' @rdname anglemania_object-methods
+setReplaceMethod("intersect_genes", "anglemania_object", function(object, value) {
   object@intersect_genes <- value
   object
 })
 
-#' Extract Integration Genes from an anglemaniaObject
+#' Extract Integration Genes from an anglemania_object
 #'
-#' Retrieves the list of genes selected for integration from the \code{anglemaniaObject}
+#' Retrieves the list of genes selected for integration from the \code{anglemania_object}
 #'
-#' @param object An \code{anglemaniaObject}.
+#' @param object An \code{anglemania_object}.
 #' @return A character vector of integration gene names.
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#' anglemania_object <- anglemania(anglemania_object)
+#' angl <- anglemania(angl)
 #' # extract the genes identified by anglemania()
-#' anglemania_genes <- get_anglemania_genes(anglemania_object)
+#' anglemania_genes <- get_anglemania_genes(angl)
 #'
-#' @describeIn anglemaniaObject-methods Access the genes extracted by anglemania
+#' @describeIn anglemania_object-methods Access the genes extracted by anglemania
 #' @export
 setGeneric(
   "get_anglemania_genes",
   function(object) standardGeneric("get_anglemania_genes")
 )
 
-#' @aliases anglemaniaObject-methods,get_anglemania_genes
-#' @rdname anglemaniaObject-methods
-setMethod("get_anglemania_genes", "anglemaniaObject", function(object) {
+#' @aliases anglemania_object-methods,get_anglemania_genes
+#' @rdname anglemania_object-methods
+setMethod("get_anglemania_genes", "anglemania_object", function(object) {
   object@integration_genes$genes
 })
 
@@ -463,7 +463,7 @@ setMethod("get_anglemania_genes", "anglemaniaObject", function(object) {
 #'   new_unique_batch_key = "batch" 
 #'   )
 #' head(se[[]])
-#' @describeIn anglemaniaObject-methods Temporarily add a unique batch key to the dataset
+#' @describeIn anglemania_object-methods Temporarily add a unique batch key to the dataset
 #' @export
 add_unique_batch_key <- function(
     seurat_object,
@@ -498,12 +498,12 @@ add_unique_batch_key <- function(
 }
 
 # ---------------------------------------------------------------------------
-# Create an anglemaniaObject from a Seurat Object
+# Create an anglemania_object from a Seurat Object
 # ---------------------------------------------------------------------------
 
-#' Create an anglemaniaObject from a Seurat Object
+#' Create an anglemania_object from a Seurat Object
 #'
-#' Constructs an \code{\link{anglemaniaObject-class}} from a given
+#' Constructs an \code{\link{anglemania_object-class}} from a given
 #' \code{\link[Seurat]{Seurat}} object. This includes extracting and processing
 #' count matrices, filtering genes based on expression in a minimum number of
 #' cells, and storing results along with dataset and batch information. It also
@@ -521,7 +521,7 @@ add_unique_batch_key <- function(
 #'   cells in which a gene must be expressed to be included in the analysis.
 #'   Default is \code{1}.
 #'
-#' @return An \code{\link{anglemaniaObject-class}} containing:
+#' @return An \code{\link{anglemania_object-class}} containing:
 #' \describe{
 #'   \item{\code{matrix_list}}{A list of filtered count matrices for each unique
 #'     batch.}
@@ -560,20 +560,20 @@ add_unique_batch_key <- function(
 #' @importFrom checkmate testString
 #'
 #' @seealso
-#' \code{\link{anglemaniaObject-class}},
+#' \code{\link{anglemania_object-class}},
 #' \code{\link{add_unique_batch_key}},
 #' \code{\link{anglemania}},
 #' \code{\link[bigstatsr]{FBM}}
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(
+#' angl <- create_anglemania_object(
 #'   se,
 #'   batch_key = "groups",
 #'   min_cells_per_gene = 1
 #' )
-#'  anglemania_object
-#' @export create_anglemaniaObject
-create_anglemaniaObject <- function(
+#'  angl
+#' @export create_anglemania_object
+create_anglemania_object <- function(
     seurat_object,
     dataset_key = NA_character_,
     batch_key,
@@ -695,7 +695,7 @@ create_anglemaniaObject <- function(
 
   # Create anglem object
   anglem_object <- new(
-    "anglemaniaObject",
+    "anglemania_object",
     matrix_list = matrix_list,
     dataset_key = ifelse(
       checkmate::testString(dataset_key),

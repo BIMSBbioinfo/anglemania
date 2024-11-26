@@ -1,7 +1,7 @@
 # anglemania works correctly with method pearson
 
     Code
-      list_stats(anglemania_object)$mean_zscore[1:10, 1:10]
+      list_stats(angl)$mean_zscore[1:10, 1:10]
     Output
                 [,1]     [,2]     [,3]       [,4]     [,5]     [,6]     [,7]
        [1,]       NA 4.022485 4.881479  2.8479871 4.483100 3.532416 3.932042
@@ -29,7 +29,7 @@
 ---
 
     Code
-      str(list_stats(anglemania_object))
+      str(list_stats(angl))
     Output
       List of 3
        $ mean_zscore: num [1:228, 1:228] NA 4.02 4.88 2.85 4.48 ...
@@ -39,7 +39,7 @@
 ---
 
     Code
-      get_anglemania_genes(anglemania_object)
+      get_anglemania_genes(angl)
     Output
         [1] "GNG11"         "CLU"           "SDPR"          "PF4"          
         [5] "GP9"           "SPARC"         "PPBP"          "HIST1H2AC"    

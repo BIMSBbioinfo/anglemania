@@ -57,7 +57,7 @@ se
 head(se[[]])
 ```
 
-## unintegrated data
+# unintegrated data
 ```{r}
 
 se_unintegrated <- se
@@ -79,7 +79,7 @@ DimPlot(se_unintegrated, reduction = "umap", group.by = "Group")
 head(se[[]])
 batch_key <- "Batch"
 
-angl <- create_anglemaniaObject(se,
+angl <- create_anglemania_object(se,
   batch_key = batch_key,
   min_cells_per_gene = 1
 )
@@ -130,9 +130,9 @@ Seurat::DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Group")
 ```{r, get HVGs}
 se_list <- SplitObject(se, split.by = batch_key)
 se_list <- lapply(se_list, NormalizeData)
-hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 350) 
-# anglemania chose only 334 genes based on the thresholds
-#   to make it comparable we only choose 350 highly variable genes
+# anglemania chose only 291 genes based on the thresholds
+#   to make it comparable we only choose 300 highly variable genes:
+hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 300) 
 ```
 
 ## integration

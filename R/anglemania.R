@@ -1,12 +1,12 @@
 # ---------------------------------------------------------------------------
-# Compute Critical Angles Between Genes Across Samples in an anglemaniaObject
+# Compute Critical Angles Between Genes Across Samples in an anglemania_object
 # ---------------------------------------------------------------------------
 
-#' Compute Critical Angles Between Genes Across Samples in an anglemaniaObject
+#' Compute Critical Angles Between Genes Across Samples in an anglemania_object
 #'
 #' @description
 #' `anglemania` computes critical angles between genes across all samples
-#' provided in an \code{\link{anglemaniaObject-class}}. It calculates angles,
+#' provided in an \code{\link{anglemania_object-class}}. It calculates angles,
 #' transforms them to z-scores, computes statistical measures, and selects
 #' genes based on specified thresholds.
 #'
@@ -14,7 +14,7 @@
 #' This function performs the following steps:
 #' \enumerate{
 #'   \item Computes angles between genes for each sample in the
-#'     \code{anglemania_object} using the specified \code{method}, via
+#'     \code{angl} using the specified \code{method}, via
 #'     \code{\link{factorise}}.
 #'   \item Transforms the angles to z-scores.
 #'   \item Computes statistical measures (mean z-score, signal-to-noise ratio)
@@ -24,9 +24,9 @@
 #' }
 #'
 #' The computed statistics and selected genes are added to the
-#' \code{anglemania_object}, which is returned.
+#' \code{angl}, which is returned.
 #'
-#' @param anglemania_object An \code{\link{anglemaniaObject-class}} containing gene
+#' @param angl An \code{\link{anglemania_object-class}} containing gene
 #' expression data and associated metadata.
 #' @param method Character string specifying the method to use for calculating
 #' the relationship between gene pairs. Default is \code{"pearson"}.
@@ -39,14 +39,14 @@
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #'   Default is \code{2000}.
 #'
-#' @return An updated \code{\link{anglemaniaObject-class}} with computed statistics and
+#' @return An updated \code{\link{anglemania_object-class}} with computed statistics and
 #'   selected genes based on the specified thresholds.
 #'
 #' @importFrom pbapply pblapply
 #' @importFrom pbapply pboptions
 #'
 #' @seealso
-#'   \code{\link{create_anglemaniaObject}},
+#'   \code{\link{create_anglemania_object}},
 #'   \code{\link{get_list_stats}},
 #'   \code{\link{select_genes}},
 #'   \code{\link{factorise}},
@@ -55,9 +55,9 @@
 #'
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-#' anglemania_object <- anglemania(
-#'   anglemania_object,
+#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' angl <- anglemania(
+#'   angl,
 #'   method = "pearson",
 #'   zscore_mean_threshold = 2,
 #'   zscore_sn_threshold = 2,
@@ -65,21 +65,21 @@
 #' )
 #'
 #' # Access the selected genes
-#' selected_genes <- get_anglemania_genes(anglemania_object)
+#' selected_genes <- get_anglemania_genes(angl)
 #' selected_genes[1:10]
 #' @export
 anglemania <- function(
-    anglemania_object,
+    angl,
     method = "pearson",
     zscore_mean_threshold = 2.5,
     zscore_sn_threshold = 2.5,
     max_n_genes = 2000) {
   # Validate inputs
-  if (!inherits(anglemania_object, "anglemaniaObject")) {
-    stop("anglemania_object needs to be an anglemaniaObject")
+  if (!inherits(angl, "anglemania_object")) {
+    stop("angl needs to be an anglemania_object")
   }
 
-  # dataset_key and batch_key are checked in create_anglemaniaObject!
+  # dataset_key and batch_key are checked in create_anglemania_object!
 
   if (!is.numeric(zscore_mean_threshold) || zscore_mean_threshold < 0) {
     stop("zscore_mean_threshold has to be a non-negative number")
@@ -100,8 +100,8 @@ anglemania <- function(
     title = "anglemania"
   )
   message("Computing angles and transforming to z-scores...")
-  matrix_list(anglemania_object) <- pbapply::pblapply(
-    matrix_list(anglemania_object),
+  matrix_list(angl) <- pbapply::pblapply(
+    matrix_list(angl),
     function(x) {
       factorise(
         x_mat = x,
@@ -112,16 +112,16 @@ anglemania <- function(
   )
 
   message("Computing statistics...")
-  list_stats(anglemania_object) <- get_list_stats(anglemania_object)
+  list_stats(angl) <- get_list_stats(angl)
   invisible(gc())
 
   message("Filtering features...")
-  anglemania_object <- select_genes(
-    anglemania_object,
+  angl <- select_genes(
+    angl,
     zscore_mean_threshold = zscore_mean_threshold,
     zscore_sn_threshold = zscore_sn_threshold,
     max_n_genes = max_n_genes
   )
 
-  return(anglemania_object)
+  return(angl)
 }

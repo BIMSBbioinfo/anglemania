@@ -4,10 +4,10 @@
 \alias{get_list_stats}
 \title{Calculate statistical measures from a list of FBMs}
 \usage{
-get_list_stats(anglemania_object)
+get_list_stats(angl)
 }
 \arguments{
-\item{anglemania_object}{An \code{anglemaniaObject} containing the list of FBMs.}
+\item{angl}{An \code{anglemania_object} containing the list of FBMs.}
 }
 \value{
 A list containing three matrices: \code{mean_zscore},
@@ -15,14 +15,14 @@ A list containing three matrices: \code{mean_zscore},
 }
 \description{
 Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
-for each element across a list of FBMs in an \code{anglemaniaObject}.
+for each element across a list of FBMs in an \code{anglemania_object}.
 }
 \examples{
 se <- SeuratObject::pbmc_small
-anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-anglemania_object <- anglemania(anglemania_object)
-list_stats(anglemania_object) <- get_list_stats(anglemania_object)
-str(list_stats(anglemania_object))
+angl <- create_anglemania_object(se, batch_key = "groups")
+angl <- anglemania(angl)
+list_stats(angl) <- get_list_stats(angl)
+str(list_stats(angl))
 }
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}

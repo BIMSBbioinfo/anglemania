@@ -132,12 +132,12 @@ get_dstat <- function(corr_matrix) {
 # ---------------------------------------------------------------------------
 #' Calculates the mean for each element of a matrix from a list of FBMs
 #'
-#' This function takes an \code{anglemaniaObject} containing a list of
+#' This function takes an \code{anglemania_object} containing a list of
 #' \code{\link[bigstatsr]{FBM}}s and calculates the mean of every element.
 #' If the list is empty or the FBMs have different dimensions,
 #' it throws an error.
 #'
-#' @param anglemania_object An \code{anglemaniaObject} containing the list of FBMs.
+#' @param angl An \code{anglemania_object} containing the list of FBMs.
 #'  In this case, the FBMs are the angle matrices computed in \code{factorise}.
 #' @return A new \code{\link[bigstatsr]{FBM}} object containing the mean values.
 #' @importFrom bigstatsr FBM
@@ -155,31 +155,31 @@ get_dstat <- function(corr_matrix) {
 #' # Create the list of FBMs
 #' fbm_list <- list(batch1 = fbm1, batch2 = fbm2)
 #'
-#' # Construct the anglemaniaObject
-#' anglemania_object <- new(
-#'   "anglemaniaObject",
+#' # Construct the anglemania_object
+#' angl <- new(
+#'   "anglemania_object",
 #'   weights = weights,
 #'   matrix_list = fbm_list
 #' )
-#' big_mat_list_mean(anglemania_object)
+#' big_mat_list_mean(angl)
 #' @export
-big_mat_list_mean <- function(anglemania_object) {
-  if (!inherits(anglemania_object, "anglemaniaObject")) {
-    stop("anglemania_object needs to be an anglemaniaObject")
+big_mat_list_mean <- function(angl) {
+  if (!inherits(angl, "anglemania_object")) {
+    stop("angl needs to be an anglemania_object")
   }
 
   # Check if all matrices in the list have the same dimensions
   if (!all(sapply(
-    matrix_list(anglemania_object),
+    matrix_list(angl),
     function(x) {
-      identical(dim(matrix_list(anglemania_object)[[1]]), dim(x))
+      identical(dim(matrix_list(angl)[[1]]), dim(x))
     }
   ))) {
     stop("All matrices in the list must have the same dimensions.")
   }
 
-  n_col <- ncol(matrix_list(anglemania_object)[[1]])
-  n_row <- nrow(matrix_list(anglemania_object)[[1]])
+  n_col <- ncol(matrix_list(angl)[[1]])
+  n_row <- nrow(matrix_list(angl)[[1]])
   mat_mean_zscore <- bigstatsr::FBM(n_row, n_col)
 
   bigstatsr::big_apply(
@@ -187,16 +187,16 @@ big_mat_list_mean <- function(anglemania_object) {
     a.FUN = function(X, ind) {
       X.sub <- X[, ind, drop = FALSE]
       wrap_mean <- function(final_mat, batch) {
-        batch_mat <- matrix_list(anglemania_object)[[batch]][
+        batch_mat <- matrix_list(angl)[[batch]][
           , ind,
           drop = FALSE
-        ] * anglemania_object@weights[batch]
+        ] * angl@weights[batch]
         final_mat <- final_mat + batch_mat
       }
       # Run function in Reduce statement on names of weights vector
       X.sub <- Reduce(
         wrap_mean,
-        names(anglemania_object@weights),
+        names(angl@weights),
         init = X.sub
       )
       X[, ind] <- X.sub # Already weighted, no need to divide
@@ -213,30 +213,30 @@ big_mat_list_mean <- function(anglemania_object) {
 #' Calculate statistical measures from a list of FBMs
 #'
 #' Computes the mean, standard deviations, and signal-to-noise ratio (SNR)
-#' for each element across a list of FBMs in an \code{anglemaniaObject}.
+#' for each element across a list of FBMs in an \code{anglemania_object}.
 #'
-#' @param anglemania_object An \code{anglemaniaObject} containing the list of FBMs.
+#' @param angl An \code{anglemania_object} containing the list of FBMs.
 #' @return A list containing three matrices: \code{mean_zscore},
 #'   \code{sds_zscore}, and \code{sn_zscore}.
 #' @importFrom bigstatsr FBM big_apply
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-#' anglemania_object <- anglemania(anglemania_object)
-#' list_stats(anglemania_object) <- get_list_stats(anglemania_object)
-#' str(list_stats(anglemania_object))
+#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' angl <- anglemania(angl)
+#' list_stats(angl) <- get_list_stats(angl)
+#' str(list_stats(angl))
 #' @seealso \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}
 #' @export
-get_list_stats <- function(anglemania_object) {
-  if (!inherits(anglemania_object, "anglemaniaObject")) {
-    stop("anglemania_object needs to be an anglemaniaObject")
+get_list_stats <- function(angl) {
+  if (!inherits(angl, "anglemania_object")) {
+    stop("angl needs to be an anglemania_object")
   }
 
   # Check if all matrices in the list have the same dimensions
   if (!all(sapply(
-    matrix_list(anglemania_object),
+    matrix_list(angl),
     function(x) {
-      identical(dim(matrix_list(anglemania_object)[[1]]), dim(x))
+      identical(dim(matrix_list(angl)[[1]]), dim(x))
     }
   ))) {
     stop("All matrices in the list need to have the same dimensions.")
@@ -245,10 +245,10 @@ get_list_stats <- function(anglemania_object) {
   message("Weighting matrix_list...")
   message("Calculating mean...")
 
-  mat_mean_zscore <- big_mat_list_mean(anglemania_object)
+  mat_mean_zscore <- big_mat_list_mean(angl)
 
-  n_col <- ncol(matrix_list(anglemania_object)[[1]])
-  n_row <- nrow(matrix_list(anglemania_object)[[1]])
+  n_col <- ncol(matrix_list(angl)[[1]])
+  n_row <- nrow(matrix_list(angl)[[1]])
   mat_sds_zscore <- bigstatsr::FBM(n_row, n_col)
 
   message("Calculating sds...")
@@ -257,16 +257,16 @@ get_list_stats <- function(anglemania_object) {
     mat_sds_zscore,
     a.FUN = function(X, ind) {
       wrap_sds <- function(final_mat, batch) {
-        batch_mat <- matrix_list(anglemania_object)[[batch]]
+        batch_mat <- matrix_list(angl)[[batch]]
         final_mat <- final_mat + (
           batch_mat[, ind, drop = FALSE] -
             mat_mean_zscore[, ind, drop = FALSE]
-        )^2 * anglemania_object@weights[batch]
+        )^2 * angl@weights[batch]
       }
       X.sub <- X[, ind, drop = FALSE]
       X.sub <- Reduce(
         wrap_sds,
-        names(anglemania_object@weights),
+        names(angl@weights),
         init = X.sub
       )
       X[, ind] <- sqrt(X.sub)
@@ -340,15 +340,15 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 }
 
 # ---------------------------------------------------------------------------
-#' Select Genes Based on Statistical Thresholds from an anglemaniaObject
+#' Select Genes Based on Statistical Thresholds from an anglemania_object
 #'
-#' Selects genes from an \code{\link{anglemaniaObject-class}} based on specified
+#' Selects genes from an \code{\link{anglemania_object-class}} based on specified
 #' thresholds for the absolute mean z-score and signal-to-noise ratio
 #' (SNR) z-score. It updates the \code{integration_genes} slot of the
-#' \code{anglemaniaObject} with the selected genes and associated
+#' \code{anglemania_object} with the selected genes and associated
 #' information.
 #'
-#' @param anglemania_object An \code{anglemaniaObject} containing statistical
+#' @param angl An \code{anglemania_object} containing statistical
 #'   matrices such as mean z-scores and SNR z-scores.
 #' @param zscore_mean_threshold Numeric value specifying the threshold for the
 #'   absolute mean z-score. Default is 2.
@@ -357,14 +357,14 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #'   If \code{NULL}, all genes that pass the thresholds are used. Default is
 #'   \code{NULL}.
-#' @return The input \code{anglemaniaObject} with the
+#' @return The input \code{anglemania_object} with the
 #'   \code{integration_genes} slot updated to include the selected genes and
 #'   their statistical information.
 #' @importFrom stats quantile
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'  \item Checks if the input object is of class \code{\link{anglemaniaObject-class}}.
+#'  \item Checks if the input object is of class \code{\link{anglemania_object-class}}.
 #'  \item If \code{max_n_genes} is not specified, it uses all genes that pass
 #'     the thresholds.
 #'  \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -374,40 +374,40 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'  \item Extracts unique genes from the selected gene pairs using
 #'     \code{\link{extract_rows_for_unique_genes}}.
 #'  \item Updates the \code{integration_genes} slot of the
-#'   \code{anglemaniaObject}
+#'   \code{anglemania_object}
 #'     with the selected genes and their statistics.
 #' }
 #' @examples
 #' se <- SeuratObject::pbmc_small
-#' anglemania_object <- create_anglemaniaObject(se, batch_key = "groups")
-#' anglemania_object <- anglemania(anglemania_object)
-#' anglemania_object <- select_genes(anglemania_object,
+#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' angl <- anglemania(angl)
+#' angl <- select_genes(angl,
 #'                       zscore_mean_threshold = 2.5,
 #'                      zscore_sn_threshold = 2.5,
 #'                      max_n_genes = 2000)
-#' anglemania_genes <- get_anglemania_genes(anglemania_object)
+#' anglemania_genes <- get_anglemania_genes(angl)
 #' # View the selected genes and use for integration
 #' @seealso \code{\link{extract_rows_for_unique_genes}},
 #'   \code{\link{intersect_genes}}, \code{\link{list_stats}}
 #' @export
 select_genes <- function(
-    anglemania_object,
+    angl,
     zscore_mean_threshold = 2,
     zscore_sn_threshold = 2,
     max_n_genes = NULL) {
-  if (!inherits(anglemania_object, "anglemaniaObject")) {
-    stop("anglemania_object needs to be an anglemaniaObject")
+  if (!inherits(angl, "anglemania_object")) {
+    stop("angl needs to be an anglemania_object")
   }
 
   if (is.null(max_n_genes)) {
     # If no max_n_genes specified, use all genes that pass the threshold
-    max_n_genes <- length(intersect_genes(anglemania_object))
+    max_n_genes <- length(intersect_genes(angl))
   }
 
   gene_ind <- which(
-    upper.tri(list_stats(anglemania_object)$sn_zscore) &
-      (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
-      (abs(list_stats(anglemania_object)$mean_zscore) >= zscore_mean_threshold),
+    upper.tri(list_stats(angl)$sn_zscore) &
+      (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
+      (abs(list_stats(angl)$mean_zscore) >= zscore_mean_threshold),
     arr.ind = TRUE
   )
 
@@ -415,12 +415,12 @@ select_genes <- function(
   if (nrow(gene_ind) == 0) {
     message("No genes passed the cutoff.")
     quantile95mean <- stats::quantile(
-      abs(list_stats(anglemania_object)$mean_zscore),
+      abs(list_stats(angl)$mean_zscore),
       0.95,
       na.rm = TRUE
     )
     quantile95sn <- stats::quantile(
-      list_stats(anglemania_object)$sn_zscore,
+      list_stats(angl)$sn_zscore,
       0.95,
       na.rm = TRUE
     )
@@ -453,21 +453,21 @@ select_genes <- function(
 
     # Re-run the selection
     gene_ind <- which(
-      upper.tri(list_stats(anglemania_object)$sn_zscore) &
-        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
-        (abs(list_stats(anglemania_object)$mean_zscore) >= zscore_mean_threshold),
+      upper.tri(list_stats(angl)$sn_zscore) &
+        (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
+        (abs(list_stats(angl)$mean_zscore) >= zscore_mean_threshold),
       arr.ind = TRUE
     )
 
     message(
       "If desired, you can re-run the selection of genes with a lower ",
       "zscore_mean_threshold and/or zscore_sn_threshold by using the ",
-      "'select_genes' function. e.g.: anglemania_object <- select_genes(",
-      "anglemania_object, zscore_mean_threshold = 1, zscore_sn_threshold = 1, ",
+      "'select_genes' function. e.g.: angl <- select_genes(",
+      "angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, ",
       "max_n_genes = 2000)"
     )
     message(
-      "Please inspect get_anglemania_genes(anglemania_object)$info",
+      "Please inspect get_anglemania_genes(angl)$info",
       " for info on the scores of the selected gene pairs."
     )
   }
@@ -475,16 +475,16 @@ select_genes <- function(
   top_n <- data.frame(
     geneA = gene_ind[, 1],
     geneB = gene_ind[, 2],
-    zscore = list_stats(anglemania_object)$mean_zscore[gene_ind],
-    snscore = list_stats(anglemania_object)$sn_zscore[gene_ind]
+    zscore = list_stats(angl)$mean_zscore[gene_ind],
+    snscore = list_stats(angl)$sn_zscore[gene_ind]
   )
 
   # Order data frame
   top_n <- top_n[order(abs(top_n$zscore), decreasing = TRUE), ]
-  anglemania_object@integration_genes$info <- top_n
+  angl@integration_genes$info <- top_n
   selected_genes <- extract_rows_for_unique_genes(top_n, max_n_genes)
-  anglemania_object@integration_genes$genes <- 
-    intersect_genes(anglemania_object)[selected_genes]
+  angl@integration_genes$genes <- 
+    intersect_genes(angl)[selected_genes]
 
-  return(anglemania_object)
+  return(angl)
 }

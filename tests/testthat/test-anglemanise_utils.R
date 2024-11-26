@@ -83,20 +83,20 @@ test_that("get_dstat throws an error when corr_matrix is not an FBM", {
 test_that("big_mat_list_mean computes the weighted mean correctly", {
   se <- se_raw
   batch_key <- "groups"
-  anglemania_object <- create_anglemaniaObject(
+  angl <- create_anglemania_object(
     se,
     batch_key = batch_key
   )
-  anglemania_object <- anglemania(anglemania_object)
+  angl <- anglemania(angl)
   # Compute the weighted mean using big_mat_list_mean
-  result_fbm <- big_mat_list_mean(anglemania_object)
+  result_fbm <- big_mat_list_mean(angl)
 
   # Extract the result as a regular matrix ==> only use a subset
   result_matrix <- result_fbm[1:100, 1:100]
 
   # Manually compute the expected weighted mean ==> only use a subset
-  expected_matrix <- anglemania_object@matrix_list$g1[1:100, 1:100] * 0.5 +
-    anglemania_object@matrix_list$g2[1:100, 1:100] * 0.5
+  expected_matrix <- angl@matrix_list$g1[1:100, 1:100] * 0.5 +
+    angl@matrix_list$g2[1:100, 1:100] * 0.5
 
 
   # Compare the result with the expected matrix
@@ -119,16 +119,16 @@ when matrices have different dimensions", {
   # Create the list of FBMs
   fbm_list <- list(batch1 = fbm1, batch2 = fbm2)
 
-  # Construct the anglemaniaObject
-  anglemania_object <- new(
-    "anglemaniaObject",
+  # Construct the anglemania_object
+  angl <- new(
+    "anglemania_object",
     weights = weights,
     matrix_list = fbm_list
   )
 
   # Expect an error
   expect_error(
-    big_mat_list_mean(anglemania_object),
+    big_mat_list_mean(angl),
     "All matrices in the list must have the same dimensions."
   )
 })
@@ -152,9 +152,9 @@ test_that("select_genes selects genes correctly based on thresholds", {
   # Define intersect_genes
   gene_names <- paste0("gene", 1:20)
 
-  # Create an anglemaniaObject with the required slots
-  test_anglemania_object <- new(
-    "anglemaniaObject",
+  # Create an anglemania_object with the required slots
+  test_angl <- new(
+    "anglemania_object",
     list_stats = list(
       mean_zscore = mean_zscore_matrix,
       sn_zscore = sn_zscore_matrix
@@ -168,7 +168,7 @@ test_that("select_genes selects genes correctly based on thresholds", {
 
   # Call select_genes with thresholds
   updated_object <- select_genes(
-    anglemania_object = test_anglemania_object,
+    angl = test_angl,
     zscore_mean_threshold = 2.0,
     zscore_sn_threshold = 2.0,
     max_n_genes = 3
@@ -242,9 +242,9 @@ test_that("select_genes adjusts thresholds when no genes pass the cutoff with la
   # Define intersect_genes
   gene_names <- paste0("gene", 1:40)
 
-  # Create an anglemaniaObject with the required slots
-  test_anglemania_object <- new(
-    "anglemaniaObject",
+  # Create an anglemania_object with the required slots
+  test_angl <- new(
+    "anglemania_object",
     list_stats = list(
       mean_zscore = mean_zscore_matrix,
       sn_zscore = sn_zscore_matrix
@@ -257,7 +257,7 @@ test_that("select_genes adjusts thresholds when no genes pass the cutoff with la
   )
   # Call select_genes with thresholds
   updated_object <- select_genes(
-    anglemania_object = test_anglemania_object,
+    angl = test_angl,
     zscore_mean_threshold = 10,
     zscore_sn_threshold = 10,
     max_n_genes = 3
