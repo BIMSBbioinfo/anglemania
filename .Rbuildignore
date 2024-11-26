@@ -21,3 +21,4 @@ R/flippitise.R
 ^playground
 ^doc$
 ^Meta$
+^codecov\.yml$
