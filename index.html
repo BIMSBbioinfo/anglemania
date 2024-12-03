@@ -58,7 +58,7 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><strong>anglemania</strong> is a new approach to the integration of scRNA-seq (and, potentially, others sc-omics) from <strong>similar</strong> biological entities. The novelty, as well as the cornerstone, of the proposed approach, is to use the conservation of <a href="https://arxiv.org/abs/1306.0256" class="external-link">angles</a> between gene pairs across an assembly of datasets to be integrated. anglemania extracts genes from gene pairs that exhibit invariant and biologically meaningful relationships across different experiments. Those genes can subsequently be used as the basis for integration algorithms such as [<a href="https://satijalab.org/seurat/reference/ccaintegration" class="external-link">Seurat CCA integration</a>], [<a href="https://docs.scvi-tools.org/en/stable/api/reference/scvi.model.SCVI.html" class="external-link">SCVI</a>] and others. Checkout our [<a href="https://bioinformatics.mdc-berlin.de/anglemania" class="external-link">website</a>].</p>
+<p><strong>anglemania</strong> is a new approach to the integration of scRNA-seq (and, potentially, others sc-omics) from <strong>similar</strong> biological entities. The novelty, as well as the cornerstone, of the proposed approach, is to use the conservation of <a href="https://arxiv.org/abs/1306.0256" class="external-link">angles</a> between gene pairs across an assembly of datasets to be integrated. anglemania extracts genes from gene pairs that exhibit invariant and biologically meaningful relationships across different experiments. Those genes can subsequently be used as the basis for integration algorithms such as <a href="https://satijalab.org/seurat/reference/ccaintegration" class="external-link">Seurat CCA integration</a>, <a href="https://docs.scvi-tools.org/en/stable/api/reference/scvi.model.SCVI.html" class="external-link">SCVI</a> and others. Checkout our <a href="https://bioinformatics.mdc-berlin.de/anglemania" class="external-link">website</a>.</p>
 <table class="table">
 <colgroup>
 <col width="50%">
@@ -73,17 +73,13 @@
 <td>Bioc Release</td>
 <td><a href="https://bioconductor.org/packages/anglemania" class="external-link"><img src="https://bioconductor.org/shields/years-in-bioc/anglemania.svg" alt="Bioc Release"></a></td>
 </tr>
-<tr class="odd">
-<td>Coverage</td>
-<td><a href="https://app.codecov.io/gh/BIMSBbioinfo/anglemania" class="external-link"><img src="https://codecov.io/gh/BIMSBbioinfo/anglemania/graph/badge.svg" alt="Codecov test coverage"></a></td>
-</tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install <strong>anglemania</strong> from Bioconductor using the following commands:</p>
+<p>You can install <strong>anglemania</strong> from Bioconductor using the following commands: <strong>once available on Bioconductor:</strong></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install BiocManager if you haven't already</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
@@ -98,7 +94,7 @@
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install from GitHub</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"BIMSBbioinfo/anglemania/"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"BIMSBbioinfo/anglemania"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>

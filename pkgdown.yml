@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   anglemania_tutorial: anglemania_tutorial.html
-last_built: 2024-11-26T16:31Z
+last_built: 2024-12-03T08:42Z
 urls:
   reference: http://bioinformatics.mdc-berlin.de/anglemania/reference
   article: http://bioinformatics.mdc-berlin.de/anglemania/articles
