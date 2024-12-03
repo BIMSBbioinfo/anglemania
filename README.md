@@ -4,14 +4,13 @@
 ## Overview
 **anglemania** is a new approach to the integration of scRNA-seq (and, potentially, others sc-omics) from **similar** biological entities.
 The novelty, as well as the cornerstone, of the proposed approach, is to use the conservation of [angles](https://arxiv.org/abs/1306.0256) between gene pairs across an assembly of datasets to be integrated.
-anglemania extracts genes from gene pairs that exhibit invariant and biologically meaningful relationships across different experiments. Those genes can subsequently be used as the basis for integration algorithms such as [[Seurat CCA integration](https://satijalab.org/seurat/reference/ccaintegration)], [[SCVI](https://docs.scvi-tools.org/en/stable/api/reference/scvi.model.SCVI.html)] and others.
-Checkout our [[website](https://bioinformatics.mdc-berlin.de/anglemania)].
+anglemania extracts genes from gene pairs that exhibit invariant and biologically meaningful relationships across different experiments. Those genes can subsequently be used as the basis for integration algorithms such as [Seurat CCA integration](https://satijalab.org/seurat/reference/ccaintegration), [SCVI](https://docs.scvi-tools.org/en/stable/api/reference/scvi.model.SCVI.html) and others.
+Checkout our [website](https://bioinformatics.mdc-berlin.de/anglemania).
 
 |  |  | 
 | - | - |
 | Github | [![Github](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BIMSBbioinfo/anglemania/actions/workflows/R-CMD-check.yaml) |
 | Bioc Release | [![Bioc Release](https://bioconductor.org/shields/years-in-bioc/anglemania.svg)](https://bioconductor.org/packages/anglemania)
-| Coverage | [![Codecov test coverage](https://codecov.io/gh/BIMSBbioinfo/anglemania/graph/badge.svg)](https://app.codecov.io/gh/BIMSBbioinfo/anglemania)
 
 
 
@@ -19,6 +18,7 @@ Checkout our [[website](https://bioinformatics.mdc-berlin.de/anglemania)].
 ## Installation
 
 You can install **anglemania** from Bioconductor using the following commands:
+**once available on Bioconductor:**
 
 ```r
 # Install BiocManager if you haven't already
@@ -37,7 +37,7 @@ if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 
 # Install from GitHub
-devtools::install_github("BIMSBbioinfo/anglemania/")
+devtools::install_github("BIMSBbioinfo/anglemania")
 ```
 
 
