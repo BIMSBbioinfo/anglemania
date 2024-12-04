@@ -361,6 +361,9 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #'   If \code{NULL}, all genes that pass the thresholds are used. Default is
 #'   \code{NULL}.
+#' @param direction whether to select genes with positive, negative or both mean z-scores. Default is "both"
+#' @param adjust_threshols whether to automatically adjust threholds if the selected genes do not meet the thresholds. Default is TRUE
+
 #' @return The input \code{anglemaniaObject} with the
 #'   \code{integration_genes} slot updated to include the selected genes and
 #'   their statistical information.
@@ -412,25 +415,48 @@ select_genes <- function(
     anglemania_object,
     zscore_mean_threshold = 2,
     zscore_sn_threshold = 2,
-    max_n_genes = NULL) {
+    max_n_genes = NULL,
+    direction   = "both",
+    adjust_thresholds = TRUE
+) {
   if (!inherits(anglemania_object, "anglemaniaObject")) {
     stop("anglemania_object needs to be an anglemaniaObject")
   }
+  if (!direction %in% c("both","positive","negative"))
+    stop("direction can only be 'both', 'positive' or 'negative'")
+  
 
   if (is.null(max_n_genes)) {
     # If no max_n_genes specified, use all genes that pass the threshold
     max_n_genes <- length(intersect_genes(anglemania_object))
   }
 
-  gene_ind <- which(
-    upper.tri(list_stats(anglemania_object)$sn_zscore) &
-      (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
-      (abs(list_stats(anglemania_object)$mean_zscore) >= zscore_mean_threshold),
-    arr.ind = TRUE
-  )
+  # Selects the direction of conserved genes
+  if(direction == "both"){
+    gene_ind <- which(
+      upper.tri(list_stats(anglemania_object)$sn_zscore) &
+        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
+        (abs(list_stats(anglemania_object)$mean_zscore) >= zscore_mean_threshold),
+      arr.ind = TRUE
+    )
+  }else if(direction == "positive"){
+    gene_ind <- which(
+      upper.tri(list_stats(anglemania_object)$sn_zscore) &
+        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
+        (list_stats(anglemania_object)$mean_zscore >= zscore_mean_threshold),
+      arr.ind = TRUE
+    )
+  }else if(direction == "negative"){
+    gene_ind <- which(
+      upper.tri(list_stats(anglemania_object)$sn_zscore) &
+        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
+        (list_stats(anglemania_object)$mean_zscore <= zscore_mean_threshold),
+      arr.ind = TRUE
+    )
+  }
 
   # Adjust thresholds if no genes passed the cutoff
-  if (nrow(gene_ind) == 0) {
+  if (nrow(gene_ind) == 0 && adjust_thresholds) {
     message("No genes passed the cutoff.")
     quantile95mean <- stats::quantile(
       abs(list_stats(anglemania_object)$mean_zscore),
@@ -490,11 +516,13 @@ select_genes <- function(
     )
   }
 
-  top_n <- data.frame(
+  top_n = data.frame(
     geneA = gene_ind[, 1],
     geneB = gene_ind[, 2],
-    zscore = list_stats(anglemania_object)$mean_zscore[gene_ind],
-    snscore = list_stats(anglemania_object)$sn_zscore[gene_ind]
+    zscore  = list_stats(anglemania_object)$mean_zscore[gene_ind],
+    snscore = list_stats(anglemania_object)$sn_zscore[gene_ind],
+    gene_nameA = intersect_genes(anglemania_object)[gene_ind[, 1]],
+    gene_nameB = intersect_genes(anglemania_object)[gene_ind[, 2]]
   )
 
   # Order data frame
