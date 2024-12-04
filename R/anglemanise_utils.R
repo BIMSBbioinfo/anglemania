@@ -414,7 +414,10 @@ prefilter_angl <- function(
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #'   If \code{NULL}, all genes that pass the thresholds are used. Default is
 #'   \code{NULL}.
-#' @return The input \code{anglemania_object} with the
+#' @param direction whether to select genes with positive, negative or both mean z-scores. Default is "both"
+#' @param adjust_threshols whether to automatically adjust threholds if the selected genes do not meet the thresholds. Default is TRUE
+
+#' @return The input \code{anglemaniaObject} with the
 #'   \code{integration_genes} slot updated to include the selected genes and
 #'   their statistical information.
 #' @importFrom stats quantile
@@ -452,35 +455,61 @@ select_genes <- function(
     angl,
     zscore_mean_threshold = 2,
     zscore_sn_threshold = 2,
-    max_n_genes = NULL) {
-  if (!inherits(angl, "anglemania_object")) {
-    stop("angl needs to be an anglemania_object")
+    max_n_genes = NULL,
+    direction   = "both",
+    adjust_thresholds = TRUE
+) {
+  if (!inherits(anglemania_object, "anglemaniaObject")) {
+    stop("anglemania_object needs to be an anglemaniaObject")
   }
+  if (!direction %in% c("both","positive","negative"))
+    stop("direction can only be 'both', 'positive' or 'negative'")
+  
 
   if (is.null(max_n_genes)) {
     # If no max_n_genes specified, use all genes that pass the threshold
     max_n_genes <- length(intersect_genes(angl))
   }
 
-  # Filter DF by thresholds
-  filtered_genes_df <- list_stats(angl)$prefiltered %>%
-    dplyr::filter(
-      abs(mean_zscore) >= zscore_mean_threshold &
-        sn_zscore >= zscore_sn_threshold
+  # Selects the direction of conserved genes
+  if(direction == "both"){
+    gene_ind <- which(
+      upper.tri(list_stats(anglemania_object)$sn_zscore) &
+        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
+        (abs(list_stats(anglemania_object)$mean_zscore) >= zscore_mean_threshold),
+      arr.ind = TRUE
     )
-  # Adjust thresholds if no genes passed the cutoff
-  while (nrow(filtered_genes_df) == 0) {
-    if (zscore_mean_threshold >= 0){
-      message("No genes passed the cutoff.")
-      zscore_mean_threshold <- zscore_mean_threshold - 0.1
-        message(
-          paste0(
-            "Decreasing zscore_mean_threshold by 0.1: ",
-            zscore_mean_threshold
-          )
-        )
+  }else if(direction == "positive"){
+    gene_ind <- which(
+      upper.tri(list_stats(anglemania_object)$sn_zscore) &
+        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
+        (list_stats(anglemania_object)$mean_zscore >= zscore_mean_threshold),
+      arr.ind = TRUE
+    )
+  }else if(direction == "negative"){
+    gene_ind <- which(
+      upper.tri(list_stats(anglemania_object)$sn_zscore) &
+        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
+        (list_stats(anglemania_object)$mean_zscore <= zscore_mean_threshold),
+      arr.ind = TRUE
+    )
+  }
 
-      zscore_sn_threshold <- zscore_sn_threshold - 0.1
+  # Adjust thresholds if no genes passed the cutoff
+  if (nrow(gene_ind) == 0 && adjust_thresholds) {
+    message("No genes passed the cutoff.")
+    quantile95mean <- stats::quantile(
+      abs(list_stats(anglemania_object)$mean_zscore),
+      0.95,
+      na.rm = TRUE
+    )
+    quantile95sn <- stats::quantile(
+      list_stats(anglemania_object)$sn_zscore,
+      0.95,
+      na.rm = TRUE
+    )
+    if (quantile95mean < zscore_mean_threshold) {
+      zscore_mean_threshold <- quantile95mean
       message(
         paste0(
           "Decreasing zscore_sn_threshold by 0.1: ",
@@ -497,12 +526,13 @@ select_genes <- function(
     }
   }
 
-  message(
-    "If desired, you can re-run the selection of genes with a lower ",
-    "zscore_mean_threshold and/or zscore_sn_threshold by using the ",
-    "'select_genes' function. e.g.: angl <- select_genes(",
-    "angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, ",
-    "max_n_genes = 2000)"
+  top_n = data.frame(
+    geneA = gene_ind[, 1],
+    geneB = gene_ind[, 2],
+    zscore  = list_stats(anglemania_object)$mean_zscore[gene_ind],
+    snscore = list_stats(anglemania_object)$sn_zscore[gene_ind],
+    gene_nameA = intersect_genes(anglemania_object)[gene_ind[, 1]],
+    gene_nameB = intersect_genes(anglemania_object)[gene_ind[, 2]]
   )
   message(
     "Please inspect get_anglemania_genes(angl)$info",
