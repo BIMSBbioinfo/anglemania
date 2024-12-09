@@ -38,6 +38,8 @@
 #'   \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
 #' @param seed An integer value for setting the seed for reproducibility during
 #'   permutation. Default is \code{1}.
+#' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
+#' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
 #'
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the
 #'   z-score-transformed angle matrix.
@@ -75,27 +77,58 @@
 factorise <- function(
     x_mat,
     method = "pearson",
-    seed = 1) {
+    seed = 1,
+    permute_row_or_column = "columns",
+    permutation_function = "sample"
+  ) {
   # Initialize empty FBM to store permuted correlation matrix
-  x_mat_perm <- bigstatsr::FBM(
-    nrow = nrow(x_mat),
-    ncol = ncol(x_mat)
-  )
+
+  
   # Validate input
   checkmate::assertClass(x_mat, "FBM")
   checkmate::assertString(method)
   checkmate::assertChoice(method, c("pearson", "spearman", "diem"))
-  # Permute matrix
+  checkmate::assertString(permute_row_or_column)
+  checkmate::assertChoice(permute_row_or_column, c("row", "column"))
+  checkmate::assertString(permutation_function)
+  checkmate::assertChoice(permutation_function, c("sample", "permute_nonzero"))
   set.seed(seed)
-  bigstatsr::big_apply(
-    x_mat,
-    a.FUN = function(X, ind) {
+  x_mat_perm <- bigstatsr::FBM(
+    nrow = nrow(x_mat),
+    ncol = ncol(x_mat)
+  )
+
+  if(permutation_function == "sample"){
+    permutation_function = base::sample
+  }else{
+    permutation_function = permute_nonzero
+  }
+
+  # default permutation is by columns
+  ind_fun = bigstatsr::cols_along(x_mat)
+  a_fun = function(X, ind) {  
       X.sub <- X[, ind, drop = FALSE]
-      X.sub <- apply(X.sub, 2, sample)
+      X.sub <- apply(X.sub, 2, permutation_function)
       x_mat_perm[, ind] <- X.sub
       NULL
-    },
+    }
+
+  # permute by rows
+  if(permute_row_or_column == "row"){
+    ind_fun = bigstatsr::rows_along(x_mat)
+    a_fun = function(X, ind){
+      X.sub <- X[ind, ,drop = FALSE]
+      X.sub <- t(apply(X.sub, 1, permutation_function))
+      x_mat_perm[ind, ] <- X.sub
+    }
+  }
+
+  # Permute matrix
+  bigstatsr::big_apply(
+    x_mat,
+    a.FUN = a_fun,
     a.combine = "c",
+    ind = ind_fun,
     block.size = 1000
   )
 
@@ -141,7 +174,7 @@ factorise <- function(
   bigstatsr::big_apply(
     x_mat_corr,
     a.FUN = function(X, ind) {
-      X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean) / dstat$sd
+      X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean[ind]) / dstat$sd[ind]
       NULL
     },
     a.combine = "c",
@@ -149,4 +182,14 @@ factorise <- function(
   )
 
   return(x_mat_corr)
+}
+
+
+#' permute non-zero elements of vectors
+#'
+#' @description
+permute_nonzero = function(v){
+  ind = v > 0
+  v[ind] = sample(v[ind])
+  v
 }
