@@ -65,9 +65,9 @@ get_dstat <- function(corr_matrix) {
   n <- bigstatsr::big_apply(
     corr_matrix,
     a.FUN = function(X, ind) {
-      sum(!is.na(X[, ind, drop = FALSE]))
+      apply(X[, ind, drop = FALSE], 2, function(x)sum(!is.na(x)))
     },
-    a.combine = "sum",
+    a.combine = "c",
     block.size = 1000
   )
 
@@ -75,22 +75,22 @@ get_dstat <- function(corr_matrix) {
   mean_value <- bigstatsr::big_apply(
     corr_matrix,
     a.FUN = function(X, ind) {
-      sum(X[, ind, drop = FALSE], na.rm = TRUE)
+      apply(X[, ind, drop = FALSE], 2, mean, na.rm = TRUE)
     },
-    a.combine = "sum",
+    a.combine = "c",
     block.size = 1000
-  ) / n
+  ) 
 
   # Calculate variance
   var_value <- bigstatsr::big_apply(
     corr_matrix,
     a.FUN = function(X, ind) {
-      sum(
-        (X[, ind, drop = FALSE] - mean_value)^2,
-        na.rm = TRUE
-      ) / (n - 2) # minus 2 because it's a symmetric matrix!!
+      apply(X[, ind, drop = FALSE], 2, function(m){
+        (mean((m-mean_value)^2, na.rm=TRUE))
+      })
+       # minus 2 because it's a symmetric matrix!!
     },
-    a.combine = "sum",
+    a.combine = "c",
     block.size = 1000
   )
 
@@ -101,9 +101,9 @@ get_dstat <- function(corr_matrix) {
   min_value <- bigstatsr::big_apply(
     corr_matrix,
     a.FUN = function(X, ind) {
-      min(X[, ind, drop = FALSE], na.rm = TRUE)
+      apply(X[, ind, drop = FALSE], 2, min, na.rm = TRUE)
     },
-    a.combine = "min",
+    a.combine = "c",
     block.size = 1000
   )
 
@@ -111,9 +111,9 @@ get_dstat <- function(corr_matrix) {
   max_value <- bigstatsr::big_apply(
     corr_matrix,
     a.FUN = function(X, ind) {
-      max(X[, ind, drop = FALSE], na.rm = TRUE)
+      apply(X[, ind, drop = FALSE], 2, max, na.rm = TRUE)
     },
-    a.combine = "max",
+    a.combine = "c",
     block.size = 1000
   )
 
@@ -181,7 +181,6 @@ big_mat_list_mean <- function(anglemania_object) {
   n_col <- ncol(matrix_list(anglemania_object)[[1]])
   n_row <- nrow(matrix_list(anglemania_object)[[1]])
   mat_mean_zscore <- bigstatsr::FBM(n_row, n_col)
-
   bigstatsr::big_apply(
     mat_mean_zscore,
     a.FUN = function(X, ind) {
@@ -199,12 +198,12 @@ big_mat_list_mean <- function(anglemania_object) {
         names(anglemania_object@weights),
         init = X.sub
       )
-      X[, ind] <- X.sub # Already weighted, no need to divide
+      X[, ind] <- X.sub / sum(anglemania_object@weights) # Already weighted, no need to divide
       NULL
     },
     a.combine = "c",
     block.size = 1000
-  )
+  ) 
 
   return(mat_mean_zscore)
 }
@@ -256,7 +255,12 @@ get_list_stats <- function(anglemania_object) {
   mat_sds_zscore <- bigstatsr::FBM(n_row, n_col)
 
   message("Calculating sds...")
+  # creates an unbiased esitmator for a sample based wighted variance calculation
+  w_sum <- sum(anglemania_object@weights)
+  w_sq_sum <- sum(anglemania_object@weights^2)
+  denominator <- w_sum - (w_sq_sum / w_sum)
 
+  # calculates the weighted sds for the big matrix
   bigstatsr::big_apply(
     mat_sds_zscore,
     a.FUN = function(X, ind) {
@@ -273,7 +277,7 @@ get_list_stats <- function(anglemania_object) {
         names(anglemania_object@weights),
         init = X.sub
       )
-      X[, ind] <- sqrt(X.sub)
+      X[, ind] <- sqrt(X.sub / denominator)
       NULL
     },
     a.combine = "c",
