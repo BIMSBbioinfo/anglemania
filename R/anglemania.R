@@ -37,6 +37,8 @@
 #' @param zscore_sn_threshold Numeric value specifying the threshold for the
 #'   signal-to-noise z-score. Default is \code{2.5}.
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
+#' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
+#' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
 #'   Default is \code{2000}.
 #'
 #' @return An updated \code{\link{anglemania_object-class}} with computed statistics and
@@ -74,7 +76,10 @@ anglemania <- function(
     zscore_mean_threshold = 2.5,
     zscore_sn_threshold = 2.5,
     max_n_genes = NULL,
-    method = "cosine") {
+    method = "cosine",
+    permute_row_or_column = "columns",
+    permutation_function = "sample"
+) {
   # Validate inputs
   if (!inherits(angl, "anglemania_object")) {
     stop("angl needs to be an anglemania_object")
@@ -107,7 +112,9 @@ anglemania <- function(
       factorise(
         x_mat = x,
         method = method,
-        seed = 1
+        seed = 1,
+        permute_row_or_column = permute_row_or_column,
+        permutation_function  = permutation_function
       )
     }
   )
