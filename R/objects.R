@@ -640,7 +640,7 @@ setMethod(
     )
   }
 
-  if (!checkmate::testString(assay) || !(assay %in% Assays(seu))) {
+  if (!checkmate::testString(assay) || !(assay %in% Assays(seurat_object))) {
     stop(
       "assay needs to be a character string of length 1 ",
       "it needs to correspond to Assays(seurat)"
