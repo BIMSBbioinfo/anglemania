@@ -53,7 +53,8 @@ setClass(
     list_stats = "list",
     intersect_genes = "character",
     min_cells_per_gene = "numeric",
-    integration_genes = "list"
+    integration_genes = "list",
+    assay = "character"
   ),
   prototype = list(
     matrix_list = list(),
@@ -67,7 +68,8 @@ setClass(
     integration_genes = list(
       info = "data.frame",
       genes = "character"
-    )
+    ),
+    assay = NA_character_
   )
 )
 
@@ -588,7 +590,7 @@ setMethod(
   object,
   batch_key,
   min_cells_per_gene = 1,
-  dataset_key = NA) {
+  dataset_key = NA_character_) {
   # Validate inputs
   checkmate::assert_class(object, "Seurat")
   meta <- .get_meta_data(object)
@@ -638,6 +640,19 @@ setMethod(
     )
   }
 
+  if (!checkmate::testString(assay) || !(assay %in% Assays(seu))) {
+    stop(
+      "assay needs to be a character string of length 1 ",
+      "it needs to correspond to Assays(seurat)"
+    )
+  }
+
+  # Create unique batch key
+  seurat_object <- add_unique_batch_key(
+    seurat_object,
+    dataset_key,
+    batch_key
+  )
 
 
   # Get the barcodes corresponding to each batch
@@ -655,7 +670,7 @@ setMethod(
       object,
       cells = bc,
       layer = "counts",
-      assay = "RNA"
+      assay = assay
     )
     filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
     filt_features <- names(filt_features[filt_features])
@@ -677,7 +692,8 @@ setMethod(
     cl = bigstatsr::nb_cores()
   )
 
-  if (checkmate::test_string(dataset_key)) {
+  if (checkmate::testString(dataset_key) && length(unique(meta[[dataset_key]])) > 1) {
+    # Calculate the weights only if there are more than two datasets 
     data_info <- meta %>%
       dplyr::select(
         batch,
@@ -696,10 +712,11 @@ setMethod(
     weights <- data_info$weight
     names(weights) <- data_info$batch
   } else {
+    # if there is only one dataset, weights should be set to one
     data_info <- meta %>%
       dplyr::select(batch, dplyr::all_of(batch_key)) %>%
       dplyr::distinct() %>%
-      dplyr::mutate(weight = 1 / nrow(.))
+      dplyr::mutate(weight = 1)
 
     weights <- data_info$weight
     names(weights) <- data_info$batch
@@ -718,7 +735,8 @@ setMethod(
     data_info = data_info,
     weights = weights,
     min_cells_per_gene = min_cells_per_gene,
-    intersect_genes = intersect_genes
+    intersect_genes = intersect_genes,
+    assay = assay
   )
 
   return(anglem_object)
