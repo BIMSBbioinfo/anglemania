@@ -12,7 +12,7 @@
 #' @param method A character string specifying the method to compute the
 #'   gene-gene relationships. Options are:
 #'   \itemize{
-#'     \item \code{"pearson"} (default): Computes the cosine angle between
+#'     \item \code{"cosine"} (default): Computes the cosine angle between
 #'       genes.
 #'     \item \code{"spearman"}: Computes the Spearman rank correlation
 #'       coefficient by rank-transforming the data before computing the
@@ -57,7 +57,7 @@
 #' @export
 extract_angles <- function(
     x_mat,
-    method = "pearson") {
+    method = "cosine") {
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- X[, ind, drop = FALSE]
     # Normalize the data:

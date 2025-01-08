@@ -4,7 +4,7 @@
 \alias{extract_angles}
 \title{Calculate cosine angle between genes}
 \usage{
-extract_angles(x_mat, method = "pearson")
+extract_angles(x_mat, method = "cosine")
 }
 \arguments{
 \item{x_mat}{An \code{\link[bigstatsr]{FBM}} object containing raw gene
@@ -14,7 +14,7 @@ The data will be normalized and scaled within the function.}
 \item{method}{A character string specifying the method to compute the
 gene-gene relationships. Options are:
 \itemize{
-\item \code{"pearson"} (default): Computes the cosine angle between
+\item \code{"cosine"} (default): Computes the cosine angle between
 genes.
 \item \code{"spearman"}: Computes the Spearman rank correlation
 coefficient by rank-transforming the data before computing the

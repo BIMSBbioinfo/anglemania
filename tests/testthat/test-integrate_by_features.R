@@ -7,7 +7,7 @@ se_raw <- se
 test_that("integrate_by_features integrates Seurat objects correctly using selected features", {
   se <- se_raw
   angl <- create_anglemania_object(se, batch_key = "groups")
-  angl <- anglemania(angl, method = "pearson")
+  angl <- anglemania(angl, method = "cosine")
 
   # Integrate samples using selected features
   options(future.globals.maxSize = 5000 * 1024^2)

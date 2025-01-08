@@ -92,7 +92,7 @@ get_anglemania_genes(object)
 \S4method{get_anglemania_genes}{anglemania_object}(object)
 
 add_unique_batch_key(
-  seurat_object,
+  object_metadata,
   dataset_key = NA_character_,
   batch_key,
   new_unique_batch_key = "batch"
@@ -103,7 +103,7 @@ add_unique_batch_key(
 
 \item{value}{A character vector of gene names.}
 
-\item{seurat_object}{A \code{\link[Seurat]{Seurat}} object.}
+\item{object_metadata}{Metadata of a \code{\link[Seurat]{Seurat}} or SingleCellExperiment object.}
 
 \item{dataset_key}{A character string specifying the column name in the
 metadata that identifies the dataset. If \code{NA}, only the
@@ -139,7 +139,7 @@ z-scores
 The updated \code{anglemania_object}.
 
 A character vector of intersected gene
-names from multiple Seurat objects.
+names from multiple Seurat or SingleCellExperiment Objects.
 
 The updated \code{anglemania_object} object.
 
@@ -214,85 +214,61 @@ analysis.
 
 \item \code{get_anglemania_genes()}: Access the genes extracted by anglemania
 
-\item \code{add_unique_batch_key()}: Temporarily add a unique batch key to the dataset
+\item \code{add_unique_batch_key()}: Temporarily add a unique batch key
+to the dataset
 
 }}
 \examples{
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(se, batch_key = "groups")
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 angl <- anglemania(angl)
 show(angl)
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(se, batch_key = "groups")
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 angl <- anglemania(angl)
 str(matrix_list(angl))
-se <- SeuratObject::pbmc_small
-se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
+sce <- sce_example()
 angl <- create_anglemania_object(
-  se,
-  dataset_key = "Dataset",
-  batch_key = "groups",
+  sce,
+  dataset_key = "dataset",
+  batch_key = "batch",
   min_cells_per_gene = 1
 )
 dataset_key(angl)
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 batch_key(angl)
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 batch_key(angl)
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 batch_key(angl)
 angl_weights(angl)
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 angl <- anglemania(angl)
 stats <- list_stats(angl)
 str(stats)
 
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 intersect_genes(angl)
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 angl <- anglemania(angl)
 # extract the genes identified by anglemania()
 anglemania_genes <- get_anglemania_genes(angl)
 
-se <- SeuratObject::pbmc_small
-se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se)/2)
-se <- add_unique_batch_key(
-  seurat_object = se,
-  dataset_key = "Dataset",
-  batch_key = "groups",
-  new_unique_batch_key = "batch" 
-  )
-head(se[[]])
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
+angl <- create_anglemania_object(
+  sce,
+  dataset_key = "dataset",
+  batch_key = "batch",
+  min_cells_per_gene = 1
+)
+head(SingleCellExperiment::colData(sce))
 }
 \seealso{
 \code{\link{anglemania}} \code{\link{get_list_stats}}

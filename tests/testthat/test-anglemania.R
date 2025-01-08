@@ -4,10 +4,10 @@
 se <- SeuratObject::pbmc_small
 se_raw <- se
 
-test_that("anglemania works correctly with method pearson", {
+test_that("anglemania works correctly with method cosine", {
   se <- se_raw
   angl <- create_anglemania_object(se, batch_key = "groups")
-  angl <- anglemania(angl, method = "pearson")
+  angl <- anglemania(angl, method = "cosine")
 
   # check that list_stats is not empty
   expect_true(length(angl@list_stats) > 0)

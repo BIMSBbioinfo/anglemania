@@ -18,7 +18,7 @@
 #'     \item If \code{method = "diem"}, computes Euclidean distances and scales
 #'       the angles accordingly, based on the methodology from the DIEM
 #'       algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
-#'     \item For other methods (\code{"pearson"}, \code{"spearman"}),
+#'     \item For other methods (\code{"cosine"}, \code{"spearman"}),
 #'       statistical measures are computed from the permuted data.
 #'   }
 #'   \item **Statistical Measures**: Calculates mean, variance, and standard
@@ -33,7 +33,7 @@
 #' @param x_mat A \code{\link[bigstatsr]{FBM}} object representing the
 #'   normalized and scaled gene expression matrix.
 #' @param method A character string specifying the method for calculating the
-#'   relationship between gene pairs. Default is \code{"pearson"}. Other options
+#'   relationship between gene pairs. Default is \code{"cosine"}. Other options
 #'   include \code{"spearman"} and \code{"diem"} (see
 #'   \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
 #' @param seed An integer value for setting the seed for reproducibility during
@@ -63,8 +63,8 @@
 #'
 #' mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 #'
-#' # Run factorise with method "pearson" and a fixed seed
-#' result_fbm <- factorise(mat, method = "pearson", seed = 1)
+#' # Run factorise with method "cosine" and a fixed seed
+#' result_fbm <- factorise(mat, method = "cosine", seed = 1)
 #' result_fbm[]
 #' @seealso
 #' \code{\link{extract_angles}},
@@ -75,7 +75,7 @@
 #' @export
 factorise <- function(
     x_mat,
-    method = "pearson",
+    method = "cosine",
     seed = 1) {
   # Initialize empty FBM to store permuted correlation matrix
   x_mat_perm <- bigstatsr::FBM(
@@ -85,7 +85,7 @@ factorise <- function(
   # Validate input
   checkmate::assertClass(x_mat, "FBM")
   checkmate::assertString(method)
-  checkmate::assertChoice(method, c("pearson", "spearman", "diem"))
+  checkmate::assertChoice(method, c("cosine", "spearman", "diem"))
   # Permute matrix
   withr::with_seed(seed,
     bigstatsr::big_apply(
@@ -109,7 +109,7 @@ factorise <- function(
     bigstatsr::big_apply(
       x_mat_corr,
       a.FUN = function(X, ind) {
-        # 1. Calculate Euclidean distance from Pearson correlation:
+        # 1. Calculate Euclidean distance from cosine similarity:
         #    dij = sqrt(2 * (1 - rij))
         X.sub <- X[, ind, drop = FALSE]
         X.sub <- sqrt(2 * (1 - X.sub))

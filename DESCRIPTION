@@ -21,6 +21,9 @@ Imports:
     checkmate,
     Seurat,
     SeuratObject,
+    S4Vectors,
+    SingleCellExperiment,
+    SummarizedExperiment,
     bigstatsr,
     dplyr,
     magrittr,
@@ -33,7 +36,8 @@ Suggests:
     knitr,
     rmarkdown,
     covr,
-    DT
+    DT,
+    scran
 VignetteBuilder: knitr
 biocViews: SingleCell, BatchEffect, MultipleComparison, FeatureExtraction
 BiocType: Software

@@ -6,7 +6,7 @@
 \usage{
 anglemania(
   angl,
-  method = "pearson",
+  method = "cosine",
   zscore_mean_threshold = 2.5,
   zscore_sn_threshold = 2.5,
   max_n_genes = 2000
@@ -17,7 +17,7 @@ anglemania(
 expression data and associated metadata.}
 
 \item{method}{Character string specifying the method to use for calculating
-the relationship between gene pairs. Default is \code{"pearson"}.
+the relationship between gene pairs. Default is \code{"cosine"}.
 Other options include \code{"diem"}
 (see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
 
@@ -57,11 +57,12 @@ The computed statistics and selected genes are added to the
 \code{angl}, which is returned.
 }
 \examples{
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(se, batch_key = "groups")
+# Set seed for reproducibility (optional)
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 angl <- anglemania(
   angl,
-  method = "pearson",
+  method = "cosine",
   zscore_mean_threshold = 2,
   zscore_sn_threshold = 2,
   max_n_genes = 2000

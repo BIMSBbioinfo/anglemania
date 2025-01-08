@@ -72,8 +72,10 @@ and compute UMAP embeddings.
 #  splits the seurat object into batches and integrates them
 #  using CCA integration and anglemania genes previously extracted
 #  with anglemania() or select_genes()
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(se, batch_key = "groups")
+sce <- sce_example()
+se <- Seurat::as.Seurat(sce, data = "counts")
+se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
+angl <- create_anglemania_object(se, batch_key = "batch")
 angl <- anglemania(angl)
 options(future.globals.maxSize = 4000 * 1024^2)
 integrated_object <- integrate_by_features(se, angl)

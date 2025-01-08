@@ -1,5 +1,5 @@
 test_that("factorise computes z-score-transformed angle 
-matrix correctly with method 'pearson'", {
+matrix correctly with method 'cosine'", {
   # Create a small test matrix with known values (genes x cells)
   # Let's assume 4 genes and 5 cells
   mat <- matrix(
@@ -17,8 +17,8 @@ matrix correctly with method 'pearson'", {
   # Convert to FBM
   x_mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
-  # Run factorise with method "pearson" and a fixed seed
-  result_fbm <- factorise(x_mat, method = "pearson", seed = 1)
+  # Run factorise with method "cosine" and a fixed seed
+  result_fbm <- factorise(x_mat, method = "cosine", seed = 1)
 
   # Extract the result as a regular matrix
   result_matrix <- result_fbm[]
@@ -34,7 +34,7 @@ matrix correctly with method 'pearson'", {
   permuted_log_normalized <- Seurat::NormalizeData(permuted_data)
 
 
-  # Step 3: Compute Pearson correlation matrices
+  # Step 3: Compute cosine correlation matrices
   original_correlation <- cor(
     t(log_normalized),
     use = "pairwise.complete.obs"
@@ -109,7 +109,7 @@ angle matrix correctly with method 'diem'", {
   )
 
   
-  # Step 3: Compute Pearson correlation matrices
+  # Step 3: Compute cosine correlation matrices
   # Transpose the normalized data to have genes as columns for cor()
   original_transposed <- t(normalized)
   permuted_transposed <- t(permuted_normalized)
@@ -169,7 +169,7 @@ matrix correctly with method 'spearman'", {
   # Convert to FBM
   x_mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
-  # Run factorise with method "pearson" and a fixed seed
+  # Run factorise with method "cosine" and a fixed seed
   result_fbm <- factorise(x_mat, method = "spearman", seed = 1)
 
   # Extract the result as a regular matrix
@@ -186,7 +186,7 @@ matrix correctly with method 'spearman'", {
   permuted_log_normalized <- Seurat::NormalizeData(permuted_data)
 
 
-  # Step 3: Compute Pearson correlation matrices
+  # Step 3: Compute cosine correlation matrices
   original_correlation <- cor(
     t(log_normalized),
     use = "pairwise.complete.obs",
@@ -220,13 +220,13 @@ test_that("factorise handles empty matrices correctly", {
   empty_mat_rows <- matrix(nrow = 0, ncol = 5)
   x_mat_rows <- bigstatsr::FBM(nrow = 0, ncol = 5)
   
-  expect_error(factorise(x_mat_rows, method = "pearson"))
+  expect_error(factorise(x_mat_rows, method = "cosine"))
   
   # Empty matrix with zero columns
   empty_mat_cols <- matrix(nrow = 5, ncol = 0)
   x_mat_cols <- bigstatsr::FBM(nrow = 5, ncol = 0)
   
-  expect_error(factorise(x_mat_cols, method = "pearson"))
+  expect_error(factorise(x_mat_cols, method = "cosine"))
 })
 
 test_that("factorise really computes the gene-gene correlation matrix -
@@ -250,8 +250,8 @@ check dimensions", {
   mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
 
-  # Run factorise with method "pearson" and a fixed seed
-  result_fbm <- factorise(mat, method = "pearson", seed = 1)
+  # Run factorise with method "cosine" and a fixed seed
+  result_fbm <- factorise(mat, method = "cosine", seed = 1)
   
   # check dims
   expect_equal(nrow(result_fbm), nrow(mat))

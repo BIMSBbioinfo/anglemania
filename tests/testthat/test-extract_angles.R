@@ -1,4 +1,4 @@
-test_that("extract_angles extracts pearson correlations correctly", {
+test_that("extract_angles extracts cosine similarities correctly", {
   mat <- matrix(
     c(0, 0, 0, 4, 2,
       1, 2, 3, 4, 5,
@@ -12,8 +12,8 @@ test_that("extract_angles extracts pearson correlations correctly", {
   # Convert to FBM
   x_mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
   
-  # Run extract_angles with method "pearson"
-  result_fbm <- extract_angles(x_mat, method = "pearson")
+  # Run extract_angles with method "cosine"
+  result_fbm <- extract_angles(x_mat, method = "cosine")
   
   # Extract the result as a regular matrix
   result_matrix <- result_fbm[]
@@ -50,7 +50,7 @@ test_that("extract_angles extracts spearman correlations correctly", {
   # Convert to FBM
   x_mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
-  # Run extract_angles with method "pearson"
+  # Run extract_angles with method "cosine"
   result_fbm <- extract_angles(x_mat, method = "spearman")
 
   # Extract the result as a regular matrix
