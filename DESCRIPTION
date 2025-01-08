@@ -40,7 +40,6 @@ Suggests:
     scran,
     batchelor,
     bluster,
-    RcppPlanc,
     rliger
 VignetteBuilder: knitr
 biocViews: SingleCell, BatchEffect, MultipleComparison, FeatureExtraction
