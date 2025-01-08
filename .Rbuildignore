@@ -2,13 +2,8 @@
 ^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^cleanup
-\.jpg$
 ^anglemania\.Rproj$
 .Rprofile
-explore_function_scape.R
-functions_graph.svg
-R/flippitise.R
 ^vignettes$
 ^LICENSE\.md$
 ^\.github$
@@ -17,9 +12,8 @@ R/flippitise.R
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-^tmp_bm
 ^playground
 ^doc$
 ^Meta$
 ^codecov\.yml$
-^.vsode
+^.vscode

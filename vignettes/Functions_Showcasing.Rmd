@@ -24,10 +24,8 @@ anglemania besides the two main ones: `create_anglemania_object` and `anglemania
 
 
 ```{r, load libraries}
+library(anglemania)
 library(SingleCellExperiment)
-# library(anglemania)
-devtools::load_all()
-
 ```
 
 # Normal anglemania workflow
