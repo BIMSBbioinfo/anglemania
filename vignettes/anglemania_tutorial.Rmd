@@ -22,12 +22,21 @@ knitr::opts_chunk$set(echo = TRUE)
 anglemania is a feature selection package that extracts genes from multi-batch scRNA-seq 
 experiments for downstream dataset integration.
 The goal is to select genes that carry high biological information and low 
-technical noise. Those genes are extracted from gene pairs that have an 
-invariant and extremely narrow or wide angle between their expression vectors.
-It improves conventional usage of highly-variable genes for integration tasks, 
+technical noise between the batches. Those genes are extracted from gene pairs 
+that have an invariant and extremely narrow or wide angle between their expression vectors.
+Conventionally, highly-variable genes (HVGs) or sometimes all genes are used
+for integration tasks (https://www.nature.com/articles/s41592-021-01336-8).
+While HVGs are a great and easy way to reduce the noise and
+dimensionality of the data, they are not optimal for integration tasks. HVGs are
+sensitive to batch effects because the variance is a function of both the technical
+and biological variance.
+anglemania improves conventional usage of HVGs for integration tasks, 
 especially when the transcriptional difference between cell types or cell states 
 is subtle (showcased here with de.facLoc set to 0.1 (= mild differences between "Groups")).
-anglemania can be used on top of SingleCellExperiment or Seurat objects.
+The package can be used on top of SingleCellExperiment or Seurat objects.
+
+Under the hood, anglemania works with file-backed big matrices (FBMs) from the bigstatsr package 
+(https://github.com/privefl/bigstatsr/) for fast and memory efficient computation.
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
@@ -54,7 +63,7 @@ nGroups <- 3
 nGenes <- 5000
 groupCells <- 300
 
-sim <- splatSimulate(
+sce <- splatSimulate(
     batchCells = rep(groupCells * nGroups, nBatches),
     batch.facLoc = batch.facLoc,
     group.prob = rep(1/nGroups, nGroups),
@@ -69,8 +78,6 @@ sim <- splatSimulate(
     bcv.common  = 0.1,
     seed = 42
 )
-
-sce <- sim
 sce
 ```
 
