@@ -561,6 +561,7 @@ setGeneric(
 #' @import checkmate
 #' @importFrom SingleCellExperiment colData
 #' @keywords internal
+#' @noRd
 .get_meta_data <- function(object) {
   if (checkmate::test_class(object, "Seurat")) {
     return(object[[]])

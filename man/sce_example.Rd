@@ -4,7 +4,7 @@
 \alias{sce_example}
 \title{Generate example SingleCellExperiment object}
 \usage{
-sce_example()
+sce_example(seed = 42)
 }
 \value{
 A SingleCellExperiment object
