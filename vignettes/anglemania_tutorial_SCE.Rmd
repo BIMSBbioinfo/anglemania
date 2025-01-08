@@ -1,0 +1,306 @@
+---
+title: "anglemania_tutorial_SCE"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: "paged"
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    theme: simplex
+vignette: >
+  %\VignetteIndexEntry{anglemania tutorial SCE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+.libPaths(.Library)
+```
+
+# Introduction
+anglemania is a feature selection package that extracts genes from multi-batch scRNA-seq 
+experiments for downstream dataset integration.
+The goal is to select genes that carry high biological information and low 
+technical noise. Those genes are extracted from gene pairs that have an 
+invariant and extremely narrow or wide angle between their expression vectors.
+It improves conventional usage of highly-variable genes for integration tasks, 
+especially when the transcriptional difference between cell types or cell states 
+is subtle (showcased here with de.facLoc set to 0.1 (= mild differences between "Groups")).
+anglemania can be used on top of SingleCellExperiment or Seurat objects.
+
+```{r, load libraries}
+suppressPackageStartupMessages({
+  # library(anglemania)
+  devtools::load_all()
+  library(dplyr)
+  library(Seurat)
+  library(splatter)
+  library(SingleCellExperiment)
+  library(scater)
+  library(scran)
+  library(bluster)
+  library(RcppPlanc)
+  library(rliger)
+  library(batchelor)
+})
+```
+
+# Create simulated data with mild batch effects and mild differences between the groups/cell types
+```{r, create simulated data}
+batch.facLoc <- 0.1
+de.facLoc <- 0.1
+nBatches <- 4
+nGroups <- 3
+nGenes <- 5000
+groupCells <- 300
+
+sim <- splatSimulate(
+    batchCells = rep(groupCells * nGroups, nBatches),
+    batch.facLoc = batch.facLoc,
+    group.prob = rep(1/nGroups, nGroups),
+    nGenes = nGenes,
+    batch.facScale = 0.1,
+    method = "groups",
+    verbose = FALSE,
+    out.prob    = 0.001,
+    de.prob     = 0.1, # mild
+    de.facLoc   = de.facLoc,
+    de.facScale = 0.1,
+    bcv.common  = 0.1,
+    seed = 42
+)
+
+sce <- sim
+sce
+```
+
+# unintegrated data
+```{r}
+sce_unintegrated <- sce
+# Normalization.
+sce_unintegrated <- logNormCounts(sce_unintegrated)
+
+# Feature selection.
+dec <- modelGeneVar(sce_unintegrated)
+hvg <- getTopHVGs(dec, prop = 0.1)
+
+# PCA.
+set.seed(1234)
+sce_unintegrated <- scater::runPCA(sce_unintegrated, ncomponents = 50, subset_row = hvg)
+
+# Clustering.
+colLabels(sce_unintegrated) <- clusterCells(sce_unintegrated,
+  use.dimred = "PCA",
+  BLUSPARAM = NNGraphParam(cluster.fun = "louvain")
+)
+
+# Visualization.
+sce_unintegrated <- scater::runUMAP(sce_unintegrated, dimred = "PCA")
+plotUMAP(sce_unintegrated, colour_by = "Batch")
+plotUMAP(sce_unintegrated, colour_by = "Group")
+```
+
+# run anglemania
+## create anglemania object
+* We create an anglemania object to have a standardized input to the anglemania function
+  * It can be created from:
+    * An SingleCellExperiment (SCE) object
+    * Seurat object
+    * a list of SCE and/or Seurat objects
+* pre-requisites are that you:
+  * have a column in the metadata (colData for SCE) that specifies the batch/sample a cell belongs to
+  * or if you pass a list of SCE/Seurat objects, just provide this as the input and
+   don't specify a batch key
+```{r, create anglemania object}
+head(colData(sce))
+batch_key <- "Batch"
+angl <- create_anglemania_object(
+  sce,
+  batch_key = batch_key
+)
+angl
+```
+
+## run anglemania function
+* the anglemania function has five arguments
+  * the input anglemania object
+  * method: either cosine, spearman or diem
+    * this is the method by which the relationship of the gene pairs is measured. Default is cosine, 
+      which is the cosine similarity between the expression vectors of the gene pairs.
+  * zscore_mean_threshold: We compute a mean of the zscore of the relationship between a gene pair,
+    and then we set a minimal cutoff for the (absolute) mean zscore. A cutoff of 2 means that the
+    filtered gene pairs have a relationship, e.g. cosine similarity, that is 2 standard deviations 
+    away from the mean of all cosine similarities from this dataset. A higher value means a more 
+    stringent cutoff.
+  * zscore_sn_threshold: The SN or signal-to-noise ratio measures the invariance of the relationship
+    of the relationship between the gene pair. A high SN ratio means that the relationship is constant
+    over multiple batches.
+  * max_n_genes: you can specify a maximum number of extracted genes. They are sorted by decreasing 
+    mean zscore
+```{r, run anglemania}
+angl <- anglemania(angl,
+  zscore_mean_threshold = 2,
+  zscore_sn_threshold = 2,
+  max_n_genes = 2000 # optionally define a max number of genes. default is 2000
+)
+# If you think the number of selected genes is too high or low you can adjust the thresholds:
+angl <- select_genes(angl,
+                     zscore_mean_threshold = 2.5,
+                     zscore_sn_threshold = 2.5)
+# Inspect the anglemania genes
+integration_genes <- get_anglemania_genes(angl)
+head(integration_genes)
+length(integration_genes)
+```
+
+* We use LIGER https://github.com/welch-lab/liger, https://www.nature.com/articles/s41596-020-0391-8 
+  and fastMNN https://rdrr.io/github/LTLA/batchelor/, https://www.nature.com/articles/nbt.4091
+  and compare the results when we use HVGs and anglemania genes as the input
+
+# Liger integration
+## HVGs
+### low number of HVGs
+```{r, echo=FALSE, results="hide"}
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+sce_list <- lapply(barcodes_by_batch, function(x) sce[,x])
+sce_lig <- rliger::createLiger(sce_list, "rna")
+sce_lig <- sce_lig %>%
+  rliger::normalize() %>%
+  rliger::selectGenes(nGenes = 320) %>%
+  # because we chose 319 genes with anglemania we only keep 320 HVGs for better comparability
+  rliger::scaleNotCenter()
+sce_lig <- rliger::runIntegration(sce_lig, k = 20)
+sce_lig
+```
+
+```{r, echo=FALSE, results="hide"}
+sce_lig <- runUMAP(sce_lig)
+sce_lig
+umap_rliger <- rliger::dimRed(sce_lig, "UMAP")
+rownames(umap_rliger) <- sapply(rownames(umap_rliger), function(x) stringr::str_split(x, "_")[[1]][2])
+reducedDim(sce, "umap_liger_hvg_320") <- umap_rliger
+```
+
+### 2000 HVGs 
+```{r, echo=FALSE, results="hide"}
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+sce_list <- lapply(barcodes_by_batch, function(x) sce[,x])
+sce_lig <- rliger::createLiger(sce_list, "rna")
+sce_lig <- sce_lig %>%
+  rliger::normalize() %>%
+  rliger::selectGenes(nGenes = 2000) %>%
+  rliger::scaleNotCenter()
+sce_lig <- rliger::runIntegration(sce_lig, k = 20)
+sce_lig
+```
+
+```{r, echo=FALSE, results="hide"}
+sce_lig <- runUMAP(sce_lig)
+sce_lig
+umap_rliger <- rliger::dimRed(sce_lig, "UMAP")
+rownames(umap_rliger) <- sapply(rownames(umap_rliger), function(x) stringr::str_split(x, "_")[[1]][2])
+reducedDim(sce, "umap_liger_hvg_2000") <- umap_rliger
+```
+
+
+## anglemania
+```{r, echo=FALSE, results="hide"}
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+sce_list <- lapply(barcodes_by_batch, function(x) sce[,x])
+sce_lig <- rliger::createLiger(sce_list, "rna")
+sce_lig <- rliger::normalize(sce_lig)
+varFeatures(sce_lig) <- integration_genes # just act like the anglemania genes are the "variable features"
+sce_lig <- rliger::scaleNotCenter(sce_lig)
+sce_lig <- rliger::runIntegration(sce_lig, k = 20)
+sce_lig
+```
+
+```{r, echo=FALSE, results="hide"}
+sce_lig <- runUMAP(sce_lig)
+sce_lig
+umap_rliger <- rliger::dimRed(sce_lig, "UMAP")
+rownames(umap_rliger) <- sapply(rownames(umap_rliger), function(x) stringr::str_split(x, "_")[[1]][2])
+reducedDim(sce, "umap_liger_anglemania") <- umap_rliger
+```
+
+## Plot
+```{r}
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_liger_hvg_320") +
+  ggtitle("Integration using top 320 HVGs, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_liger_hvg_320") +
+  ggtitle("Integration using top 320 HVGs, colored by Group")
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_liger_hvg_2000") +
+  ggtitle("Integration using top 2000 HVGs, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_liger_hvg_2000") +
+  ggtitle("Integration using top 2000 HVGs, colored by Group")
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_liger_anglemania") +
+  ggtitle("Integration using anglemania genes, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_liger_anglemania") +
+  ggtitle("Integration using anglemania genes, colored by Group")
+```
+
+# MNN integration
+## HVGs
+### 320 HVGs
+```{r, echo=FALSE, results="hide"}
+hvg <- sce %>%
+  scater::logNormCounts() %>%
+  modelGeneVar(block = colData(sce)[[batch_key]]) %>%
+  getTopHVGs(n = 320)
+  
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+sce_list <- lapply(barcodes_by_batch, function(x) sce[, x])
+sce_mnn <- sce %>%
+  scater::logNormCounts()
+sce_mnn <- batchelor::fastMNN(sce_mnn, subset.row = hvg, k = 20, batch = factor(colData(sce_mnn)[[batch_key]]), d = 50)
+reducedDim(sce, "MNN_hvg_320") <- reducedDim(sce_mnn, "corrected")
+sce <- scater::runUMAP(sce, dimred = "MNN_hvg_320", name = "umap_MNN_hvg_320")
+# k is the number of nearest neighbours to consider when identifying MNNs
+```
+
+### 2000 HVGs
+```{r, echo=FALSE, results="hide"}
+hvg <- sce %>%
+  scater::logNormCounts() %>%
+  modelGeneVar(block = colData(sce)[[batch_key]]) %>%
+  getTopHVGs(n = 2000)
+  
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+sce_list <- lapply(barcodes_by_batch, function(x) sce[, x])
+sce_mnn <- sce %>%
+  scater::logNormCounts()
+sce_mnn <- batchelor::fastMNN(sce_mnn, subset.row = hvg, k = 20, batch = factor(colData(sce_mnn)[[batch_key]]), d = 50)
+reducedDim(sce, "MNN_hvg_2000") <- reducedDim(sce_mnn, "corrected")
+sce <- scater::runUMAP(sce, dimred = "MNN_hvg_2000", name = "umap_MNN_hvg_2000")
+```
+
+## anglemania
+```{r, echo=FALSE, results="hide"}
+sce_mnn <- sce %>%
+  scater::logNormCounts()
+sce_mnn <- batchelor::fastMNN(sce_mnn, subset.row = integration_genes, k = 20, batch = factor(colData(sce_mnn)[[batch_key]]), d = 50)
+reducedDim(sce, "MNN_anglemania") <- reducedDim(sce_mnn, "corrected")
+sce <- scater::runUMAP(sce, dimred = "MNN_anglemania", name = "umap_MNN_anglemania")
+```
+
+## Plot
+```{r}
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_320") +
+  ggtitle("MNN integration using top 320 HVGs, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_320") +
+  ggtitle("MNN integration using top 320 HVGs, colored by Group")
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_2000") +
+  ggtitle("MNN integration using top 2000 HVGs, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_2000") +
+  ggtitle("MNN integration using top 2000 HVGs, colored by Group")
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_anglemania") +
+  ggtitle("MNN integration using anglemania genes, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_anglemania") +
+  ggtitle("MNN integration using anglemania genes, colored by Group")
+```
+
+
+```{r}
+sessionInfo()
+```
