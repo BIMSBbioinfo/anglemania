@@ -22,3 +22,4 @@ R/flippitise.R
 ^doc$
 ^Meta$
 ^codecov\.yml$
+^.vsode

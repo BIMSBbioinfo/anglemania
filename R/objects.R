@@ -32,12 +32,11 @@
 #' @docType class
 #' @rdname anglemania_object-class
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
+#' sce <- sce_example()
 #' angl <- create_anglemania_object(
-#'   se,
-#'   dataset_key = "Dataset",
-#'   batch_key = "groups",
+#'   sce,
+#'   dataset_key = "dataset",
+#'   batch_key = "batch",
 #'   min_cells_per_gene = 1
 #' )
 #' angl
@@ -84,10 +83,10 @@ setClass(
 #'
 #' @param object An \code{anglemania_object}.
 #' @return Prints a summary to the console.
-#' @importFrom checkmate testString
+#' @importFrom checkmate test_string
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' show(angl)
 #' @describeIn anglemania_object-methods show anglemania_object info
@@ -97,7 +96,7 @@ setMethod("show", "anglemania_object", function(object) {
   cat("Dataset key:", object@dataset_key, "\n")
   cat("Batch key:", object@batch_key, "\n")
 
-  if (checkmate::testString(object@dataset_key)) {
+  if (checkmate::test_string(object@dataset_key)) {
     num_datasets <- nrow(unique(object@data_info[, object@dataset_key, drop = FALSE]))
     cat("Number of datasets:", num_datasets, "\n")
     cat(
@@ -143,8 +142,8 @@ setMethod("show", "anglemania_object", function(object) {
 #' @return A list of \code{\link[bigstatsr]{FBM}} objects containing gene
 #'   expression matrices.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' str(matrix_list(angl))
 #' @describeIn anglemania_object-methods Access matrix list
@@ -186,12 +185,11 @@ setReplaceMethod("matrix_list", "anglemania_object", function(object, value) {
 #' @param object An \code{anglemania_object}.
 #' @return A character string representing the dataset key.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
+#' sce <- sce_example()
 #' angl <- create_anglemania_object(
-#'   se,
-#'   dataset_key = "Dataset",
-#'   batch_key = "groups",
+#'   sce,
+#'   dataset_key = "dataset",
+#'   batch_key = "batch",
 #'   min_cells_per_gene = 1
 #' )
 #' dataset_key(angl)
@@ -213,12 +211,8 @@ setMethod("dataset_key", "anglemania_object", function(object) object@dataset_ke
 #' @param object An \code{anglemania_object}.
 #' @return A character string representing the batch key.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' batch_key(angl)
 #' @describeIn anglemania_object-methods Access batch key of anglemania_object
 #' @export
@@ -239,12 +233,8 @@ setMethod("batch_key", "anglemania_object", function(object) object@batch_key)
 #' @param object An \code{anglemania_object}.
 #' @return A data frame containing dataset and batch information.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' batch_key(angl)
 #' @describeIn anglemania_object-methods Access info of selected gene pairs
 #' @export
@@ -264,12 +254,8 @@ setMethod("data_info", "anglemania_object", function(object) object@data_info)
 #' @param object An \code{anglemania_object}.
 #' @return A named numeric vector of weights.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' batch_key(angl)
 #' angl_weights(angl)
 #' @describeIn anglemania_object-methods Access weights
@@ -312,12 +298,8 @@ setReplaceMethod("angl_weights", "anglemania_object", function(object, value) {
 #' @return A list containing statistical matrices such as mean z-scores and SNR
 #'   z-scores
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' stats <- list_stats(angl)
 #' str(stats)
@@ -359,14 +341,10 @@ setReplaceMethod("list_stats", "anglemania_object", function(object, value) {
 #'
 #' @param object An \code{anglemania_object}.
 #' @return A character vector of intersected gene 
-#'  names from multiple Seurat objects.
+#'  names from multiple Seurat or SingleCellExperiment Objects.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' intersect_genes(angl)
 #' @describeIn anglemania_object-methods 
 #' Access the intersection of genes of all batches
@@ -410,12 +388,8 @@ setReplaceMethod("intersect_genes", "anglemania_object", function(object, value)
 #' @param object An \code{anglemania_object}.
 #' @return A character vector of integration gene names.
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' # extract the genes identified by anglemania()
 #' anglemania_genes <- get_anglemania_genes(angl)
@@ -433,14 +407,14 @@ setMethod("get_anglemania_genes", "anglemania_object", function(object) {
   object@integration_genes$genes
 })
 
-#' Add a Unique Batch Key to a Seurat Object's Metadata
+#' Add a Unique Batch Key to a Seurat or SingleCellExperiment Object's Metadata
 #'
 #' This function adds a unique batch identifier to the metadata of a
 #' \code{\link[Seurat]{Seurat}} object by combining specified dataset and batch
 #' keys. This is useful for distinguishing samples during integration or
 #' analysis.
 #'
-#' @param seurat_object A \code{\link[Seurat]{Seurat}} object.
+#' @param object_metadata Metadata of a \code{\link[Seurat]{Seurat}} or SingleCellExperiment object.
 #' @param dataset_key A character string specifying the column name in the
 #'   metadata that identifies the dataset. If \code{NA}, only the
 #'   \code{batch_key} is used.
@@ -453,25 +427,28 @@ setMethod("get_anglemania_genes", "anglemania_object", function(object) {
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
-#' @examples 
-#' se <- SeuratObject::pbmc_small
-#' se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se)/2)
-#' se <- add_unique_batch_key(
-#'   seurat_object = se,
-#'   dataset_key = "Dataset",
-#'   batch_key = "groups",
-#'   new_unique_batch_key = "batch" 
-#'   )
-#' head(se[[]])
-#' @describeIn anglemania_object-methods Temporarily add a unique batch key to the dataset
+#' @import checkmate
+#' @examples
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
+#' angl <- create_anglemania_object(
+#'   sce,
+#'   dataset_key = "dataset",
+#'   batch_key = "batch",
+#'   min_cells_per_gene = 1
+#' )
+#' head(SingleCellExperiment::colData(sce))
+#' @describeIn anglemania_object-methods Temporarily add a unique batch key
+#' to the dataset
 #' @export
 add_unique_batch_key <- function(
-    seurat_object,
+    object_metadata,
     dataset_key = NA_character_,
     batch_key,
     new_unique_batch_key = "batch") {
-  if (checkmate::testString(dataset_key)) {
-    meta <- seurat_object[[]] %>%
+
+  if (checkmate::test_string(dataset_key)) {
+    object_metadata <- object_metadata %>%
       tidyr::unite(
         "batch",
         dplyr::all_of(batch_key),
@@ -485,7 +462,7 @@ add_unique_batch_key <- function(
         remove = FALSE
       )
   } else {
-    meta <- seurat_object[[]] %>%
+    object_metadata <- object_metadata %>%
       tidyr::unite(
         "batch",
         dplyr::all_of(batch_key),
@@ -493,41 +470,45 @@ add_unique_batch_key <- function(
         remove = FALSE
       )
   }
-  seurat_object[[]] <- meta
-  return(seurat_object)
+
+  return(object_metadata)
 }
 
 # ---------------------------------------------------------------------------
-# Create an anglemania_object from a Seurat Object
+# Create an anglemania_object from a Seurat or SingleCellExperiment Object
 # ---------------------------------------------------------------------------
 
-#' Create an anglemania_object from a Seurat Object
+#' Create an anglemania_object from a Seurat or SingleCellExperiment Object
 #'
 #' Constructs an \code{\link{anglemania_object-class}} from a given
-#' \code{\link[Seurat]{Seurat}} object. This includes extracting and processing
-#' count matrices, filtering genes based on expression in a minimum number of
-#' cells, and storing results along with dataset and batch information. It also
-#' calculates weights for each dataset or batch based on the number of samples.
+#' \code{\link[Seurat]{Seurat}} or
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
+#' This includes extracting and processing count matrices, filtering genes
+#' based on expression in a minimum number of cells, and storing results
+#' along with dataset and batch information. It also calculates weights for
+#' each dataset or batch based on the number of samples.
 #'
-#' @param seurat_object A \code{\link[Seurat]{Seurat}} object containing
-#'   single-cell RNA-seq data.
+#' @param object A \code{\link[Seurat]{Seurat}} or
+#'    \code{\link[SingleCellExperiment]{SingleCellExperiment}} object
+#'    containing single-cell RNA-seq data.
 #' @param dataset_key A character string indicating the column name in the
-#'   Seurat object metadata that identifies the dataset to which each cell
+#'   object metadata that identifies the dataset to which each cell
 #'   belongs. If \code{NA}, all cells are assumed to belong to the same
 #'   dataset.
 #' @param batch_key A character string indicating the column name(s) in the
-#'   Seurat object metadata that identify the batch to which each cell belongs.
+#'   object metadata that identify the batch to which each cell belongs.
 #' @param min_cells_per_gene A numeric value indicating the minimum number of
 #'   cells in which a gene must be expressed to be included in the analysis.
 #'   Default is \code{1}.
+#' @param ... Additional arguments
 #'
 #' @return An \code{\link{anglemania_object-class}} containing:
 #' \describe{
 #'   \item{\code{matrix_list}}{A list of filtered count matrices for each unique
 #'     batch.}
-#'   \item{\code{dataset_key}}{The dataset key used for splitting the Seurat
+#'   \item{\code{dataset_key}}{The dataset key used for splitting the
 #'     object.}
-#'   \item{\code{batch_key}}{The batch key used for splitting the Seurat
+#'   \item{\code{batch_key}}{The batch key used for splitting the
 #'     object.}
 #'   \item{\code{data_info}}{A data frame summarizing the number of samples per
 #'     dataset and their weights.}
@@ -542,7 +523,7 @@ add_unique_batch_key <- function(
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'   \item Adds a unique batch key to the Seurat object's metadata using
+#'   \item Adds a unique batch key to the metadata using
 #'     \code{\link{add_unique_batch_key}}.
 #'   \item Extracts count matrices for each batch.
 #'   \item Filters genes based on the \code{min_cells_per_gene} threshold.
@@ -552,12 +533,13 @@ add_unique_batch_key <- function(
 #' }
 #'
 #' @importFrom SeuratObject LayerData
+#' @importFrom SummarizedExperiment assay
 #' @importFrom tidyr unite
 #' @importFrom Matrix rowSums
 #' @importFrom pbapply pblapply
 #' @importFrom dplyr select distinct group_by add_count mutate n_groups
 #' @importFrom bigstatsr nb_cores
-#' @importFrom checkmate testString
+#' @import checkmate
 #'
 #' @seealso
 #' \code{\link{anglemania_object-class}},
@@ -565,32 +547,64 @@ add_unique_batch_key <- function(
 #' \code{\link{anglemania}},
 #' \code{\link[bigstatsr]{FBM}}
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(
-#'   se,
-#'   batch_key = "groups",
-#'   min_cells_per_gene = 1
-#' )
-#'  angl
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
+#' angl
 #' @export create_anglemania_object
-create_anglemania_object <- function(
-    seurat_object,
-    dataset_key = NA_character_,
-    batch_key,
-    min_cells_per_gene = 1) {
-  # Validate inputs
-  if (!inherits(seurat_object, "Seurat")) {
-    stop("seurat_object needs to be a Seurat object")
-  }
+#'
+# Generic function
+setGeneric(
+  "create_anglemania_object",
+  function(object, ...) standardGeneric("create_anglemania_object"))
 
-  if (checkmate::testString(dataset_key)) {
+#' Internal helper function to get metadata from a Seurat or SCE object
+#' @import checkmate
+#' @importFrom SingleCellExperiment colData
+#' @keywords internal
+.get_meta_data <- function(object) {
+  if (checkmate::test_class(object, "Seurat")) {
+    return(object[[]])
+  } else if (checkmate::test_class(object, "SingleCellExperiment")) {
+    return(SingleCellExperiment::colData(object) %>% as.data.frame())
+  } else {
+    stop("object must be a Seurat or SingleCellExperiment object")
+  }
+}
+
+#' @rdname create_anglemania_object
+#' @export
+#' @examples
+#' sce <- sce_example()
+#' se <- Seurat::as.Seurat(sce, data = "counts")
+#' se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
+#' angl <- create_anglemania_object(se, batch_key = "batch")
+#' angl
+#' @method create_anglemania_object Seurat
+setMethod(
+  "create_anglemania_object",
+  "Seurat",
+  function(
+  object,
+  dataset_key = NA,
+  batch_key,
+  min_cells_per_gene = 1) {
+  # Validate inputs
+  checkmate::assert_class(object, "Seurat")
+  meta <- .get_meta_data(object)
+  # Create unique batch key
+  meta <- add_unique_batch_key(
+    meta,
+    dataset_key,
+    batch_key
+  )
+  if (checkmate::test_string(dataset_key)) {
     if (length(dataset_key) != 1) {
      stop(
        "dataset_key needs to be a character string of length 1 ",
        "corresponding to the column in the metadata of the Seurat ",
        "object that indicates which dataset the cells belong to"
      ) 
-    } else if (!(dataset_key %in% colnames(seurat_object[[]]))) {
+    } else if (!(dataset_key %in% colnames(meta))) {
        stop(
          "dataset_key needs to be a column in the metadata of the Seurat ",
          "object that indicates which dataset the cells belong to"
@@ -599,7 +613,7 @@ create_anglemania_object <- function(
     message(
       "Using dataset_key: ", dataset_key
     )
-  } else if (checkmate::testScalarNA(dataset_key, null.ok = TRUE)) {
+  } else if (checkmate::test_scalar_na(dataset_key, null.ok = TRUE)) {
       message(
         "No dataset_key specified.\n",
         "Assuming that all samples belong to the same dataset ",
@@ -614,7 +628,8 @@ create_anglemania_object <- function(
     )
   }
 
-  if (!checkmate::testString(batch_key) || length(batch_key) != 1) {
+  if (!checkmate::test_string(batch_key) || length(batch_key) != 1 || 
+      !(batch_key %in% colnames(meta))) {
     stop(
       "batch_key needs to be a character string of length 1 ",
       "corresponding to the column in the metadata of the Seurat ",
@@ -622,17 +637,10 @@ create_anglemania_object <- function(
     )
   }
 
-  # Create unique batch key
-  seurat_object <- add_unique_batch_key(
-    seurat_object,
-    dataset_key,
-    batch_key
-  )
 
-  meta <- seurat_object[[]]
 
   # Get the barcodes corresponding to each batch
-  matrix_list <- split(rownames(meta), meta$batch)
+  barcodes_by_batch <- split(rownames(meta), meta$batch)
 
   # Extract counts for each batch
   message("Extracting count matrices...")
@@ -641,10 +649,10 @@ create_anglemania_object <- function(
     min_cells_per_gene,
     " cells per gene..."
   )
-  matrix_list <- lapply(matrix_list, function(cell_barcodes) {
+  matrix_list <- lapply(barcodes_by_batch, function(bc) {
     counts_matrix <- SeuratObject::LayerData(
-      seurat_object,
-      cells = cell_barcodes,
+      object,
+      cells = bc,
       layer = "counts",
       assay = "RNA"
     )
@@ -668,7 +676,7 @@ create_anglemania_object <- function(
     cl = bigstatsr::nb_cores()
   )
 
-  if (checkmate::testString(dataset_key)) {
+  if (checkmate::test_string(dataset_key)) {
     data_info <- meta %>%
       dplyr::select(
         batch,
@@ -676,7 +684,10 @@ create_anglemania_object <- function(
       ) %>%
       dplyr::distinct() %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(dataset_key))) %>%
-      dplyr::add_count(dplyr::across(dplyr::all_of(dataset_key)), name = "n_samples") %>%
+      dplyr::add_count(
+        dplyr::across(dplyr::all_of(dataset_key)), 
+        name = "n_samples"
+        ) %>%
       dplyr::mutate(
         weight = 1 / n_samples / dplyr::n_groups(.)
       )
@@ -698,7 +709,7 @@ create_anglemania_object <- function(
     "anglemania_object",
     matrix_list = matrix_list,
     dataset_key = ifelse(
-      checkmate::testString(dataset_key),
+      checkmate::test_string(dataset_key),
       dataset_key,
       NA_character_
     ),
@@ -711,3 +722,241 @@ create_anglemania_object <- function(
 
   return(anglem_object)
 }
+)
+
+#' @rdname create_anglemania_object
+#' @export
+#' @examples
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
+#' angl
+#' @method create_anglemania_object SingleCellExperiment
+setMethod(
+  "create_anglemania_object",
+  "SingleCellExperiment",
+  function(
+      object,
+      dataset_key = NA,
+      batch_key,
+      min_cells_per_gene = 1) {
+    # Validate inputs
+    checkmate::assert_class(object, "SingleCellExperiment")
+    meta <- .get_meta_data(object)
+    # Create unique batch key
+    meta <- add_unique_batch_key(
+      meta,
+      dataset_key,
+      batch_key
+    )
+    if (checkmate::test_string(dataset_key)) {
+      if (length(dataset_key) != 1) {
+        stop(
+          "dataset_key needs to be a character string of length 1 ",
+          "corresponding to the column in the metadata of the Seurat ",
+          "object that indicates which dataset the cells belong to"
+        )
+      } else if (!(dataset_key %in% colnames(meta))) {
+        stop(
+          "dataset_key needs to be a column in the metadata of the Seurat ",
+          "object that indicates which dataset the cells belong to"
+        )
+      }
+      message(
+        "Using dataset_key: ", dataset_key
+      )
+    } else if (checkmate::test_scalar_na(dataset_key, null.ok = TRUE)) {
+      message(
+        "No dataset_key specified.\n",
+        "Assuming that all samples belong to the same dataset ",
+        "and are separated by batch_key: ", batch_key
+      )
+    } else {
+      stop(
+        "dataset_key needs to be NA/NULL or a character string of length 1 ",
+        "corresponding to the column in the metadata of the Seurat ",
+        "object that indicates which dataset the cells belong to"
+      )
+    }
+
+    if (!checkmate::test_string(batch_key) || length(batch_key) != 1 ||
+      !(batch_key %in% colnames(meta))) {
+      stop(
+        "batch_key needs to be a character string of length 1 ",
+        "corresponding to the column in the metadata of the Seurat ",
+        "object that indicates which batch the cells belong to"
+      )
+    }
+
+
+
+    # Get the barcodes corresponding to each batch
+    barcodes_by_batch <- split(rownames(meta), meta$batch)
+
+    # Extract counts for each batch
+    message("Extracting count matrices...")
+    message(
+      "Filtering each batch to at least ",
+      min_cells_per_gene,
+      " cells per gene..."
+    )
+    matrix_list <- lapply(barcodes_by_batch, function(bc) {
+      counts_matrix <- SummarizedExperiment::assay(object, "counts")[, bc, drop = FALSE]
+      filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
+      filt_features <- names(filt_features[filt_features])
+      counts_matrix <- counts_matrix[filt_features, ]
+      return(counts_matrix)
+    })
+
+    # Reduce to intersection of genes between batches
+    message("Using the intersection of filtered genes from all batches...")
+    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+    message("Number of genes in intersected set: ", length(intersect_genes))
+
+    matrix_list <- pbapply::pblapply(
+      matrix_list,
+      function(x) {
+        x <- x[intersect_genes, ]
+        x <- sparse_to_fbm(x)
+      },
+      cl = bigstatsr::nb_cores()
+    )
+
+    if (checkmate::test_string(dataset_key)) {
+      data_info <- meta %>%
+        dplyr::select(
+          batch,
+          dplyr::all_of(c(dataset_key, batch_key))
+        ) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(dplyr::across(dplyr::all_of(dataset_key))) %>%
+        dplyr::add_count(
+          dplyr::across(dplyr::all_of(dataset_key)),
+          name = "n_samples"
+        ) %>%
+        dplyr::mutate(
+          weight = 1 / n_samples / dplyr::n_groups(.)
+        )
+
+      weights <- data_info$weight
+      names(weights) <- data_info$batch
+    } else {
+      data_info <- meta %>%
+        dplyr::select(batch, dplyr::all_of(batch_key)) %>%
+        dplyr::distinct() %>%
+        dplyr::mutate(weight = 1 / nrow(.))
+
+      weights <- data_info$weight
+      names(weights) <- data_info$batch
+    }
+
+    # Create anglem object
+    anglem_object <- new(
+      "anglemania_object",
+      matrix_list = matrix_list,
+      dataset_key = ifelse(
+        checkmate::test_string(dataset_key),
+        dataset_key,
+        NA_character_
+      ),
+      batch_key = batch_key,
+      data_info = data_info,
+      weights = weights,
+      min_cells_per_gene = min_cells_per_gene,
+      intersect_genes = intersect_genes
+    )
+
+    return(anglem_object)
+  }
+)
+
+
+#' @rdname create_anglemania_object
+#' @export
+#' @examples
+#' sce <- sce_example()
+#' sce_list <- list(sce1 = sce, sce2 = sce)
+#' angl <- create_anglemania_object(sce_list)
+#' angl
+#' se <- Seurat::as.Seurat(sce, data = "counts")
+#' se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
+#' se_list <- list(se1 = se, se2 = se)
+#' angl <- create_anglemania_object(se_list)
+#' angl
+#' @method create_anglemania_object list
+setMethod(
+  "create_anglemania_object",
+  "list",
+  function(
+      object,
+      min_cells_per_gene = 1) {
+    checkmate::assert_list(object, types = c("Seurat", "SingleCellExperiment"))
+
+
+    #------ MATRIX LIST ------#
+    # Extract counts for each batch
+    message("Extracting count matrices...")
+    message(
+      "Filtering each batch to at least ",
+      min_cells_per_gene,
+      " cells per gene..."
+    )
+    matrix_list <- lapply(object, function(object) {
+      if (checkmate::test_class(object, "Seurat")) {
+        counts_matrix <- SeuratObject::LayerData(
+          object,
+          layer = "counts",
+          assay = "RNA"
+        )
+      } else if (checkmate::test_class(object, "SingleCellExperiment")) {
+        counts_matrix <- SummarizedExperiment::assay(object, "counts")
+      }
+      filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
+      filt_features <- names(filt_features[filt_features])
+      counts_matrix <- counts_matrix[filt_features, ]
+      return(counts_matrix)
+    })
+
+    # Reduce to intersection of genes between batches
+    message("Using the intersection of filtered genes from all batches...")
+    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+    message("Number of genes in intersected set: ", length(intersect_genes))
+
+    matrix_list <- pbapply::pblapply(
+      matrix_list,
+      function(x) {
+        x <- x[intersect_genes, ]
+        x <- sparse_to_fbm(x)
+      },
+      cl = bigstatsr::nb_cores()
+    )
+
+    #------- DATA INFO ------#
+    if (checkmate::test_names(names(object), "named")) {
+      data_info <- data.frame(batch = names(object)) %>%
+        dplyr::mutate(weight = 1 / nrow(.))
+      weights <- data_info$weight
+      names(weights) <- data_info$batch
+    } else {
+      names(object) <- paste0("batch", seq_along(object))
+      data_info <- data.frame(batch = names(object)) %>%
+        dplyr::mutate(weight = 1 / nrow(.))
+      weights <- data_info$weight
+      names(weights) <- data_info$batch
+    }
+
+
+    #------- CREATE ANGLEM OBJECT ------#
+    anglem_object <- new(
+      "anglemania_object",
+      matrix_list = matrix_list,
+      dataset_key = NA_character_,
+      batch_key = "batch",
+      data_info = data_info,
+      weights = weights,
+      min_cells_per_gene = min_cells_per_gene,
+      intersect_genes = intersect_genes
+    )
+
+    return(anglem_object)
+  }
+)

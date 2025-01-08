@@ -29,7 +29,7 @@
 #' @param angl An \code{\link{anglemania_object-class}} containing gene
 #' expression data and associated metadata.
 #' @param method Character string specifying the method to use for calculating
-#' the relationship between gene pairs. Default is \code{"pearson"}.
+#' the relationship between gene pairs. Default is \code{"cosine"}.
 #' Other options include \code{"diem"}
 #' (see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
 #' @param zscore_mean_threshold Numeric value specifying the threshold
@@ -54,11 +54,12 @@
 #'   \url{https://arxiv.org/abs/1306.0256}
 #'
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' # Set seed for reproducibility (optional)
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(
 #'   angl,
-#'   method = "pearson",
+#'   method = "cosine",
 #'   zscore_mean_threshold = 2,
 #'   zscore_sn_threshold = 2,
 #'   max_n_genes = 2000
@@ -70,7 +71,7 @@
 #' @export
 anglemania <- function(
     angl,
-    method = "pearson",
+    method = "cosine",
     zscore_mean_threshold = 2.5,
     zscore_sn_threshold = 2.5,
     max_n_genes = 2000) {

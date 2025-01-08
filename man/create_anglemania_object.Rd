@@ -2,26 +2,43 @@
 % Please edit documentation in R/objects.R
 \name{create_anglemania_object}
 \alias{create_anglemania_object}
-\title{Create an anglemania_object from a Seurat Object}
+\alias{create_anglemania_object,Seurat-method}
+\alias{create_anglemania_object,SingleCellExperiment-method}
+\alias{create_anglemania_object,list-method}
+\title{Create an anglemania_object from a Seurat or SingleCellExperiment Object}
 \usage{
-create_anglemania_object(
-  seurat_object,
-  dataset_key = NA_character_,
+create_anglemania_object(object, ...)
+
+\S4method{create_anglemania_object}{Seurat}(
+  object,
+  dataset_key = NA,
   batch_key,
   min_cells_per_gene = 1
 )
+
+\S4method{create_anglemania_object}{SingleCellExperiment}(
+  object,
+  dataset_key = NA,
+  batch_key,
+  min_cells_per_gene = 1
+)
+
+\S4method{create_anglemania_object}{list}(object, min_cells_per_gene = 1)
 }
 \arguments{
-\item{seurat_object}{A \code{\link[Seurat]{Seurat}} object containing
-single-cell RNA-seq data.}
+\item{object}{A \code{\link[Seurat]{Seurat}} or
+\code{\link[SingleCellExperiment]{SingleCellExperiment}} object
+containing single-cell RNA-seq data.}
+
+\item{...}{Additional arguments}
 
 \item{dataset_key}{A character string indicating the column name in the
-Seurat object metadata that identifies the dataset to which each cell
+object metadata that identifies the dataset to which each cell
 belongs. If \code{NA}, all cells are assumed to belong to the same
 dataset.}
 
 \item{batch_key}{A character string indicating the column name(s) in the
-Seurat object metadata that identify the batch to which each cell belongs.}
+object metadata that identify the batch to which each cell belongs.}
 
 \item{min_cells_per_gene}{A numeric value indicating the minimum number of
 cells in which a gene must be expressed to be included in the analysis.
@@ -32,9 +49,9 @@ An \code{\link{anglemania_object-class}} containing:
 \describe{
 \item{\code{matrix_list}}{A list of filtered count matrices for each unique
 batch.}
-\item{\code{dataset_key}}{The dataset key used for splitting the Seurat
+\item{\code{dataset_key}}{The dataset key used for splitting the
 object.}
-\item{\code{batch_key}}{The batch key used for splitting the Seurat
+\item{\code{batch_key}}{The batch key used for splitting the
 object.}
 \item{\code{data_info}}{A data frame summarizing the number of samples per
 dataset and their weights.}
@@ -48,15 +65,17 @@ threshold used for filtering.}
 }
 \description{
 Constructs an \code{\link{anglemania_object-class}} from a given
-\code{\link[Seurat]{Seurat}} object. This includes extracting and processing
-count matrices, filtering genes based on expression in a minimum number of
-cells, and storing results along with dataset and batch information. It also
-calculates weights for each dataset or batch based on the number of samples.
+\code{\link[Seurat]{Seurat}} or
+\code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
+This includes extracting and processing count matrices, filtering genes
+based on expression in a minimum number of cells, and storing results
+along with dataset and batch information. It also calculates weights for
+each dataset or batch based on the number of samples.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item Adds a unique batch key to the Seurat object's metadata using
+\item Adds a unique batch key to the metadata using
 \code{\link{add_unique_batch_key}}.
 \item Extracts count matrices for each batch.
 \item Filters genes based on the \code{min_cells_per_gene} threshold.
@@ -66,13 +85,26 @@ The function performs the following steps:
 }
 }
 \examples{
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(
-  se,
-  batch_key = "groups",
-  min_cells_per_gene = 1
-)
- angl
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
+angl
+sce <- sce_example()
+se <- Seurat::as.Seurat(sce, data = "counts")
+se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
+angl <- create_anglemania_object(se, batch_key = "batch")
+angl
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
+angl
+sce <- sce_example()
+sce_list <- list(sce1 = sce, sce2 = sce)
+angl <- create_anglemania_object(sce_list)
+angl
+se <- Seurat::as.Seurat(sce, data = "counts")
+se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
+se_list <- list(se1 = se, se2 = se)
+angl <- create_anglemania_object(se_list)
+angl
 }
 \seealso{
 \code{\link{anglemania_object-class}},

@@ -46,12 +46,11 @@ and their statistics.}
 }}
 
 \examples{
-se <- SeuratObject::pbmc_small
-se[[]]$Dataset <- rep(c("A", "B"), each = ncol(se) / 2)
+sce <- sce_example()
 angl <- create_anglemania_object(
-  se,
-  dataset_key = "Dataset",
-  batch_key = "groups",
+  sce,
+  dataset_key = "dataset",
+  batch_key = "batch",
   min_cells_per_gene = 1
 )
 angl

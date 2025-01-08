@@ -220,8 +220,8 @@ big_mat_list_mean <- function(angl) {
 #'   \code{sds_zscore}, and \code{sn_zscore}.
 #' @importFrom bigstatsr FBM big_apply
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' list_stats(angl) <- get_list_stats(angl)
 #' str(list_stats(angl))
@@ -378,8 +378,8 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'     with the selected genes and their statistics.
 #' }
 #' @examples
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' sce <- sce_example()
+#' angl <- create_anglemania_object(sce, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' angl <- select_genes(angl,
 #'                       zscore_mean_threshold = 2.5,
@@ -485,6 +485,8 @@ select_genes <- function(
   selected_genes <- extract_rows_for_unique_genes(top_n, max_n_genes)
   angl@integration_genes$genes <- 
     intersect_genes(angl)[selected_genes]
-
+  print(paste0(
+    "Selected ", length(selected_genes), " genes for integration."
+  ))
   return(angl)
 }

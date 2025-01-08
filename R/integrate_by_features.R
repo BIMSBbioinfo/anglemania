@@ -63,8 +63,10 @@
 #' #  splits the seurat object into batches and integrates them
 #' #  using CCA integration and anglemania genes previously extracted
 #' #  with anglemania() or select_genes()
-#' se <- SeuratObject::pbmc_small
-#' angl <- create_anglemania_object(se, batch_key = "groups")
+#' sce <- sce_example()
+#' se <- Seurat::as.Seurat(sce, data = "counts")
+#' se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
+#' angl <- create_anglemania_object(se, batch_key = "batch")
 #' angl <- anglemania(angl)
 #' options(future.globals.maxSize = 4000 * 1024^2)
 #' integrated_object <- integrate_by_features(se, angl)
@@ -85,8 +87,8 @@ integrate_by_features <- function(
     verbose = FALSE) {
   dataset_key <- angl@dataset_key
   batch_key <- angl@batch_key
-  seurat_object <- add_unique_batch_key(
-    seurat_object,
+  seurat_object[[]] <- add_unique_batch_key(
+    seurat_object[[]],
     dataset_key,
     batch_key
   ) # Temporarily adds unique batch key "batch" to metadata
@@ -201,7 +203,7 @@ integrate_seurat_list <- function(
     process = TRUE, # Should scaling, PCA, and UMAP be performed?
     verbose = FALSE) {
   # validate inputs
-  checkmate::assertClass(seurat_list, "list")
+  checkmate::assert_list(seurat_list, types = "Seurat")
   checkmate::assertTRUE(length(seurat_list) > 1)
   checkmate::assertCharacter(features)
   checkmate::assertTRUE(

@@ -1,4 +1,4 @@
-# anglemania works correctly with method pearson
+# anglemania works correctly with method cosine
 
     Code
       list_stats(angl)$mean_zscore[1:10, 1:10]

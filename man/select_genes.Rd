@@ -55,8 +55,8 @@ with the selected genes and their statistics.
 }
 }
 \examples{
-se <- SeuratObject::pbmc_small
-angl <- create_anglemania_object(se, batch_key = "groups")
+sce <- sce_example()
+angl <- create_anglemania_object(sce, batch_key = "batch")
 angl <- anglemania(angl)
 angl <- select_genes(angl,
                       zscore_mean_threshold = 2.5,

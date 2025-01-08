@@ -18,7 +18,7 @@ test_that("unique batch key is added", {
   )
   se <- Seurat::AddMetaData(se, dataset_col)
 
-  se <- add_unique_batch_key(se,
+  se[[]] <- add_unique_batch_key(se[[]],
     batch_key = batch_key,
     dataset_key = dataset_key
   )
@@ -83,7 +83,7 @@ test_that(
     )
     se <- SeuratObject::AddMetaData(se, dataset_col)
 
-    se <- add_unique_batch_key(se,
+    se[[]] <- add_unique_batch_key(se[[]],
       batch_key = batch_key,
       dataset_key = dataset_key
     )

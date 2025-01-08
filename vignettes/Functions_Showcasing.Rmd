@@ -1,0 +1,98 @@
+---
+title: "Functions_Showcasing"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: "paged"
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    theme: simplex
+vignette: >
+  %\VignetteIndexEntry{Other Functions in anglemania}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+.libPaths(.Library)
+```
+
+# Introduction
+In this Vignette we want to quickly show the few other functions that are available in 
+anglemania besides the two main ones: `create_anglemania_object` and `anglemania`.
+
+
+```{r, load libraries}
+library(SingleCellExperiment)
+# library(anglemania)
+devtools::load_all()
+
+```
+
+# Normal anglemania workflow
+```{r}
+sce <- sce_example()
+batch_key <- "batch"
+angl <- create_anglemania_object(sce, batch_key = batch_key)
+angl <- anglemania(angl)
+angl
+```
+
+# under the hood of the anglemania function
+* anglemania is run on the anglemania object and it calls three functions:
+    * factorise: 
+        * creates a permutation of the input matrix to create a null distribution
+        * computes the cosine similarity (or spearman coefficient or diem) between gene expresion 
+          vector pairs matrix for both the original and permuted matrices
+        * computes the zscore of the relationship between the gene pairs taking the mean and standard 
+          deviation of the null distribution
+        * it does this for every batch in the dataset!
+    * get_list_stats
+        * computes the mean and standard deviation of the zscores across the matrices from
+          the different batches.
+    * select_genes
+        * filters the gene pairs by the mean zscore and the signal-to-noise ratio (SN, i.e. the 
+          mean divided by the standard deviation).
+
+## factorise
+```{r}
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+counts_by_batch <- lapply(barcodes_by_batch, function(x) {
+    counts(sce[, x]) %>% sparse_to_fbm()
+})
+counts_by_batch[[1]][1:10, 1:6]
+class(counts_by_batch[[1]])
+factorised <- lapply(counts_by_batch, factorise)
+factorised[[1]][1:10, 1:6]
+```
+
+## get_list_stats
+* get_list_stats gets called on the anglemania object so we create and inspect a anglemania object
+```{r}
+sce <- sce_example()
+batch_key <- "batch"
+angl <- create_anglemania_object(sce, batch_key = batch_key)
+list_stats(angl) # this slot is empty
+angl <- anglemania(angl) 
+names(list_stats(angl))
+class(list_stats(angl))
+list_stats(angl)$mean_zscore[1:10, 1:6]
+list_stats(angl)$sn_zscore[1:10, 1:6]
+```
+
+## select_genes
+* under the hood, anglemania calls select_genes on the anglemania object with the default thresholds
+  zscore_mean_threshold = 2.5, zscore_sn_threshold = 2.5
+* we can use select_genes to change the thresholds without having to run anglemania again
+```{r}
+previous_genes <- get_anglemania_genes(angl)
+angl <- select_genes(angl,
+                     zscore_mean_threshold = 2,
+                     zscore_sn_threshold = 2)
+# Inspect the anglemania genes
+new_genes <- get_anglemania_genes(angl)
+
+length(previous_genes)
+length(new_genes)
+```

@@ -4,14 +4,14 @@
 \alias{factorise}
 \title{Factorize Angle Matrices into Z-Scores}
 \usage{
-factorise(x_mat, method = "pearson", seed = 1)
+factorise(x_mat, method = "cosine", seed = 1)
 }
 \arguments{
 \item{x_mat}{A \code{\link[bigstatsr]{FBM}} object representing the
 normalized and scaled gene expression matrix.}
 
 \item{method}{A character string specifying the method for calculating the
-relationship between gene pairs. Default is \code{"pearson"}. Other options
+relationship between gene pairs. Default is \code{"cosine"}. Other options
 include \code{"spearman"} and \code{"diem"} (see
 \url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
 
@@ -40,7 +40,7 @@ original and permuted matrices using \code{\link{extract_angles}}.
 \item If \code{method = "diem"}, computes Euclidean distances and scales
 the angles accordingly, based on the methodology from the DIEM
 algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
-\item For other methods (\code{"pearson"}, \code{"spearman"}),
+\item For other methods (\code{"cosine"}, \code{"spearman"}),
 statistical measures are computed from the permuted data.
 }
 \item \strong{Statistical Measures}: Calculates mean, variance, and standard
@@ -69,8 +69,8 @@ mat <- matrix(
 
 mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
-# Run factorise with method "pearson" and a fixed seed
-result_fbm <- factorise(mat, method = "pearson", seed = 1)
+# Run factorise with method "cosine" and a fixed seed
+result_fbm <- factorise(mat, method = "cosine", seed = 1)
 result_fbm[]
 }
 \seealso{
