@@ -9,6 +9,8 @@
 #' @importFrom stats rpois
 #' @importFrom S4Vectors DataFrame
 #' @importFrom withr with_seed
+#' @param seed The seed for the random number generator. Because this function
+#' is only used locally, we allow to set a set within the function.
 #' @return A SingleCellExperiment object
 #' @examples
 #' sce <- sce_example()

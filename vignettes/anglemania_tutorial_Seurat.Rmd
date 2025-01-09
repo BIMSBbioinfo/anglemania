@@ -1,5 +1,5 @@
 ---
-title: "anglemania_tutorial_Seurat"
+title: "Running anglemania with Seurat"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -16,6 +16,7 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# .libPaths(.Library)
 ```
 
 # Introduction
