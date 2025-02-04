@@ -48,7 +48,6 @@ suppressPackageStartupMessages({
   library(scater)
   library(scran)
   library(bluster)
-  library(RcppPlanc)
   library(rliger)
   library(batchelor)
 })

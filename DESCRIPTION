@@ -38,6 +38,7 @@ Suggests:
     covr,
     DT,
     scran,
+    scater,
     batchelor,
     bluster,
     rliger
