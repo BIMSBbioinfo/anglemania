@@ -6,6 +6,10 @@
 \usage{
 sce_example(seed = 42)
 }
+\arguments{
+\item{seed}{The seed for the random number generator. Because this function
+is only used locally, we allow to set a seed within the function.}
+}
 \value{
 A SingleCellExperiment object
 }
