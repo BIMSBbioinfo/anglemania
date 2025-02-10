@@ -4,89 +4,149 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>anglemania_tutorial • anglemania</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="anglemania_tutorial">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running anglemania with SingleCellExperiment • anglemania</title>
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Running anglemania with SingleCellExperiment">
+<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
 </head>
-<body>
-    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
+<body data-spy="scroll" data-target="#toc">
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <div class="container template-article">
+      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">anglemania</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.0</span>
+      </span>
+    </div>
 
-    <a class="navbar-brand me-2" href="../index.html">anglemania</a>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+<li>
+  <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
-
-
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/anglemania_tutorial.html">anglemania_tutorial</a></li>
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/anglemania_tutorial_Seurat.html">Running anglemania with Seurat</a>
+    </li>
+    <li>
+      <a href="../articles/anglemania_tutorial.html">Running anglemania with SingleCellExperiment</a>
+    </li>
+    <li>
+      <a href="../articles/Functions_Showcasing.html">Functions_Showcasing</a>
+    </li>
   </ul>
 </li>
       </ul>
-<ul class="navbar-nav">
-<li class="nav-item"><form class="form-inline" role="search">
- <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
-</form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/BIMSBbioinfo/anglemania/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/BIMSBbioinfo/anglemania/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
       </ul>
 </div>
-
-
+<!--/.nav-collapse -->
   </div>
-</nav><div class="container template-article">
+<!--/.container -->
+</div>
+<!--/.navbar -->
 
 
 
-
-<div class="row">
-  <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>anglemania_tutorial</h1>
+      </header><div class="row">
+  <div class="col-md-9 contents">
+    <div class="page-header toc-ignore">
+      <h1 data-toc-skip>Running anglemania with
+SingleCellExperiment</h1>
             
-            <h4 data-toc-skip class="date">2024-12-03</h4>
+            <h4 data-toc-skip class="date">2025-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BIMSBbioinfo/anglemania/blob/master/vignettes/anglemania_tutorial.Rmd" class="external-link"><code>vignettes/anglemania_tutorial.Rmd</code></a></small>
-      <div class="d-none name"><code>anglemania_tutorial.Rmd</code></div>
+      <div class="hidden name"><code>anglemania_tutorial.Rmd</code></div>
+
     </div>
 
     
     
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>anglemania is a feature selection package that extracts genes from
+multi-batch scRNA-seq experiments for downstream dataset integration.
+The goal is to select genes that carry high biological information and
+low technical noise between the batches. Those genes are extracted from
+gene pairs that have an invariant and extremely narrow or wide angle
+between their expression vectors. Conventionally, highly-variable genes
+(HVGs) or sometimes all genes are used for integration tasks (<a href="https://www.nature.com/articles/s41592-021-01336-8" class="external-link uri">https://www.nature.com/articles/s41592-021-01336-8</a>).
+While HVGs are a great and easy way to reduce the noise and
+dimensionality of the data, they are not optimal for integration tasks.
+HVGs are sensitive to batch effects because the variance is a function
+of both the technical and biological variance. anglemania improves
+conventional usage of HVGs for integration tasks, especially when the
+transcriptional difference between cell types or cell states is subtle
+(showcased here with de.facLoc set to 0.1 (= mild differences between
+“Groups”)). The package can be used on top of SingleCellExperiment or
+Seurat objects.</p>
+<p>Under the hood, anglemania works with file-backed big matrices (FBMs)
+from the bigstatsr package (<a href="https://github.com/privefl/bigstatsr/" class="external-link uri">https://github.com/privefl/bigstatsr/</a>) for fast and
+memory efficient computation.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RcppPlanc"</span>, repos <span class="op">=</span> <span class="st">"https://welch-lab.r-universe.dev"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Installing package into '/home/runner/work/_temp/Library'</span></span>
+<span><span class="co">## (as 'lib' is unspecified)</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># for LIGER integration, it as of now needs RcppPlanc</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioinformatics.mdc-berlin.de/anglemania" class="external-link">anglemania</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/splatter/" class="external-link">splatter</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/" class="external-link">scater</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MarioniLab/scran/" class="external-link">scran</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bluster</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://welch-lab.github.io/liger/" class="external-link">rliger</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">batchelor</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: replacing previous import 'S4Arrays::makeNindexFromArrayViewport' by</span></span>
-<span><span class="co">## 'DelayedArray::makeNindexFromArrayViewport' when loading 'SummarizedExperiment'</span></span></code></pre>
+</div>
 <div class="section level2">
-<h2 id="create-simulated-data">Create simulated data<a class="anchor" aria-label="anchor" href="#create-simulated-data"></a>
+<h2 id="create-simulated-data-with-mild-batch-effects-and-mild-differences-between-the-groupscell-types">Create simulated data with mild batch effects and mild differences
+between the groups/cell types<a class="anchor" aria-label="anchor" href="#create-simulated-data-with-mild-batch-effects-and-mild-differences-between-the-groupscell-types"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">batch.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.4</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">batch.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
 <span><span class="va">de.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
 <span><span class="va">nBatches</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">nGroups</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span><span class="va">nGenes</span> <span class="op">&lt;-</span> <span class="fl">5000</span></span>
-<span><span class="va">groupCells</span> <span class="op">&lt;-</span> <span class="fl">800</span></span>
+<span><span class="va">groupCells</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
 <span></span>
-<span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://oshlack.github.io/splatter/reference/splatSimulate.html" class="external-link">splatSimulate</a></span><span class="op">(</span></span>
-<span>    batchCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">300</span> <span class="op">*</span> <span class="va">nGroups</span>, <span class="va">nBatches</span><span class="op">)</span>,</span>
+<span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://oshlack.github.io/splatter/reference/splatSimulate.html" class="external-link">splatSimulate</a></span><span class="op">(</span></span>
+<span>    batchCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">groupCells</span> <span class="op">*</span> <span class="va">nGroups</span>, <span class="va">nBatches</span><span class="op">)</span>,</span>
 <span>    batch.facLoc <span class="op">=</span> <span class="va">batch.facLoc</span>,</span>
 <span>    group.prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">nGroups</span>, <span class="va">nGroups</span><span class="op">)</span>,</span>
 <span>    nGenes <span class="op">=</span> <span class="va">nGenes</span>,</span>
@@ -94,118 +154,107 @@
 <span>    method <span class="op">=</span> <span class="st">"groups"</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    out.prob    <span class="op">=</span> <span class="fl">0.001</span>,</span>
-<span>    de.prob     <span class="op">=</span> <span class="fl">0.1</span>, <span class="co"># mild </span></span>
+<span>    de.prob     <span class="op">=</span> <span class="fl">0.1</span>, <span class="co"># mild</span></span>
 <span>    de.facLoc   <span class="op">=</span> <span class="va">de.facLoc</span>,</span>
 <span>    de.facScale <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>    bcv.common  <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>    bcv.common  <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>    seed <span class="op">=</span> <span class="fl">42</span></span>
 <span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/CreateSeuratObject.html" class="external-link">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span>, meta.data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">colData</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Data is of class matrix. Coercing to dgCMatrix.</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
-<span><span class="va">se</span></span></code></pre></div>
-<pre><code><span><span class="co">## An object of class Seurat </span></span>
-<span><span class="co">## 5000 features across 3600 samples within 1 assay </span></span>
-<span><span class="co">## Active assay: RNA (5000 features, 0 variable features)</span></span>
-<span><span class="co">##  1 layer present: counts</span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">se</span><span class="op">[[</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##          orig.ident nCount_RNA nFeature_RNA  Cell  Batch  Group ExpLibSize</span></span>
-<span><span class="co">## Cell1 SeuratProject      81008         4004 Cell1 Batch1 Group2   80853.00</span></span>
-<span><span class="co">## Cell2 SeuratProject      43335         3625 Cell2 Batch1 Group3   43357.87</span></span>
-<span><span class="co">## Cell3 SeuratProject      61149         3859 Cell3 Batch1 Group2   61126.45</span></span>
-<span><span class="co">## Cell4 SeuratProject      53996         3763 Cell4 Batch1 Group1   53628.79</span></span>
-<span><span class="co">## Cell5 SeuratProject      66404         3881 Cell5 Batch1 Group1   65474.87</span></span>
-<span><span class="co">## Cell6 SeuratProject      57973         3842 Cell6 Batch1 Group3   57751.74</span></span></code></pre>
+<span><span class="va">sce</span></span></code></pre></div>
+<pre><code><span><span class="co">## class: SingleCellExperiment </span></span>
+<span><span class="co">## dim: 5000 3600 </span></span>
+<span><span class="co">## metadata(1): Params</span></span>
+<span><span class="co">## assays(6): BatchCellMeans BaseCellMeans ... TrueCounts counts</span></span>
+<span><span class="co">## rownames(5000): Gene1 Gene2 ... Gene4999 Gene5000</span></span>
+<span><span class="co">## rowData names(11): Gene BaseGeneMean ... DEFacGroup2 DEFacGroup3</span></span>
+<span><span class="co">## colnames(3600): Cell1 Cell2 ... Cell3599 Cell3600</span></span>
+<span><span class="co">## colData names(4): Cell Batch Group ExpLibSize</span></span>
+<span><span class="co">## reducedDimNames(0):</span></span>
+<span><span class="co">## mainExpName: NULL</span></span>
+<span><span class="co">## altExpNames(0):</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="unintegrated-data">unintegrated data<a class="anchor" aria-label="anchor" href="#unintegrated-data"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">se_unintegrated</span> <span class="op">&lt;-</span> <span class="va">se</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>  <span class="va">se_unintegrated</span> <span class="op">&lt;-</span> <span class="va">se_unintegrated</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://satijalab.org/seurat/reference/NormalizeData.html" class="external-link">NormalizeData</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html" class="external-link">FindVariableFeatures</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html" class="external-link">ScaleData</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html" class="external-link">RunPCA</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html" class="external-link">RunUMAP</a></span><span class="op">(</span>dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Normalizing layer: counts</span></span></code></pre>
-<pre><code><span><span class="co">## Finding variable features for layer counts</span></span></code></pre>
-<pre><code><span><span class="co">## Centering and scaling data matrix</span></span></code></pre>
-<pre><code><span><span class="co">## PC_ 1 </span></span>
-<span><span class="co">## Positive:  Gene4998, Gene1851, Gene1858, Gene1769, Gene4167, Gene4359, Gene3114, Gene1392, Gene906, Gene2555 </span></span>
-<span><span class="co">##     Gene1186, Gene2855, Gene4451, Gene329, Gene2316, Gene2668, Gene1276, Gene1192, Gene946, Gene3822 </span></span>
-<span><span class="co">##     Gene35, Gene3183, Gene3668, Gene4055, Gene3778, Gene2967, Gene3604, Gene1666, Gene80, Gene2950 </span></span>
-<span><span class="co">## Negative:  Gene1778, Gene4947, Gene3361, Gene2804, Gene3191, Gene3939, Gene3248, Gene2846, Gene4023, Gene2954 </span></span>
-<span><span class="co">##     Gene670, Gene1749, Gene1520, Gene2384, Gene543, Gene2777, Gene4148, Gene2684, Gene4012, Gene2408 </span></span>
-<span><span class="co">##     Gene4822, Gene805, Gene4522, Gene4760, Gene475, Gene4756, Gene4161, Gene4226, Gene2347, Gene736 </span></span>
-<span><span class="co">## PC_ 2 </span></span>
-<span><span class="co">## Positive:  Gene4898, Gene3827, Gene2969, Gene4182, Gene4812, Gene4914, Gene4247, Gene950, Gene811, Gene280 </span></span>
-<span><span class="co">##     Gene4844, Gene1746, Gene3652, Gene3144, Gene4773, Gene4852, Gene1929, Gene1021, Gene2554, Gene3403 </span></span>
-<span><span class="co">##     Gene1268, Gene254, Gene915, Gene938, Gene2843, Gene4489, Gene709, Gene4074, Gene4667, Gene2103 </span></span>
-<span><span class="co">## Negative:  Gene4768, Gene2483, Gene2444, Gene1171, Gene448, Gene575, Gene3564, Gene2433, Gene351, Gene912 </span></span>
-<span><span class="co">##     Gene1870, Gene3060, Gene2568, Gene4128, Gene1786, Gene2891, Gene4209, Gene4637, Gene297, Gene2010 </span></span>
-<span><span class="co">##     Gene787, Gene492, Gene3687, Gene4718, Gene3262, Gene1657, Gene1493, Gene2031, Gene4101, Gene4740 </span></span>
-<span><span class="co">## PC_ 3 </span></span>
-<span><span class="co">## Positive:  Gene267, Gene1099, Gene1610, Gene505, Gene471, Gene4737, Gene4440, Gene4515, Gene4485, Gene3812 </span></span>
-<span><span class="co">##     Gene2434, Gene1179, Gene2501, Gene3619, Gene4586, Gene4343, Gene4125, Gene4879, Gene3772, Gene4654 </span></span>
-<span><span class="co">##     Gene3567, Gene3889, Gene1562, Gene19, Gene3077, Gene4830, Gene2132, Gene3466, Gene3294, Gene4287 </span></span>
-<span><span class="co">## Negative:  Gene463, Gene3025, Gene2894, Gene444, Gene840, Gene95, Gene816, Gene4617, Gene3813, Gene4709 </span></span>
-<span><span class="co">##     Gene101, Gene1699, Gene3385, Gene3369, Gene2122, Gene4376, Gene1006, Gene1685, Gene3846, Gene4490 </span></span>
-<span><span class="co">##     Gene1590, Gene2521, Gene4858, Gene4463, Gene2239, Gene274, Gene4673, Gene289, Gene3068, Gene3290 </span></span>
-<span><span class="co">## PC_ 4 </span></span>
-<span><span class="co">## Positive:  Gene1312, Gene4793, Gene1488, Gene2650, Gene389, Gene1558, Gene1133, Gene793, Gene4895, Gene1582 </span></span>
-<span><span class="co">##     Gene4231, Gene4586, Gene1782, Gene3570, Gene471, Gene554, Gene463, Gene2214, Gene1147, Gene2496 </span></span>
-<span><span class="co">##     Gene3077, Gene4490, Gene2761, Gene3462, Gene3141, Gene2312, Gene3827, Gene9, Gene533, Gene4890 </span></span>
-<span><span class="co">## Negative:  Gene345, Gene361, Gene670, Gene470, Gene4238, Gene4869, Gene2382, Gene4738, Gene4661, Gene816 </span></span>
-<span><span class="co">##     Gene645, Gene2552, Gene2521, Gene128, Gene2842, Gene23, Gene4363, Gene4445, Gene2245, Gene1340 </span></span>
-<span><span class="co">##     Gene3183, Gene1464, Gene1843, Gene3168, Gene564, Gene1419, Gene280, Gene4215, Gene4205, Gene2573 </span></span>
-<span><span class="co">## PC_ 5 </span></span>
-<span><span class="co">## Positive:  Gene816, Gene4403, Gene3168, Gene4299, Gene4969, Gene1651, Gene3618, Gene2512, Gene4616, Gene1419 </span></span>
-<span><span class="co">##     Gene4350, Gene777, Gene4388, Gene634, Gene2354, Gene4509, Gene4231, Gene35, Gene3992, Gene2842 </span></span>
-<span><span class="co">##     Gene2936, Gene2282, Gene3846, Gene4982, Gene1236, Gene3676, Gene1768, Gene350, Gene2434, Gene1659 </span></span>
-<span><span class="co">## Negative:  Gene4586, Gene1851, Gene4797, Gene265, Gene4014, Gene920, Gene4574, Gene3377, Gene3570, Gene3141 </span></span>
-<span><span class="co">##     Gene2985, Gene2687, Gene3077, Gene1052, Gene3567, Gene463, Gene584, Gene3328, Gene2860, Gene4407 </span></span>
-<span><span class="co">##     Gene3493, Gene3228, Gene1647, Gene1160, Gene337, Gene1312, Gene1921, Gene3462, Gene3564, Gene4065</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">se_unintegrated</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="va">sce</span></span>
+<span><span class="co"># Normalization.</span></span>
+<span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/logNormCounts.html" class="external-link">logNormCounts</a></span><span class="op">(</span><span class="va">sce_unintegrated</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Feature selection.</span></span>
+<span><span class="va">dec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html" class="external-link">modelGeneVar</a></span><span class="op">(</span><span class="va">sce_unintegrated</span><span class="op">)</span></span>
+<span><span class="va">hvg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/getTopHVGs.html" class="external-link">getTopHVGs</a></span><span class="op">(</span><span class="va">dec</span>, prop <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># PCA.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">runPCA</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, ncomponents <span class="op">=</span> <span class="fl">50</span>, subset_row <span class="op">=</span> <span class="va">hvg</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Clustering.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/colLabels.html" class="external-link">colLabels</a></span><span class="op">(</span><span class="va">sce_unintegrated</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/clusterCells.html" class="external-link">clusterCells</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>,</span>
+<span>  use.dimred <span class="op">=</span> <span class="st">"PCA"</span>,</span>
+<span>  BLUSPARAM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/bluster/man/NNGraphParam-class.html" class="external-link">NNGraphParam</a></span><span class="op">(</span>cluster.fun <span class="op">=</span> <span class="st">"louvain"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Visualization.</span></span>
+<span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html" class="external-link">runUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, dimred <span class="op">=</span> <span class="st">"PCA"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">se_unintegrated</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-1-2.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="run-anglemania">run anglemania<a class="anchor" aria-label="anchor" href="#run-anglemania"></a>
 </h2>
 <div class="section level3">
-<h3 id="create-anglem-object">create anglem object<a class="anchor" aria-label="anchor" href="#create-anglem-object"></a>
+<h3 id="create-anglemania-object">create anglemania object<a class="anchor" aria-label="anchor" href="#create-anglemania-object"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">se</span><span class="op">[[</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##          orig.ident nCount_RNA nFeature_RNA  Cell  Batch  Group ExpLibSize</span></span>
-<span><span class="co">## Cell1 SeuratProject      81008         4004 Cell1 Batch1 Group2   80853.00</span></span>
-<span><span class="co">## Cell2 SeuratProject      43335         3625 Cell2 Batch1 Group3   43357.87</span></span>
-<span><span class="co">## Cell3 SeuratProject      61149         3859 Cell3 Batch1 Group2   61126.45</span></span>
-<span><span class="co">## Cell4 SeuratProject      53996         3763 Cell4 Batch1 Group1   53628.79</span></span>
-<span><span class="co">## Cell5 SeuratProject      66404         3881 Cell5 Batch1 Group1   65474.87</span></span>
-<span><span class="co">## Cell6 SeuratProject      57973         3842 Cell6 Batch1 Group3   57751.74</span></span></code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<ul>
+<li>We create an anglemania object to have a standardized input to the
+anglemania function
+<ul>
+<li>It can be created from:
+<ul>
+<li>An SingleCellExperiment (SCE) object</li>
+<li>Seurat object</li>
+<li>a list of SCE and/or Seurat objects</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>pre-requisites are that you:
+<ul>
+<li>have a column in the metadata (colData for SCE) that specifies the
+batch/sample a cell belongs to</li>
+<li>or if you pass a list of SCE/Seurat objects, just provide this as
+the input and don’t specify a batch key</li>
+</ul>
+</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## DataFrame with 6 rows and 4 columns</span></span>
+<span><span class="co">##              Cell       Batch    Group ExpLibSize</span></span>
+<span><span class="co">##       &lt;character&gt; &lt;character&gt; &lt;factor&gt;  &lt;numeric&gt;</span></span>
+<span><span class="co">## Cell1       Cell1      Batch1   Group1    46898.1</span></span>
+<span><span class="co">## Cell2       Cell2      Batch1   Group1    54688.2</span></span>
+<span><span class="co">## Cell3       Cell3      Batch1   Group2    52027.9</span></span>
+<span><span class="co">## Cell4       Cell4      Batch1   Group1    52319.5</span></span>
+<span><span class="co">## Cell5       Cell5      Batch1   Group3    37774.7</span></span>
+<span><span class="co">## Cell6       Cell6      Batch1   Group3    58112.3</span></span></code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"Batch"</span></span>
-<span></span>
-<span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">se</span>,</span>
-<span>  batch_key <span class="op">=</span> <span class="va">batch_key</span>,</span>
-<span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span></span>
+<span>  <span class="va">sce</span>,</span>
+<span>  batch_key <span class="op">=</span> <span class="va">batch_key</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## No dataset_key specified.</span></span>
 <span><span class="co">## Assuming that all samples belong to the same dataset and are separated by batch_key: Batch</span></span></code></pre>
 <pre><code><span><span class="co">## Extracting count matrices...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering each batch to at least 1 cells per gene...</span></span></code></pre>
 <pre><code><span><span class="co">## Using the intersection of filtered genes from all batches...</span></span></code></pre>
-<pre><code><span><span class="co">## Number of genes in intersected set: 4958</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Number of genes in intersected set: 4970</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span></span></code></pre></div>
 <pre><code><span><span class="co">## anglemania_object</span></span>
 <span><span class="co">## --------------</span></span>
@@ -215,15 +264,41 @@
 <span><span class="co">## Total number of batches: 4 </span></span>
 <span><span class="co">## Batches (showing first 5):</span></span>
 <span><span class="co">## Batch1, Batch2, Batch3, Batch4 </span></span>
-<span><span class="co">## Number of intersected genes: 4958 </span></span>
+<span><span class="co">## Number of intersected genes: 4970 </span></span>
 <span><span class="co">## Intersected genes (showing first 10):</span></span>
 <span><span class="co">## Gene1, Gene2, Gene3, Gene4, Gene5, Gene6, Gene7, Gene8, Gene9, Gene10 , ...</span></span>
 <span><span class="co">## Min cells per gene: 1</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="run-anglemania-1">run anglemania<a class="anchor" aria-label="anchor" href="#run-anglemania-1"></a>
+<h3 id="run-anglemania-function">run anglemania function<a class="anchor" aria-label="anchor" href="#run-anglemania-function"></a>
 </h3>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<ul>
+<li>the anglemania function has five arguments
+<ul>
+<li>the input anglemania object</li>
+<li>method: either cosine, spearman or diem
+<ul>
+<li>this is the method by which the relationship of the gene pairs is
+measured. Default is cosine, which is the cosine similarity between the
+expression vectors of the gene pairs.</li>
+</ul>
+</li>
+<li>zscore_mean_threshold: We compute a mean of the zscore of the
+relationship between a gene pair, and then we set a minimal cutoff for
+the (absolute) mean zscore. A cutoff of 2 means that the filtered gene
+pairs have a relationship, e.g. cosine similarity, that is 2 standard
+deviations away from the mean of all cosine similarities from this
+dataset. A higher value means a more stringent cutoff.</li>
+<li>zscore_sn_threshold: The SN or signal-to-noise ratio measures the
+invariance of the relationship of the relationship between the gene
+pair. A high SN ratio means that the relationship is constant over
+multiple batches.</li>
+<li>max_n_genes: you can specify a maximum number of extracted genes.
+They are sorted by decreasing mean zscore</li>
+</ul>
+</li>
+</ul>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -235,130 +310,323 @@
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating sds...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
+<pre><code><span><span class="co">## [1] "Selected 1698 genes for integration."</span></span></code></pre>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># If you think the number of selected genes is too high or low you can adjust the thresholds:</span></span>
+<span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>                     zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
-<span><span class="co"># Inspect the anglemania genes</span></span>
+<span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "Selected 348 genes for integration."</span></span></code></pre>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Inspect the anglemania genes</span></span>
 <span><span class="va">integration_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "Gene816"  "Gene4124" "Gene4586" "Gene4679" "Gene1921" "Gene680"</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] "Gene71"   "Gene3527" "Gene2470" "Gene4030" "Gene355"  "Gene394"</span></span></code></pre>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 291</span></span></code></pre>
-</div>
-<div class="section level3">
-<h3 id="integration">integration<a class="anchor" aria-label="anchor" href="#integration"></a>
-</h3>
+<pre><code><span><span class="co">## [1] 348</span></span></code></pre>
 <ul>
-<li>we implemented the easy-to-use integrate_by_features() function from
-the anglemania package which uses Seurat CCA integration</li>
-<li>you can also just use the anglemania genes for other integration
-algorithms</li>
+<li>We use LIGER <a href="https://github.com/welch-lab/liger" class="external-link uri">https://github.com/welch-lab/liger</a>, <a href="https://www.nature.com/articles/s41596-020-0391-8" class="external-link uri">https://www.nature.com/articles/s41596-020-0391-8</a> and
+fastMNN <a href="https://rdrr.io/github/LTLA/batchelor/" class="external-link uri">https://rdrr.io/github/LTLA/batchelor/</a>, <a href="https://www.nature.com/articles/nbt.4091" class="external-link uri">https://www.nature.com/articles/nbt.4091</a> and compare the
+results when we use HVGs and anglemania genes as the input</li>
 </ul>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># if the Seurat FindIntegrationAnchors() function does not work,</span></span>
-<span><span class="co"># change this to the specified size:</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">4000</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>  <span class="va">seurat_integrated_angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/integrate_by_features.html">integrate_by_features</a></span><span class="op">(</span><span class="va">se</span>,</span>
-<span>    <span class="va">angl</span>,</span>
-<span>    process <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Log normalizing data...</span></span></code></pre>
-<pre><code><span><span class="co">## Finding integration anchors...</span></span></code></pre>
-<pre><code><span><span class="co">## Integrating samples...</span></span></code></pre>
-<pre><code><span><span class="co">## Running PCA with 30 PCs</span></span></code></pre>
-<pre><code><span><span class="co">## Running UMAP with 30 PCs and 30 neighbors</span></span></code></pre>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seurat_integrated_angl</span></span></code></pre></div>
-<pre><code><span><span class="co">## An object of class Seurat </span></span>
-<span><span class="co">## 5291 features across 3600 samples within 2 assays </span></span>
-<span><span class="co">## Active assay: integrated (291 features, 291 variable features)</span></span>
-<span><span class="co">##  2 layers present: data, scale.data</span></span>
-<span><span class="co">##  1 other assay present: RNA</span></span>
-<span><span class="co">##  2 dimensional reductions calculated: pca, umap</span></span></code></pre>
-</div>
-<div class="section level3">
-<h3 id="plot-integration">plot integration<a class="anchor" aria-label="anchor" href="#plot-integration"></a>
-</h3>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_angl</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_angl</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="comparison-to-using-hvgs">Comparison to using HVGs<a class="anchor" aria-label="anchor" href="#comparison-to-using-hvgs"></a>
+<h2 id="liger-integration">Liger integration<a class="anchor" aria-label="anchor" href="#liger-integration"></a>
 </h2>
 <div class="section level3">
-<h3 id="get-hvgs">get HVGs<a class="anchor" aria-label="anchor" href="#get-hvgs"></a>
+<h3 id="hvgs">HVGs<a class="anchor" aria-label="anchor" href="#hvgs"></a>
 </h3>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">se_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SplitObject.html" class="external-link">SplitObject</a></span><span class="op">(</span><span class="va">se</span>, split.by <span class="op">=</span> <span class="va">batch_key</span><span class="op">)</span></span>
-<span><span class="va">se_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">se_list</span>, <span class="va">NormalizeData</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Normalizing layer: counts</span></span>
-<span><span class="co">## Normalizing layer: counts</span></span>
-<span><span class="co">## Normalizing layer: counts</span></span>
-<span><span class="co">## Normalizing layer: counts</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># anglemania chose only 291 genes based on the thresholds</span></span>
-<span><span class="co">#   to make it comparable we only choose 300 highly variable genes:</span></span>
-<span><span class="va">hvg_features</span> <span class="op">&lt;-</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/SelectIntegrationFeatures.html" class="external-link">SelectIntegrationFeatures</a></span><span class="op">(</span><span class="va">se_list</span>, nfeatures <span class="op">=</span> <span class="fl">300</span><span class="op">)</span> </span></code></pre></div>
-<pre><code><span><span class="co">## No variable features found for object1 in the object.list. Running FindVariableFeatures ...</span></span></code></pre>
-<pre><code><span><span class="co">## Finding variable features for layer counts</span></span></code></pre>
-<pre><code><span><span class="co">## No variable features found for object2 in the object.list. Running FindVariableFeatures ...</span></span></code></pre>
-<pre><code><span><span class="co">## Finding variable features for layer counts</span></span></code></pre>
-<pre><code><span><span class="co">## No variable features found for object3 in the object.list. Running FindVariableFeatures ...</span></span></code></pre>
-<pre><code><span><span class="co">## Finding variable features for layer counts</span></span></code></pre>
-<pre><code><span><span class="co">## No variable features found for object4 in the object.list. Running FindVariableFeatures ...</span></span></code></pre>
-<pre><code><span><span class="co">## Finding variable features for layer counts</span></span></code></pre>
+<div class="section level4">
+<h4 id="low-number-of-hvgs">low number of HVGs<a class="anchor" aria-label="anchor" href="#low-number-of-hvgs"></a>
+</h4>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Finally 490 shared variable features are selected.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Generating UMAP on unaligned cell factor loadings</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Generating UMAP on unaligned cell factor loadings ... done</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> <span style="color: #00BB00;">DimRed</span> <span style="color: #0000BB;">"UMAP"</span> is now set as default.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .check_reddim_names(x, value, withDimnames): non-NULL 'rownames(value)' should be the same as 'colnames(x)' for</span></span>
+<span><span class="co">## 'reducedDim&lt;-'. This will be an error in the next release of</span></span>
+<span><span class="co">## Bioconductor.</span></span></code></pre>
+</div>
+<div class="section level4">
+<h4 id="hvgs-1">2000 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-1"></a>
+</h4>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Finally 2598 shared variable features are selected.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Generating UMAP on unaligned cell factor loadings</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Generating UMAP on unaligned cell factor loadings ... done</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> <span style="color: #00BB00;">DimRed</span> <span style="color: #0000BB;">"UMAP"</span> is now set as default.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .check_reddim_names(x, value, withDimnames): non-NULL 'rownames(value)' should be the same as 'colnames(x)' for</span></span>
+<span><span class="co">## 'reducedDim&lt;-'. This will be an error in the next release of</span></span>
+<span><span class="co">## Bioconductor.</span></span></code></pre>
+</div>
 </div>
 <div class="section level3">
-<h3 id="integration-1">integration<a class="anchor" aria-label="anchor" href="#integration-1"></a>
+<h3 id="anglemania">anglemania<a class="anchor" aria-label="anchor" href="#anglemania"></a>
 </h3>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>  <span class="va">seurat_integrated_hvg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/integrate_seurat_list.html">integrate_seurat_list</a></span><span class="op">(</span><span class="va">se_list</span>,</span>
-<span>    features <span class="op">=</span> <span class="va">hvg_features</span>,</span>
-<span>    process <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Log normalizing data...</span></span></code></pre>
-<pre><code><span><span class="co">## Finding integration anchors...</span></span></code></pre>
-<pre><code><span><span class="co">## Integrating samples...</span></span></code></pre>
-<pre><code><span><span class="co">## Running PCA with 30 PCs</span></span></code></pre>
-<pre><code><span><span class="co">## Running UMAP with 30 PCs and 30 neighbors</span></span></code></pre>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seurat_integrated_hvg</span></span></code></pre></div>
-<pre><code><span><span class="co">## An object of class Seurat </span></span>
-<span><span class="co">## 5300 features across 3600 samples within 2 assays </span></span>
-<span><span class="co">## Active assay: integrated (300 features, 300 variable features)</span></span>
-<span><span class="co">##  2 layers present: data, scale.data</span></span>
-<span><span class="co">##  1 other assay present: RNA</span></span>
-<span><span class="co">##  2 dimensional reductions calculated: pca, umap</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Generating UMAP on unaligned cell factor loadings</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Generating UMAP on unaligned cell factor loadings ... done</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> <span style="color: #00BB00;">DimRed</span> <span style="color: #0000BB;">"UMAP"</span> is now set as default.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .check_reddim_names(x, value, withDimnames): non-NULL 'rownames(value)' should be the same as 'colnames(x)' for</span></span>
+<span><span class="co">## 'reducedDim&lt;-'. This will be an error in the next release of</span></span>
+<span><span class="co">## Bioconductor.</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="plot-integration-1">plot integration<a class="anchor" aria-label="anchor" href="#plot-integration-1"></a>
+<h3 id="plot">Plot<a class="anchor" aria-label="anchor" href="#plot"></a>
 </h3>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 320 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_hvg</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 320 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_hvg</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 2000 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-3.png" width="700"></p>
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 2000 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-4.png" width="700"></p>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using anglemania genes, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-5.png" width="700"></p>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using anglemania genes, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-6.png" width="700"></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="mnn-integration">MNN integration<a class="anchor" aria-label="anchor" href="#mnn-integration"></a>
+</h2>
+<div class="section level3">
+<h3 id="hvgs-2">HVGs<a class="anchor" aria-label="anchor" href="#hvgs-2"></a>
+</h3>
+<div class="section level4">
+<h4 id="hvgs-3">320 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-3"></a>
+</h4>
+</div>
+<div class="section level4">
+<h4 id="hvgs-4">2000 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-4"></a>
+</h4>
+</div>
+</div>
+<div class="section level3">
+<h3 id="anglemania-1">anglemania<a class="anchor" aria-label="anchor" href="#anglemania-1"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="plot-1">Plot<a class="anchor" aria-label="anchor" href="#plot-1"></a>
+</h3>
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-3.png" width="700"></p>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-4.png" width="700"></p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using anglemania genes, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-5.png" width="700"></p>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using anglemania genes, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-6.png" width="700"></p>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.4.2 (2024-10-31)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.1 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
 <span><span class="co">##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -374,82 +642,124 @@ algorithms</li>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] splatter_1.30.0             SingleCellExperiment_1.28.1</span></span>
-<span><span class="co">##  [3] SummarizedExperiment_1.36.0 Biobase_2.66.0             </span></span>
-<span><span class="co">##  [5] GenomicRanges_1.58.0        GenomeInfoDb_1.42.1        </span></span>
-<span><span class="co">##  [7] IRanges_2.40.0              S4Vectors_0.44.0           </span></span>
-<span><span class="co">##  [9] BiocGenerics_0.52.0         MatrixGenerics_1.18.0      </span></span>
-<span><span class="co">## [11] matrixStats_1.4.1           Seurat_5.1.0               </span></span>
-<span><span class="co">## [13] SeuratObject_5.0.2          sp_2.1-4                   </span></span>
-<span><span class="co">## [15] dplyr_1.1.4                 anglemania_0.99.0          </span></span>
+<span><span class="co">##  [1] batchelor_1.22.0            rliger_2.1.0               </span></span>
+<span><span class="co">##  [3] bluster_1.16.0              scran_1.34.0               </span></span>
+<span><span class="co">##  [5] scater_1.34.0               ggplot2_3.5.1              </span></span>
+<span><span class="co">##  [7] scuttle_1.16.0              splatter_1.30.0            </span></span>
+<span><span class="co">##  [9] SingleCellExperiment_1.28.1 SummarizedExperiment_1.36.0</span></span>
+<span><span class="co">## [11] Biobase_2.66.0              GenomicRanges_1.58.0       </span></span>
+<span><span class="co">## [13] GenomeInfoDb_1.42.3         IRanges_2.40.1             </span></span>
+<span><span class="co">## [15] S4Vectors_0.44.0            BiocGenerics_0.52.0        </span></span>
+<span><span class="co">## [17] MatrixGenerics_1.18.1       matrixStats_1.5.0          </span></span>
+<span><span class="co">## [19] Seurat_5.2.1                SeuratObject_5.0.2         </span></span>
+<span><span class="co">## [21] sp_2.2-0                    dplyr_1.1.4                </span></span>
+<span><span class="co">## [23] anglemania_0.99.0          </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] RcppAnnoy_0.0.22        splines_4.4.2           later_1.4.1            </span></span>
-<span><span class="co">##   [4] tibble_3.2.1            polyclip_1.10-7         fastDummies_1.7.4      </span></span>
-<span><span class="co">##   [7] lifecycle_1.0.4         doParallel_1.0.17       globals_0.16.3         </span></span>
-<span><span class="co">##  [10] lattice_0.22-6          MASS_7.3-61             backports_1.5.0        </span></span>
-<span><span class="co">##  [13] magrittr_2.0.3          plotly_4.10.4           sass_0.4.9             </span></span>
-<span><span class="co">##  [16] rmarkdown_2.29          jquerylib_0.1.4         yaml_2.3.10            </span></span>
-<span><span class="co">##  [19] bigparallelr_0.3.2      httpuv_1.6.15           sctransform_0.4.1      </span></span>
-<span><span class="co">##  [22] spam_2.11-0             spatstat.sparse_3.1-0   reticulate_1.40.0      </span></span>
-<span><span class="co">##  [25] cowplot_1.1.3           pbapply_1.7-2           RColorBrewer_1.1-3     </span></span>
-<span><span class="co">##  [28] abind_1.4-8             zlibbioc_1.52.0         Rtsne_0.17             </span></span>
-<span><span class="co">##  [31] purrr_1.0.2             bigassertr_0.1.6        GenomeInfoDbData_1.2.13</span></span>
-<span><span class="co">##  [34] ggrepel_0.9.6           irlba_2.3.5.1           listenv_0.9.1          </span></span>
-<span><span class="co">##  [37] spatstat.utils_3.1-1    goftest_1.2-3           RSpectra_0.16-2        </span></span>
-<span><span class="co">##  [40] spatstat.random_3.3-2   fitdistrplus_1.2-1      parallelly_1.39.0      </span></span>
-<span><span class="co">##  [43] pkgdown_2.1.1           leiden_0.4.3.1          codetools_0.2-20       </span></span>
-<span><span class="co">##  [46] DelayedArray_0.32.0     tidyselect_1.2.1        UCSC.utils_1.2.0       </span></span>
-<span><span class="co">##  [49] farver_2.1.2            bigstatsr_1.6.1         spatstat.explore_3.3-3 </span></span>
-<span><span class="co">##  [52] flock_0.7               jsonlite_1.8.9          progressr_0.15.1       </span></span>
-<span><span class="co">##  [55] ggridges_0.5.6          survival_3.7-0          iterators_1.0.14       </span></span>
-<span><span class="co">##  [58] systemfonts_1.1.0       foreach_1.5.2           tools_4.4.2            </span></span>
-<span><span class="co">##  [61] ragg_1.3.3              ica_1.0-3               Rcpp_1.0.13-1          </span></span>
-<span><span class="co">##  [64] glue_1.8.0              gridExtra_2.3           SparseArray_1.6.0      </span></span>
-<span><span class="co">##  [67] xfun_0.49               withr_3.0.2             fastmap_1.2.0          </span></span>
-<span><span class="co">##  [70] fansi_1.0.6             digest_0.6.37           R6_2.5.1               </span></span>
-<span><span class="co">##  [73] mime_0.12               textshaping_0.4.0       colorspace_2.1-1       </span></span>
-<span><span class="co">##  [76] scattermore_1.2         tensor_1.5              spatstat.data_3.1-4    </span></span>
-<span><span class="co">##  [79] utf8_1.2.4              tidyr_1.3.1             generics_0.1.3         </span></span>
-<span><span class="co">##  [82] data.table_1.16.2       httr_1.4.7              htmlwidgets_1.6.4      </span></span>
-<span><span class="co">##  [85] S4Arrays_1.6.0          uwot_0.2.2              pkgconfig_2.0.3        </span></span>
-<span><span class="co">##  [88] gtable_0.3.6            lmtest_0.9-40           XVector_0.46.0         </span></span>
-<span><span class="co">##  [91] htmltools_0.5.8.1       dotCall64_1.2           scales_1.3.0           </span></span>
-<span><span class="co">##  [94] png_0.1-8               spatstat.univar_3.1-1   knitr_1.49             </span></span>
-<span><span class="co">##  [97] reshape2_1.4.4          checkmate_2.3.2         nlme_3.1-166           </span></span>
-<span><span class="co">## [100] cachem_1.1.0            zoo_1.8-12              stringr_1.5.1          </span></span>
-<span><span class="co">## [103] rmio_0.4.0              KernSmooth_2.23-24      parallel_4.4.2         </span></span>
-<span><span class="co">## [106] miniUI_0.1.1.1          desc_1.4.3              pillar_1.9.0           </span></span>
-<span><span class="co">## [109] grid_4.4.2              vctrs_0.6.5             RANN_2.6.2             </span></span>
-<span><span class="co">## [112] promises_1.3.2          ff_4.5.0                xtable_1.8-4           </span></span>
-<span><span class="co">## [115] cluster_2.1.6           evaluate_1.0.1          cli_3.6.3              </span></span>
-<span><span class="co">## [118] locfit_1.5-9.10         compiler_4.4.2          rlang_1.1.4            </span></span>
-<span><span class="co">## [121] crayon_1.5.3            future.apply_1.11.3     labeling_0.4.3         </span></span>
-<span><span class="co">## [124] ps_1.8.1                plyr_1.8.9              fs_1.6.5               </span></span>
-<span><span class="co">## [127] stringi_1.8.4           viridisLite_0.4.2       deldir_2.0-4           </span></span>
-<span><span class="co">## [130] BiocParallel_1.40.0     munsell_0.5.1           lazyeval_0.2.2         </span></span>
-<span><span class="co">## [133] spatstat.geom_3.3-4     Matrix_1.7-1            RcppHNSW_0.6.0         </span></span>
-<span><span class="co">## [136] patchwork_1.3.0         future_1.34.0           ggplot2_3.5.1          </span></span>
-<span><span class="co">## [139] shiny_1.9.1             ROCR_1.0-11             igraph_2.1.1           </span></span>
-<span><span class="co">## [142] bslib_0.8.0             bit_4.5.0</span></span></code></pre>
+<span><span class="co">##   [1] RcppAnnoy_0.0.22          splines_4.4.2            </span></span>
+<span><span class="co">##   [3] later_1.4.1               tibble_3.2.1             </span></span>
+<span><span class="co">##   [5] polyclip_1.10-7           fastDummies_1.7.5        </span></span>
+<span><span class="co">##   [7] lifecycle_1.0.4           edgeR_4.4.2              </span></span>
+<span><span class="co">##   [9] doParallel_1.0.17         globals_0.16.3           </span></span>
+<span><span class="co">##  [11] lattice_0.22-6            MASS_7.3-61              </span></span>
+<span><span class="co">##  [13] backports_1.5.0           magrittr_2.0.3           </span></span>
+<span><span class="co">##  [15] limma_3.62.2              plotly_4.10.4            </span></span>
+<span><span class="co">##  [17] sass_0.4.9                rmarkdown_2.29           </span></span>
+<span><span class="co">##  [19] jquerylib_0.1.4           yaml_2.3.10              </span></span>
+<span><span class="co">##  [21] bigparallelr_0.3.2        metapod_1.14.0           </span></span>
+<span><span class="co">##  [23] httpuv_1.6.15             sctransform_0.4.1        </span></span>
+<span><span class="co">##  [25] spam_2.11-1               spatstat.sparse_3.1-0    </span></span>
+<span><span class="co">##  [27] reticulate_1.40.0         cowplot_1.1.3            </span></span>
+<span><span class="co">##  [29] pbapply_1.7-2             RColorBrewer_1.1-3       </span></span>
+<span><span class="co">##  [31] ResidualMatrix_1.16.0     abind_1.4-8              </span></span>
+<span><span class="co">##  [33] zlibbioc_1.52.0           Rtsne_0.17               </span></span>
+<span><span class="co">##  [35] purrr_1.0.4               bigassertr_0.1.6         </span></span>
+<span><span class="co">##  [37] GenomeInfoDbData_1.2.13   ggrepel_0.9.6            </span></span>
+<span><span class="co">##  [39] irlba_2.3.5.1             listenv_0.9.1            </span></span>
+<span><span class="co">##  [41] spatstat.utils_3.1-2      goftest_1.2-3            </span></span>
+<span><span class="co">##  [43] RSpectra_0.16-2           dqrng_0.4.1              </span></span>
+<span><span class="co">##  [45] spatstat.random_3.3-2     fitdistrplus_1.2-2       </span></span>
+<span><span class="co">##  [47] parallelly_1.42.0         DelayedMatrixStats_1.28.1</span></span>
+<span><span class="co">##  [49] pkgdown_2.1.1             codetools_0.2-20         </span></span>
+<span><span class="co">##  [51] DelayedArray_0.32.0       tidyselect_1.2.1         </span></span>
+<span><span class="co">##  [53] UCSC.utils_1.2.0          farver_2.1.2             </span></span>
+<span><span class="co">##  [55] viridis_0.6.5             ScaledMatrix_1.14.0      </span></span>
+<span><span class="co">##  [57] bigstatsr_1.6.1           spatstat.explore_3.3-4   </span></span>
+<span><span class="co">##  [59] flock_0.7                 jsonlite_1.8.9           </span></span>
+<span><span class="co">##  [61] BiocNeighbors_2.0.1       progressr_0.15.1         </span></span>
+<span><span class="co">##  [63] ggridges_0.5.6            survival_3.7-0           </span></span>
+<span><span class="co">##  [65] iterators_1.0.14          systemfonts_1.2.1        </span></span>
+<span><span class="co">##  [67] foreach_1.5.2             tools_4.4.2              </span></span>
+<span><span class="co">##  [69] ragg_1.3.3                ica_1.0-3                </span></span>
+<span><span class="co">##  [71] Rcpp_1.0.14               glue_1.8.0               </span></span>
+<span><span class="co">##  [73] gridExtra_2.3             SparseArray_1.6.1        </span></span>
+<span><span class="co">##  [75] xfun_0.50                 withr_3.0.2              </span></span>
+<span><span class="co">##  [77] fastmap_1.2.0             rsvd_1.0.5               </span></span>
+<span><span class="co">##  [79] digest_0.6.37             R6_2.5.1                 </span></span>
+<span><span class="co">##  [81] mime_0.12                 textshaping_1.0.0        </span></span>
+<span><span class="co">##  [83] colorspace_2.1-1          scattermore_1.2          </span></span>
+<span><span class="co">##  [85] tensor_1.5                spatstat.data_3.1-4      </span></span>
+<span><span class="co">##  [87] tidyr_1.3.1               generics_0.1.3           </span></span>
+<span><span class="co">##  [89] data.table_1.16.4         FNN_1.1.4.1              </span></span>
+<span><span class="co">##  [91] httr_1.4.7                htmlwidgets_1.6.4        </span></span>
+<span><span class="co">##  [93] S4Arrays_1.6.0            uwot_0.2.2               </span></span>
+<span><span class="co">##  [95] pkgconfig_2.0.3           gtable_0.3.6             </span></span>
+<span><span class="co">##  [97] lmtest_0.9-40             XVector_0.46.0           </span></span>
+<span><span class="co">##  [99] htmltools_0.5.8.1         dotCall64_1.2            </span></span>
+<span><span class="co">## [101] scales_1.3.0              png_0.1-8                </span></span>
+<span><span class="co">## [103] spatstat.univar_3.1-1     knitr_1.49               </span></span>
+<span><span class="co">## [105] reshape2_1.4.4            checkmate_2.3.2          </span></span>
+<span><span class="co">## [107] nlme_3.1-166              cachem_1.1.0             </span></span>
+<span><span class="co">## [109] zoo_1.8-12                stringr_1.5.1            </span></span>
+<span><span class="co">## [111] rmio_0.4.0                KernSmooth_2.23-24       </span></span>
+<span><span class="co">## [113] vipor_0.4.7               parallel_4.4.2           </span></span>
+<span><span class="co">## [115] miniUI_0.1.1.1            desc_1.4.3               </span></span>
+<span><span class="co">## [117] pillar_1.10.1             grid_4.4.2               </span></span>
+<span><span class="co">## [119] vctrs_0.6.5               RANN_2.6.2               </span></span>
+<span><span class="co">## [121] promises_1.3.2            BiocSingular_1.22.0      </span></span>
+<span><span class="co">## [123] ff_4.5.2                  beachmat_2.22.0          </span></span>
+<span><span class="co">## [125] xtable_1.8-4              cluster_2.1.6            </span></span>
+<span><span class="co">## [127] beeswarm_0.4.0            evaluate_1.0.3           </span></span>
+<span><span class="co">## [129] cli_3.6.3                 locfit_1.5-9.11          </span></span>
+<span><span class="co">## [131] compiler_4.4.2            rlang_1.1.5              </span></span>
+<span><span class="co">## [133] crayon_1.5.3              future.apply_1.11.3      </span></span>
+<span><span class="co">## [135] labeling_0.4.3            ps_1.8.1                 </span></span>
+<span><span class="co">## [137] ggbeeswarm_0.7.2          plyr_1.8.9               </span></span>
+<span><span class="co">## [139] fs_1.6.5                  stringi_1.8.4            </span></span>
+<span><span class="co">## [141] viridisLite_0.4.2         deldir_2.0-4             </span></span>
+<span><span class="co">## [143] BiocParallel_1.40.0       munsell_0.5.1            </span></span>
+<span><span class="co">## [145] lazyeval_0.2.2            spatstat.geom_3.3-5      </span></span>
+<span><span class="co">## [147] Matrix_1.7-1              RcppHNSW_0.6.0           </span></span>
+<span><span class="co">## [149] patchwork_1.3.0           sparseMatrixStats_1.18.0 </span></span>
+<span><span class="co">## [151] future_1.34.0             statmod_1.5.0            </span></span>
+<span><span class="co">## [153] shiny_1.10.0              ROCR_1.0-11              </span></span>
+<span><span class="co">## [155] igraph_2.1.4              bslib_0.9.0              </span></span>
+<span><span class="co">## [157] RcppPlanc_1.0.0           bit_4.5.0.1</span></span></code></pre>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
-    </nav></aside>
+  </div>
+
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+
+      </div>
+
 </div>
 
 
 
-    <footer><div class="pkgdown-footer-left">
-  <p>Developed by Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin.</p>
+      <footer><div class="copyright">
+  <p></p>
+<p>Developed by Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin.</p>
 </div>
 
-<div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<div class="pkgdown">
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
-    </footer>
+      </footer>
 </div>
+
 
 
 
