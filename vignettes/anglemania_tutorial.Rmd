@@ -39,6 +39,8 @@ Under the hood, anglemania works with file-backed big matrices (FBMs) from the b
 (https://github.com/privefl/bigstatsr/) for fast and memory efficient computation.
 
 ```{r, load libraries}
+install.packages("RcppPlanc", repos = "https://welch-lab.r-universe.dev")
+# for LIGER integration, it as of now needs RcppPlanc
 suppressPackageStartupMessages({
   library(anglemania)
   library(dplyr)

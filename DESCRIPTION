@@ -41,7 +41,8 @@ Suggests:
     scater,
     batchelor,
     bluster,
-    rliger
+    rliger,
+    RcppArmadillo
 VignetteBuilder: knitr
 biocViews: SingleCell, BatchEffect, MultipleComparison, FeatureExtraction
 BiocType: Software
