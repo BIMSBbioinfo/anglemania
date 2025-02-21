@@ -58,12 +58,14 @@
 extract_angles <- function(
     x_mat,
     method = "pearson") {
+
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- X[, ind, drop = FALSE]
     # Normalize the data:
     #   divide gene counts by the number of total counts per cell,
     #   multiply by 10,000 (scaling factor like in Seurat)
-    X.sub <- t(t(X.sub) / colSums(X.sub) * 10000)
+    # +1 prevents NaN values when working with partial features
+    X.sub <- t(t(X.sub) / (colSums(X.sub)+1) * 10000)
     X.sub <- log1p(X.sub)
 
     X[, ind] <- X.sub
@@ -88,6 +90,17 @@ extract_angles <- function(
   # The big_cor function from bigstatsr scales and centers the
   # count matrix and calculates the covariance (cross product X^T X)
   diag(x_mat) <- NA
+
+  # replaces NaN with NA values in the matrix
+  bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+      X.sub <- apply(X[, ind, drop = FALSE], 2, function(x){
+        xx = x
+        xx[is.nan(xx)] = NA
+        xx
+      })
+      x_mat[, ind] <- X.sub
+      NULL
+    })
 
   return(x_mat)
 }

@@ -130,6 +130,10 @@ anglemania <- function(
   list_stats(anglemania_object) <- get_list_stats(anglemania_object)
   invisible(gc())
 
+  # this corrects sn values when sds is zero - can happen if only one pair of the gene is found 
+  # in one sample
+  list_stats(anglemania_object)$sn_zscore[list_stats(anglemania_object)$sds_zscore == 0] = 0
+
   message("Filtering features...")
   anglemania_object <- select_genes(
     anglemania_object,

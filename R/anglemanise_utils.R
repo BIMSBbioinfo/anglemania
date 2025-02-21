@@ -60,71 +60,26 @@ get_dstat <- function(corr_matrix) {
   if (!inherits(corr_matrix, "FBM")) {
     stop("corr_matrix has to be a FBM object")
   }
-
-  # Calculate number of non-NA entries
-  n <- bigstatsr::big_apply(
-    corr_matrix,
-    a.FUN = function(X, ind) {
-      apply(X[, ind, drop = FALSE], 2, function(x)sum(!is.na(x)))
-    },
-    a.combine = "c",
-    block.size = 1000
-  )
-
-  # Calculate mean
-  mean_value <- bigstatsr::big_apply(
-    corr_matrix,
-    a.FUN = function(X, ind) {
-      apply(X[, ind, drop = FALSE], 2, mean, na.rm = TRUE)
-    },
-    a.combine = "c",
-    block.size = 1000
-  ) 
-
-  # Calculate variance
-  var_value <- bigstatsr::big_apply(
-    corr_matrix,
-    a.FUN = function(X, ind) {
-      apply(X[, ind, drop = FALSE], 2, function(m){
-        (mean((m-mean_value)^2, na.rm=TRUE))
-      })
-       # minus 2 because it's a symmetric matrix!!
-    },
-    a.combine = "c",
-    block.size = 1000
-  )
+  stats_funs <- c("mean","var","min","max")
+  # min/max give warnings if value NA -> suppressWarnings
+  dstat <- suppressWarnings({
+    lapply(setNames(stats_funs, stats_funs), function(fun){
+      stat_value <- bigstatsr::big_apply(
+      corr_matrix,
+      a.FUN = function(X, ind) {
+        apply(X[, ind, drop = FALSE], 2, fun, na.rm = TRUE)
+      },
+      a.combine = "c",
+      block.size = 1000
+      ) 
+      stat_value = replace_with_na(stat_value)
+      stat_value
+    })
+  })
 
   # Calculate standard deviation
-  sd_value <- sqrt(var_value)
-
-  # Calculate minimum
-  min_value <- bigstatsr::big_apply(
-    corr_matrix,
-    a.FUN = function(X, ind) {
-      apply(X[, ind, drop = FALSE], 2, min, na.rm = TRUE)
-    },
-    a.combine = "c",
-    block.size = 1000
-  )
-
-  # Calculate maximum
-  max_value <- bigstatsr::big_apply(
-    corr_matrix,
-    a.FUN = function(X, ind) {
-      apply(X[, ind, drop = FALSE], 2, max, na.rm = TRUE)
-    },
-    a.combine = "c",
-    block.size = 1000
-  )
-
-  dstat <- list(
-    mean = mean_value,
-    var  = var_value,
-    sd   = sd_value,
-    sn   = sd_value / mean_value, # signal-to-noise ratio
-    min  = min_value,
-    max  = max_value
-  )
+  dstat$sd = sqrt(dstat$var)
+  dstat$sn = dstat$sd / dstat$mean
 
   return(dstat)
 }
@@ -181,6 +136,7 @@ big_mat_list_mean <- function(anglemania_object) {
   n_col <- ncol(matrix_list(anglemania_object)[[1]])
   n_row <- nrow(matrix_list(anglemania_object)[[1]])
   mat_mean_zscore <- bigstatsr::FBM(n_row, n_col)
+  
   bigstatsr::big_apply(
     mat_mean_zscore,
     a.FUN = function(X, ind) {
@@ -189,16 +145,26 @@ big_mat_list_mean <- function(anglemania_object) {
         batch_mat <- matrix_list(anglemania_object)[[batch]][
           , ind,
           drop = FALSE
-        ] * anglemania_object@weights[batch]
+        ] 
+        
+        # calculates the number of samples in which the feature is present, weighted
+        # by the dataset weight
+        nmat <- (!is.na(batch_mat) + 0) * anglemania_object@weights[batch]
         final_mat <- final_mat + batch_mat
+        final_mat[is.na(final_mat)] = 0
+        list(final_mat, nmat)
       }
       # Run function in Reduce statement on names of weights vector
-      X.sub <- Reduce(
-        wrap_mean,
-        names(anglemania_object@weights),
-        init = X.sub
-      )
-      X[, ind] <- X.sub / sum(anglemania_object@weights) # Already weighted, no need to divide
+      lmats <- lapply(names(anglemania_object@weights), function(batch){
+        wrap_mean(X.sub, batch)
+      })
+      # this sums up the z-scores across samples
+      m_sum <- Reduce("+", lapply(lmats,'[[', 1))
+      # this gets the number of samples in which the feature was present
+      m_n   <- Reduce("+", lapply(lmats,'[[', 2))
+
+      # Divide by zero shouldn't happen because the features have already been filtered properly
+      X[, ind] <- m_sum / m_n # Already weighted, no need to divide
       NULL
     },
     a.combine = "c",
@@ -247,7 +213,6 @@ get_list_stats <- function(anglemania_object) {
 
   message("Weighting matrix_list...")
   message("Calculating mean...")
-
   mat_mean_zscore <- big_mat_list_mean(anglemania_object)
 
   n_col <- ncol(matrix_list(anglemania_object)[[1]])
@@ -255,34 +220,46 @@ get_list_stats <- function(anglemania_object) {
   mat_sds_zscore <- bigstatsr::FBM(n_row, n_col)
 
   message("Calculating sds...")
-  # creates an unbiased esitmator for a sample based wighted variance calculation
-  w_sum <- sum(anglemania_object@weights)
-  w_sq_sum <- sum(anglemania_object@weights^2)
-  denominator <- w_sum - (w_sq_sum / w_sum)
-
   # calculates the weighted sds for the big matrix
   bigstatsr::big_apply(
     mat_sds_zscore,
     a.FUN = function(X, ind) {
-      wrap_sds <- function(final_mat, batch) {
-        batch_mat <- matrix_list(anglemania_object)[[batch]]
-        final_mat <- final_mat + (
-          batch_mat[, ind, drop = FALSE] -
-            mat_mean_zscore[, ind, drop = FALSE]
-        )^2 * anglemania_object@weights[batch]
-      }
       X.sub <- X[, ind, drop = FALSE]
-      X.sub <- Reduce(
-        wrap_sds,
-        names(anglemania_object@weights),
-        init = X.sub
-      )
-      X[, ind] <- sqrt(X.sub / denominator)
+      wrap_mean <- function(final_mat, batch) {
+        batch_mat <- matrix_list(anglemania_object)[[batch]][
+          , ind,
+          drop = FALSE
+        ] 
+        
+        # calculates the number of samples in which the feature is present, weighted
+        # by the dataset weight
+        nmat <- (!is.na(batch_mat) + 0) * anglemania_object@weights[batch]
+
+        # calculates the weighted standard deviation
+        final_mat <- final_mat + (batch_mat - mat_mean_zscore[, ind, drop=FALSE])^2 * anglemania_object@weights[batch]
+        final_mat[is.na(final_mat)] = 0
+        list(final_mat, nmat)
+      }
+      # Run function in Reduce statement on names of weights vector
+      lmats <- lapply(names(anglemania_object@weights), function(batch){
+        wrap_mean(X.sub, batch)
+      })
+      # this sums up the z-scores across samples
+      m_sd <- Reduce("+", lapply(lmats,'[[', 1))
+      # this gets the number of samples in which the feature was present
+      w_m_sum    <- Reduce("+", lapply(lmats,'[[', 2))
+      w_m_sum_sq <- Reduce("+", lapply(lmats, function(x)x[[2]]^2))
+      
+      # creates an unbiased esitmator for a sample based wighted variance calculation
+      denominator = w_m_sum - (w_m_sum_sq / w_m_sum)
+
+      # Divide by zero shouldn't happen because the features have already been filtered properly
+      X[, ind] <- sqrt(m_sd / w_m_sum_sq) # Already weighted, no need to divide
       NULL
     },
     a.combine = "c",
     block.size = 1000
-  )
+  ) 
 
   mat_sn_zscore <- bigstatsr::FBM(n_row, n_col)
   diag(mat_sds_zscore) <- NA # Avoid dividing by zero
@@ -537,4 +514,98 @@ select_genes <- function(
     intersect_genes(anglemania_object)[selected_genes]
 
   return(anglemania_object)
+}
+
+
+
+# ---------------------------------------------------------------------------
+#' replace Nan and Inf values with NA
+#'
+#' @description
+replace_with_na = function(v){
+
+    v[is.nan(v)] = NA
+    v[is.infinite(v)] = NA
+  v
+}
+
+
+# ---------------------------------------------------------------------------
+#' Overlap of Variable Genes Across Thresholds
+#'
+#' This function computes the overlap between variable genes identified in a Seurat object and the gene sets selected 
+#' from an "anglemania" analysis object (`ang_obj`) at multiple threshold levels. For each threshold, genes are 
+#' selected from `ang_obj` by applying `select_genes`, and the intersection of these genes with the variable features 
+#' of the Seurat object is calculated. The result is a summary data frame that includes the number and percentage of 
+#' variable genes overlapping with the anglemania-selected genes, as well as the number of genes selected at each 
+#' threshold.
+#'
+#' @param seu A Seurat object. If variable features have not been identified, they will be computed using 
+#'   \code{\link[Seurat]{FindVariableFeatures}}.
+#' @param ang_obj An anglemania analysis object. This is used by `select_genes` and `get_anglemania_genes` to select genes 
+#'   based on the provided thresholds.
+#' @param thresholds A numeric vector of thresholds used for gene selection from `ang_obj`. Default is \code{c(0.5, 1:15)}.
+#'
+#' @return A data frame with the following columns:
+#' \describe{
+#'   \item{threshold}{The threshold value used for gene selection.}
+#'   \item{intersecting_genes}{The number of genes that are both variable in \code{seu} and selected by \code{ang_obj}.}
+#'   \item{perc_var_genes}{The proportion of variable genes in \code{seu} that are also selected by \code{ang_obj}.}
+#'   \item{number_angl_genes}{The total number of genes selected by \code{ang_obj} at the given threshold.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' seu <- CreateSeuratObject(counts = your_count_data)
+#' seu <- FindVariableFeatures(seu)
+#' ang_obj <- create_anglemania_object(your_data)
+#' variable_genes_overlap(seu, ang_obj)
+#' }
+#'
+#' @export
+variable_genes_overlap = function(
+    seu, 
+    ang_obj,
+    zscore_mean_thresholds = c(0.5, 1:15),
+    zscore_sn_thresholds   = c(0.5, 1:15),
+    adjust_thresholds      = FALSE,
+    layer                  = "data"
+){
+    # Check if the Seurat object has variable features. If not, compute them.
+    if(length(VariableFeatures(seu)) == 0) {
+        seu = FindVariableFeatures(seu, layer = layer)
+    }
+
+    # For each threshold, select genes from ang_obj and extract their names.
+    dparams = expand.grid(zscore_mean_thresholds, zscore_sn_thresholds)
+    colnames(dparams) = c("zscore_mean_thresholds","zscore_sn_thresholds")
+    lg = lapply(1:nrow(dparams), function(i){
+        angl = select_genes(
+            ang_obj,
+            zscore_mean_threshold = dparams$zscore_mean_thresholds[i],
+            zscore_sn_threshold   = dparams$zscore_sn_thresholds[i], 
+            direction = "both",
+            adjust_thresholds = adjust_thresholds
+        )
+        gg = get_anglemania_genes(angl)
+        if(length(gg) < 0)
+          gg = ""
+        return(gg)
+    })
+
+    # NOTE: There seems to be a variable "mseu" that is not defined in the original code. 
+    # Assuming it's meant to be "seu", we replace it accordingly.
+    
+    # Compute the intersection of anglemania-selected genes with variable features of the Seurat object.
+    lg_int = lapply(lg, function(x) length(intersect(x, VariableFeatures(seu))))
+    
+    # Construct a data frame summarizing the intersections and percentages.
+    dg_int = dparams %>%
+        data.frame() %>%
+        mutate(intersecting_genes = unlist(lg_int)) %>%
+        mutate(perc_var_genes = intersecting_genes / length(VariableFeatures(seu))) %>%
+        mutate(number_angl_genes = sapply(lg, length)) %>%
+        mutate(perc_ang_genes = intersecting_genes / number_angl_genes)
+
+    return(dg_int)
 }
