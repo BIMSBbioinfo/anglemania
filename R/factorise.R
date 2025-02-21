@@ -94,11 +94,12 @@ factorise <- function(
   checkmate::assertString(permutation_function)
   checkmate::assertChoice(permutation_function, c("sample", "permute_nonzero"))
   set.seed(seed)
+  tmpfile = tempfile()
   x_mat_perm <- bigstatsr::FBM(
     nrow = nrow(x_mat),
-    ncol = ncol(x_mat)
+    ncol = ncol(x_mat),
+    backingfile = file.path(tmpfile, digest::digest(tmpfile,length=10))
   )
-
   if(permutation_function == "sample"){
     permutation_function = base::sample
   }else{
@@ -153,7 +154,6 @@ factorise <- function(
     )
 
     dstat <- get_dstat(x_mat_corr)
-
     scale_factor <- (dstat$min - dstat$max) / dstat$var
     bigstatsr::big_apply(
       x_mat_corr,
@@ -170,12 +170,16 @@ factorise <- function(
   } else {
     dstat <- get_dstat(x_mat_perm_corr)
   }
-
   # Transform original correlation matrix into z-scores
   bigstatsr::big_apply(
     x_mat_corr,
     a.FUN = function(X, ind) {
-      X[, ind] <- (X[, ind, drop = FALSE] - dstat$mean[ind]) / dstat$sd[ind]
+      zscores <- (X[, ind, drop = FALSE] - dstat$mean[ind]) / dstat$sd[ind]
+      # this is needed because sometimes all the correlation matrices are 0, and then
+      # the mean is zero
+      zscores[is.na(zscores)] = 0
+      X[, ind] <- zscores
+      X[is.na(X[,ind]), ind] = 0
       NULL
     },
     a.combine = "c",
@@ -186,6 +190,7 @@ factorise <- function(
 }
 
 
+# ---------------------------------------------------------------------------
 #' permute non-zero elements of vectors
 #'
 #' @description
