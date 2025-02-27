@@ -581,7 +581,9 @@ create_anglemaniaObject <- function(
     dataset_key = NA_character_,
     batch_key,
     min_cells_per_gene = 1,
-    assay = "RNA"
+    assay = "RNA",
+    allow_missing_features = FALSE,
+    min_samples_per_gene = 2
 ) {
   # Validate inputs
   if (!inherits(seurat_object, "Seurat")) {
@@ -644,8 +646,9 @@ create_anglemaniaObject <- function(
   meta <- seurat_object[[]]
 
   # Get the barcodes corresponding to each batch
+  # IMPORTANT: When dataset = "string" the order of samples changes
   matrix_list <- split(rownames(meta), meta$batch)
-
+  
   # Extract counts for each batch
   message("Extracting count matrices...")
   message(
@@ -666,16 +669,36 @@ create_anglemaniaObject <- function(
     return(counts_matrix)
   })
 
-  # Reduce to intersection of genes between batches
-  message("Using the intersection of filtered genes from all batches...")
-  intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+  # checks whether the genes should be present in all samples or just a subset of samples
+  if(!allow_missing_features){
+    # Reduce to intersection of genes between batches
+    message("Using the intersection of filtered genes from all batches...")
+    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+  }else{
+    message("Using genes which are present in minimally ",min_samples_per_gene, " samples...")
+    intersect_genes <- table(unlist(lapply(matrix_list, rownames)))
+    intersect_genes <- sort(rownames(intersect_genes)[intersect_genes >= min_samples_per_gene])
+  }
   message("Number of genes in intersected set: ", length(intersect_genes))
 
+  
   matrix_list <- pbapply::pblapply(
     matrix_list,
     function(x) {
-      x <- x[intersect_genes, ]
-      x <- sparse_to_fbm(x)
+      genes_in = intersect(rownames(x), intersect_genes)
+      x_in <- x[genes_in, ]
+      # Checks whether matrix contains missing features
+      genes_out = setdiff(intersect_genes, rownames(x))
+      if(length(genes_out) > 0){
+        # this pads the matrix with missing features
+        x_out = Matrix::Matrix(0, nrow=length(genes_out), ncol = ncol(x_in))
+        rownames(x_out) = genes_out
+        colnames(x_out) = colnames(x_in)
+        x_in = rbind(x_in, x_out)
+        # IMPORTANT: keeps track that the missing features are ordered in the same way in all matrices
+        x_in = x_in[intersect_genes,]
+      }
+      x_in <- sparse_to_fbm(x_in)
     },
     cl = bigstatsr::nb_cores()
   )
@@ -692,10 +715,14 @@ create_anglemaniaObject <- function(
       dplyr::add_count(across(all_of(dataset_key)), name = "n_samples") %>%
       dplyr::mutate(
         weight = 1 / n_samples / dplyr::n_groups(.)
-      )
+      ) %>%
+      ## Normalize weights so that their mean is 1 - this helps when the features are not present in all samples
+      ungroup() %>%
+      mutate(weight = weight / mean(weight))
 
     weights <- data_info$weight
     names(weights) <- data_info$batch
+
   } else {
     # if there is only one dataset, weights should be set to one
     data_info <- meta %>%
@@ -706,7 +733,6 @@ create_anglemaniaObject <- function(
     weights <- data_info$weight
     names(weights) <- data_info$batch
   }
-
   # Create anglem object
   anglem_object <- new(
     "anglemaniaObject",
