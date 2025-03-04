@@ -82,7 +82,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running anglemania with Seurat</h1>
             
-            <h4 data-toc-skip class="date">2025-02-10</h4>
+            <h4 data-toc-skip class="date">2025-03-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BIMSBbioinfo/anglemania/blob/master/vignettes/anglemania_tutorial_Seurat.Rmd" class="external-link"><code>vignettes/anglemania_tutorial_Seurat.Rmd</code></a></small>
       <div class="hidden name"><code>anglemania_tutorial_Seurat.Rmd</code></div>
@@ -313,7 +313,7 @@ They are sorted by decreasing mean zscore</li>
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span> <span class="co"># optionally define a max number of genes. default is 2000</span></span>
+<span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span> <span class="co"># optionally define a max number of genes.</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Computing angles and transforming to z-scores...</span></span></code></pre>
 <pre><code><span><span class="co">## Computing statistics...</span></span></code></pre>
@@ -321,18 +321,23 @@ They are sorted by decreasing mean zscore</li>
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating sds...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
+<pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span></code></pre>
+<pre><code><span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 1666 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>                     zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span>
+<span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 319 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Inspect the anglemania genes</span></span>
 <span><span class="va">integration_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Gene394"  "Gene3527" "Gene71"   "Gene5000" "Gene650"  "Gene3843"</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 319</span></span></code></pre>
 </div>
@@ -345,7 +350,7 @@ the anglemania package which uses Seurat CCA integration</li>
 <li>you can also just use the anglemania genes for other integration
 algorithms</li>
 </ul>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># if the Seurat FindIntegrationAnchors() function does not work,</span></span>
 <span><span class="co"># change this to the specified size:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">4000</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
@@ -360,7 +365,7 @@ algorithms</li>
 <pre><code><span><span class="co">## Integrating samples...</span></span></code></pre>
 <pre><code><span><span class="co">## Running PCA with 30 PCs</span></span></code></pre>
 <pre><code><span><span class="co">## Running UMAP with 30 PCs and 30 neighbors</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">seurat_integrated_angl</span></span></code></pre></div>
 <pre><code><span><span class="co">## An object of class Seurat </span></span>
 <span><span class="co">## 5319 features across 3600 samples within 2 assays </span></span>
@@ -372,10 +377,10 @@ algorithms</li>
 <div class="section level3">
 <h3 id="plot-integration">plot integration<a class="anchor" aria-label="anchor" href="#plot-integration"></a>
 </h3>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_angl</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_Seurat_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_angl</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_Seurat_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 </div>
@@ -386,14 +391,14 @@ algorithms</li>
 <div class="section level3">
 <h3 id="get-hvgs">get HVGs<a class="anchor" aria-label="anchor" href="#get-hvgs"></a>
 </h3>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">se_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SplitObject.html" class="external-link">SplitObject</a></span><span class="op">(</span><span class="va">se</span>, split.by <span class="op">=</span> <span class="va">batch_key</span><span class="op">)</span></span>
 <span><span class="va">se_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">se_list</span>, <span class="va">NormalizeData</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Normalizing layer: counts</span></span>
 <span><span class="co">## Normalizing layer: counts</span></span>
 <span><span class="co">## Normalizing layer: counts</span></span>
 <span><span class="co">## Normalizing layer: counts</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># anglemania chose only 319 genes based on the thresholds</span></span>
 <span><span class="co">#   to make it comparable we only choose 320 highly variable genes:</span></span>
 <span><span class="va">hvg_features</span> <span class="op">&lt;-</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/SelectIntegrationFeatures.html" class="external-link">SelectIntegrationFeatures</a></span><span class="op">(</span><span class="va">se_list</span>, nfeatures <span class="op">=</span> <span class="fl">320</span><span class="op">)</span> </span></code></pre></div>
@@ -409,7 +414,7 @@ algorithms</li>
 <div class="section level3">
 <h3 id="integration-1">integration<a class="anchor" aria-label="anchor" href="#integration-1"></a>
 </h3>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">seurat_integrated_hvg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/integrate_seurat_list.html">integrate_seurat_list</a></span><span class="op">(</span><span class="va">se_list</span>,</span>
 <span>    features <span class="op">=</span> <span class="va">hvg_features</span>,</span>
@@ -421,7 +426,7 @@ algorithms</li>
 <pre><code><span><span class="co">## Integrating samples...</span></span></code></pre>
 <pre><code><span><span class="co">## Running PCA with 30 PCs</span></span></code></pre>
 <pre><code><span><span class="co">## Running UMAP with 30 PCs and 30 neighbors</span></span></code></pre>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">seurat_integrated_hvg</span></span></code></pre></div>
 <pre><code><span><span class="co">## An object of class Seurat </span></span>
 <span><span class="co">## 5320 features across 3600 samples within 2 assays </span></span>
@@ -433,17 +438,17 @@ algorithms</li>
 <div class="section level3">
 <h3 id="plot-integration-1">plot integration<a class="anchor" aria-label="anchor" href="#plot-integration-1"></a>
 </h3>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_hvg</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_Seurat_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_hvg</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_Seurat_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.4.2 (2024-10-31)</span></span>
+<pre><code><span><span class="co">## R version 4.4.3 (2025-02-28)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.1 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.2 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -473,53 +478,53 @@ algorithms</li>
 <span><span class="co">## [15] dplyr_1.1.4                 anglemania_0.99.0          </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] RcppAnnoy_0.0.22        splines_4.4.2           later_1.4.1            </span></span>
-<span><span class="co">##   [4] tibble_3.2.1            polyclip_1.10-7         fastDummies_1.7.5      </span></span>
-<span><span class="co">##   [7] lifecycle_1.0.4         doParallel_1.0.17       globals_0.16.3         </span></span>
-<span><span class="co">##  [10] lattice_0.22-6          MASS_7.3-61             backports_1.5.0        </span></span>
-<span><span class="co">##  [13] magrittr_2.0.3          plotly_4.10.4           sass_0.4.9             </span></span>
-<span><span class="co">##  [16] rmarkdown_2.29          jquerylib_0.1.4         yaml_2.3.10            </span></span>
-<span><span class="co">##  [19] bigparallelr_0.3.2      httpuv_1.6.15           sctransform_0.4.1      </span></span>
-<span><span class="co">##  [22] spam_2.11-1             spatstat.sparse_3.1-0   reticulate_1.40.0      </span></span>
-<span><span class="co">##  [25] cowplot_1.1.3           pbapply_1.7-2           RColorBrewer_1.1-3     </span></span>
-<span><span class="co">##  [28] abind_1.4-8             zlibbioc_1.52.0         Rtsne_0.17             </span></span>
-<span><span class="co">##  [31] purrr_1.0.4             bigassertr_0.1.6        GenomeInfoDbData_1.2.13</span></span>
-<span><span class="co">##  [34] ggrepel_0.9.6           irlba_2.3.5.1           listenv_0.9.1          </span></span>
-<span><span class="co">##  [37] spatstat.utils_3.1-2    goftest_1.2-3           RSpectra_0.16-2        </span></span>
-<span><span class="co">##  [40] spatstat.random_3.3-2   fitdistrplus_1.2-2      parallelly_1.42.0      </span></span>
-<span><span class="co">##  [43] pkgdown_2.1.1           codetools_0.2-20        DelayedArray_0.32.0    </span></span>
-<span><span class="co">##  [46] tidyselect_1.2.1        UCSC.utils_1.2.0        farver_2.1.2           </span></span>
-<span><span class="co">##  [49] bigstatsr_1.6.1         spatstat.explore_3.3-4  flock_0.7              </span></span>
-<span><span class="co">##  [52] jsonlite_1.8.9          progressr_0.15.1        ggridges_0.5.6         </span></span>
-<span><span class="co">##  [55] survival_3.7-0          iterators_1.0.14        systemfonts_1.2.1      </span></span>
-<span><span class="co">##  [58] foreach_1.5.2           tools_4.4.2             ragg_1.3.3             </span></span>
-<span><span class="co">##  [61] ica_1.0-3               Rcpp_1.0.14             glue_1.8.0             </span></span>
-<span><span class="co">##  [64] gridExtra_2.3           SparseArray_1.6.1       xfun_0.50              </span></span>
-<span><span class="co">##  [67] withr_3.0.2             fastmap_1.2.0           digest_0.6.37          </span></span>
-<span><span class="co">##  [70] R6_2.5.1                mime_0.12               textshaping_1.0.0      </span></span>
-<span><span class="co">##  [73] colorspace_2.1-1        scattermore_1.2         tensor_1.5             </span></span>
-<span><span class="co">##  [76] spatstat.data_3.1-4     tidyr_1.3.1             generics_0.1.3         </span></span>
-<span><span class="co">##  [79] data.table_1.16.4       httr_1.4.7              htmlwidgets_1.6.4      </span></span>
-<span><span class="co">##  [82] S4Arrays_1.6.0          uwot_0.2.2              pkgconfig_2.0.3        </span></span>
-<span><span class="co">##  [85] gtable_0.3.6            lmtest_0.9-40           XVector_0.46.0         </span></span>
-<span><span class="co">##  [88] htmltools_0.5.8.1       dotCall64_1.2           scales_1.3.0           </span></span>
-<span><span class="co">##  [91] png_0.1-8               spatstat.univar_3.1-1   knitr_1.49             </span></span>
-<span><span class="co">##  [94] reshape2_1.4.4          checkmate_2.3.2         nlme_3.1-166           </span></span>
-<span><span class="co">##  [97] cachem_1.1.0            zoo_1.8-12              stringr_1.5.1          </span></span>
-<span><span class="co">## [100] rmio_0.4.0              KernSmooth_2.23-24      parallel_4.4.2         </span></span>
-<span><span class="co">## [103] miniUI_0.1.1.1          desc_1.4.3              pillar_1.10.1          </span></span>
-<span><span class="co">## [106] grid_4.4.2              vctrs_0.6.5             RANN_2.6.2             </span></span>
-<span><span class="co">## [109] promises_1.3.2          ff_4.5.2                xtable_1.8-4           </span></span>
-<span><span class="co">## [112] cluster_2.1.6           evaluate_1.0.3          cli_3.6.3              </span></span>
-<span><span class="co">## [115] locfit_1.5-9.11         compiler_4.4.2          rlang_1.1.5            </span></span>
-<span><span class="co">## [118] crayon_1.5.3            future.apply_1.11.3     labeling_0.4.3         </span></span>
-<span><span class="co">## [121] ps_1.8.1                plyr_1.8.9              fs_1.6.5               </span></span>
-<span><span class="co">## [124] stringi_1.8.4           viridisLite_0.4.2       deldir_2.0-4           </span></span>
-<span><span class="co">## [127] BiocParallel_1.40.0     munsell_0.5.1           lazyeval_0.2.2         </span></span>
-<span><span class="co">## [130] spatstat.geom_3.3-5     Matrix_1.7-1            RcppHNSW_0.6.0         </span></span>
-<span><span class="co">## [133] patchwork_1.3.0         future_1.34.0           ggplot2_3.5.1          </span></span>
-<span><span class="co">## [136] shiny_1.10.0            ROCR_1.0-11             igraph_2.1.4           </span></span>
-<span><span class="co">## [139] bslib_0.9.0             bit_4.5.0.1</span></span></code></pre>
+<span><span class="co">##   [1] RColorBrewer_1.1-3      jsonlite_1.9.1          magrittr_2.0.3         </span></span>
+<span><span class="co">##   [4] spatstat.utils_3.1-2    farver_2.1.2            rmarkdown_2.29         </span></span>
+<span><span class="co">##   [7] zlibbioc_1.52.0         fs_1.6.5                ragg_1.3.3             </span></span>
+<span><span class="co">##  [10] vctrs_0.6.5             ROCR_1.0-11             spatstat.explore_3.3-4 </span></span>
+<span><span class="co">##  [13] S4Arrays_1.6.0          htmltools_0.5.8.1       SparseArray_1.6.2      </span></span>
+<span><span class="co">##  [16] sass_0.4.9              sctransform_0.4.1       parallelly_1.42.0      </span></span>
+<span><span class="co">##  [19] KernSmooth_2.23-26      bslib_0.9.0             htmlwidgets_1.6.4      </span></span>
+<span><span class="co">##  [22] desc_1.4.3              ica_1.0-3               plyr_1.8.9             </span></span>
+<span><span class="co">##  [25] plotly_4.10.4           zoo_1.8-13              cachem_1.1.0           </span></span>
+<span><span class="co">##  [28] igraph_2.1.4            mime_0.12               lifecycle_1.0.4        </span></span>
+<span><span class="co">##  [31] iterators_1.0.14        pkgconfig_2.0.3         Matrix_1.7-2           </span></span>
+<span><span class="co">##  [34] R6_2.6.1                fastmap_1.2.0           GenomeInfoDbData_1.2.13</span></span>
+<span><span class="co">##  [37] fitdistrplus_1.2-2      future_1.34.0           shiny_1.10.0           </span></span>
+<span><span class="co">##  [40] digest_0.6.37           colorspace_2.1-1        ps_1.9.0               </span></span>
+<span><span class="co">##  [43] patchwork_1.3.0         tensor_1.5              RSpectra_0.16-2        </span></span>
+<span><span class="co">##  [46] irlba_2.3.5.1           textshaping_1.0.0       rmio_0.4.0             </span></span>
+<span><span class="co">##  [49] labeling_0.4.3          progressr_0.15.1        spatstat.sparse_3.1-0  </span></span>
+<span><span class="co">##  [52] httr_1.4.7              polyclip_1.10-7         abind_1.4-8            </span></span>
+<span><span class="co">##  [55] compiler_4.4.3          withr_3.0.2             doParallel_1.0.17      </span></span>
+<span><span class="co">##  [58] backports_1.5.0         BiocParallel_1.40.0     fastDummies_1.7.5      </span></span>
+<span><span class="co">##  [61] bigassertr_0.1.6        MASS_7.3-64             DelayedArray_0.32.0    </span></span>
+<span><span class="co">##  [64] tools_4.4.3             bigstatsr_1.6.1         lmtest_0.9-40          </span></span>
+<span><span class="co">##  [67] httpuv_1.6.15           future.apply_1.11.3     goftest_1.2-3          </span></span>
+<span><span class="co">##  [70] glue_1.8.0              nlme_3.1-167            promises_1.3.2         </span></span>
+<span><span class="co">##  [73] bigparallelr_0.3.2      grid_4.4.3              checkmate_2.3.2        </span></span>
+<span><span class="co">##  [76] Rtsne_0.17              cluster_2.1.8           reshape2_1.4.4         </span></span>
+<span><span class="co">##  [79] generics_0.1.3          gtable_0.3.6            spatstat.data_3.1-4    </span></span>
+<span><span class="co">##  [82] flock_0.7               tidyr_1.3.1             data.table_1.17.0      </span></span>
+<span><span class="co">##  [85] XVector_0.46.0          spatstat.geom_3.3-5     RcppAnnoy_0.0.22       </span></span>
+<span><span class="co">##  [88] ggrepel_0.9.6           RANN_2.6.2              foreach_1.5.2          </span></span>
+<span><span class="co">##  [91] pillar_1.10.1           stringr_1.5.1           spam_2.11-1            </span></span>
+<span><span class="co">##  [94] RcppHNSW_0.6.0          later_1.4.1             splines_4.4.3          </span></span>
+<span><span class="co">##  [97] lattice_0.22-6          bit_4.5.0.1             survival_3.8-3         </span></span>
+<span><span class="co">## [100] deldir_2.0-4            tidyselect_1.2.1        locfit_1.5-9.11        </span></span>
+<span><span class="co">## [103] miniUI_0.1.1.1          pbapply_1.7-2           knitr_1.49             </span></span>
+<span><span class="co">## [106] gridExtra_2.3           scattermore_1.2         xfun_0.51              </span></span>
+<span><span class="co">## [109] UCSC.utils_1.2.0        stringi_1.8.4           lazyeval_0.2.2         </span></span>
+<span><span class="co">## [112] yaml_2.3.10             evaluate_1.0.3          codetools_0.2-20       </span></span>
+<span><span class="co">## [115] tibble_3.2.1            cli_3.6.4               uwot_0.2.3             </span></span>
+<span><span class="co">## [118] xtable_1.8-4            reticulate_1.41.0       systemfonts_1.2.1      </span></span>
+<span><span class="co">## [121] munsell_0.5.1           jquerylib_0.1.4         Rcpp_1.0.14            </span></span>
+<span><span class="co">## [124] globals_0.16.3          spatstat.random_3.3-2   png_0.1-8              </span></span>
+<span><span class="co">## [127] spatstat.univar_3.1-1   parallel_4.4.3          pkgdown_2.1.1          </span></span>
+<span><span class="co">## [130] ggplot2_3.5.1           dotCall64_1.2           ff_4.5.2               </span></span>
+<span><span class="co">## [133] listenv_0.9.1           viridisLite_0.4.2       scales_1.3.0           </span></span>
+<span><span class="co">## [136] ggridges_0.5.6          crayon_1.5.3            purrr_1.0.4            </span></span>
+<span><span class="co">## [139] rlang_1.1.5             cowplot_1.1.3</span></span></code></pre>
 </div>
 </div>
   </div>

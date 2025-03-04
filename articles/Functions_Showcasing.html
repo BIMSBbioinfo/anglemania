@@ -82,7 +82,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Functions_Showcasing</h1>
             
-            <h4 data-toc-skip class="date">2025-02-10</h4>
+            <h4 data-toc-skip class="date">2025-03-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BIMSBbioinfo/anglemania/blob/master/vignettes/Functions_Showcasing.Rmd" class="external-link"><code>vignettes/Functions_Showcasing.Rmd</code></a></small>
       <div class="hidden name"><code>Functions_Showcasing.Rmd</code></div>
@@ -185,8 +185,11 @@ are available in anglemania besides the two main ones:
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating sds...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
+<pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span></code></pre>
+<pre><code><span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 36 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span></span></code></pre></div>
 <pre><code><span><span class="co">## anglemania_object</span></span>
 <span><span class="co">## --------------</span></span>
@@ -238,7 +241,7 @@ ratio (SN, i.e. the mean divided by the standard deviation).</li>
 <div class="section level3">
 <h3 id="factorise">factorise<a class="anchor" aria-label="anchor" href="#factorise"></a>
 </h3>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">barcodes_by_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">[[</span><span class="va">batch_key</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">counts_by_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">barcodes_by_batch</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sce</span><span class="op">[</span>, <span class="va">x</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/sparse_to_fbm.html">sparse_to_fbm</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -255,12 +258,12 @@ ratio (SN, i.e. the mean divided by the standard deviation).</li>
 <span><span class="co">##  [8,]    3    3    3    3    5    4</span></span>
 <span><span class="co">##  [9,]    6    4    5    5    3    1</span></span>
 <span><span class="co">## [10,]    6    4    5    2    6    4</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">counts_by_batch</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "FBM"</span></span>
 <span><span class="co">## attr(,"package")</span></span>
 <span><span class="co">## [1] "bigstatsr"</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">factorised</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">counts_by_batch</span>, <span class="va">factorise</span><span class="op">)</span></span>
 <span><span class="va">factorised</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##             [,1]        [,2]       [,3]        [,4]       [,5]       [,6]</span></span>
@@ -282,7 +285,7 @@ ratio (SN, i.e. the mean divided by the standard deviation).</li>
 <li>get_list_stats gets called on the anglemania object so we create and
 inspect a anglemania object</li>
 </ul>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"batch"</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="va">batch_key</span><span class="op">)</span></span></code></pre></div>
@@ -292,10 +295,10 @@ inspect a anglemania object</li>
 <pre><code><span><span class="co">## Filtering each batch to at least 1 cells per gene...</span></span></code></pre>
 <pre><code><span><span class="co">## Using the intersection of filtered genes from all batches...</span></span></code></pre>
 <pre><code><span><span class="co">## Number of genes in intersected set: 300</span></span></code></pre>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span> <span class="co"># this slot is empty</span></span></code></pre></div>
 <pre><code><span><span class="co">## list()</span></span></code></pre>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## Computing angles and transforming to z-scores...</span></span></code></pre>
 <pre><code><span><span class="co">## Computing statistics...</span></span></code></pre>
@@ -303,14 +306,17 @@ inspect a anglemania object</li>
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating sds...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
+<pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span></code></pre>
+<pre><code><span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 36 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "mean_zscore" "sds_zscore"  "sn_zscore"</span></span></code></pre>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] "mean_zscore" "sds_zscore"  "sn_zscore"   "prefiltered"</span></span></code></pre>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">$</span><span class="va">mean_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##             [,1]        [,2]       [,3]        [,4]        [,5]        [,6]</span></span>
 <span><span class="co">##  [1,]         NA -1.47361566 -0.6737199  0.79226342  0.20563482  0.29347030</span></span>
@@ -323,7 +329,7 @@ inspect a anglemania object</li>
 <span><span class="co">##  [8,] -0.0478384 -1.11509607 -0.7896121 -0.63001026 -1.43434185 -0.84468556</span></span>
 <span><span class="co">##  [9,]  1.2866480  0.34648068 -0.5253048 -0.78855628 -0.69594257 -0.50281463</span></span>
 <span><span class="co">## [10,]  0.5280248  1.21974236  0.8667575 -0.27678173  0.04317401  0.87613079</span></span></code></pre>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">$</span><span class="va">sn_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##            [,1]       [,2]      [,3]      [,4]        [,5]       [,6]</span></span>
 <span><span class="co">##  [1,]        NA 4.87986702 4.4438254 2.2276412  0.32912160 1.64052702</span></span>
@@ -347,19 +353,21 @@ zscore_sn_threshold = 2.5</li>
 <li>we can use select_genes to change the thresholds without having to
 run anglemania again</li>
 </ul>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">previous_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>                     zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span></code></pre>
+<pre><code><span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 214 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Inspect the anglemania genes</span></span>
 <span><span class="va">new_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">previous_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 36</span></span></code></pre>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">new_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 214</span></span></code></pre>
 </div>

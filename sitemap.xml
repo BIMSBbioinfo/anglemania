@@ -7,6 +7,7 @@
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/angl_cor.html</loc></url>
 <url><loc>/reference/anglemania.html</loc></url>
 <url><loc>/reference/anglemania_object-class.html</loc></url>
 <url><loc>/reference/anglemania_object-methods.html</loc></url>
@@ -21,6 +22,7 @@
 <url><loc>/reference/integrate_by_features.html</loc></url>
 <url><loc>/reference/integrate_seurat_list.html</loc></url>
 <url><loc>/reference/pipe.html</loc></url>
+<url><loc>/reference/prefilter_angl.html</loc></url>
 <url><loc>/reference/sce_example.html</loc></url>
 <url><loc>/reference/select_genes.html</loc></url>
 <url><loc>/reference/sparse_to_fbm.html</loc></url>

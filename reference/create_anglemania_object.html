@@ -83,17 +83,17 @@ each dataset or batch based on the number of samples.</p>
 <span><span class="co"># S4 method for class 'Seurat'</span></span>
 <span><span class="fu">create_anglemania_object</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  dataset_key <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  <span class="va">batch_key</span>,</span>
-<span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span></span>
+<span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  dataset_key <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'SingleCellExperiment'</span></span>
 <span><span class="fu">create_anglemania_object</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  dataset_key <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  <span class="va">batch_key</span>,</span>
-<span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span></span>
+<span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  dataset_key <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'list'</span></span>
@@ -114,13 +114,6 @@ containing single-cell RNA-seq data.</p></dd>
 <dd><p>Additional arguments</p></dd>
 
 
-<dt id="arg-dataset-key">dataset_key<a class="anchor" aria-label="anchor" href="#arg-dataset-key"></a></dt>
-<dd><p>A character string indicating the column name in the
-object metadata that identifies the dataset to which each cell
-belongs. If <code>NA</code>, all cells are assumed to belong to the same
-dataset.</p></dd>
-
-
 <dt id="arg-batch-key">batch_key<a class="anchor" aria-label="anchor" href="#arg-batch-key"></a></dt>
 <dd><p>A character string indicating the column name(s) in the
 object metadata that identify the batch to which each cell belongs.</p></dd>
@@ -130,6 +123,13 @@ object metadata that identify the batch to which each cell belongs.</p></dd>
 <dd><p>A numeric value indicating the minimum number of
 cells in which a gene must be expressed to be included in the analysis.
 Default is <code>1</code>.</p></dd>
+
+
+<dt id="arg-dataset-key">dataset_key<a class="anchor" aria-label="anchor" href="#arg-dataset-key"></a></dt>
+<dd><p>A character string indicating the column name in the
+object metadata that identifies the dataset to which each cell
+belongs. If <code>NA</code>, all cells are assumed to belong to the same
+dataset.</p></dd>
 
 </dl></div>
     <div id="value">

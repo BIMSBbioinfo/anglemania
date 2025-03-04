@@ -108,6 +108,9 @@ for each element across a list of FBMs in an <code>anglemania_object</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 36 genes for integration."</span>
 <span class="r-in"><span><span class="fu"><a href="anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">get_list_stats</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
@@ -115,9 +118,66 @@ for each element across a list of FBMs in an <code>anglemania_object</code>.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ mean_zscore: num [1:300, 1:300] NA -1.474 -0.674 0.792 0.206 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ sds_zscore : num [1:300, 1:300] NA 0.302 0.152 0.356 0.625 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ sn_zscore  : num [1:300, 1:300] NA 4.88 4.444 2.228 0.329 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ mean_zscore:Reference class 'FBM' [package "bigstatsr"] with 15 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ extptr      :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ extptr_rw   :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ nrow        : int 300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpxXbTgT/file2e3c728dd326.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpxXbTgT/file2e3c728dd326.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpxXbTgT/file2e3c728dd326.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ file_size   : num 720000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..and 22 methods, of which 8 are  possibly relevant:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..  add_columns, bm, bm.desc, check_dimensions, check_write_permissions,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..  initialize, save, show#envRefClass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ sds_zscore :Reference class 'FBM' [package "bigstatsr"] with 15 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ extptr      :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ extptr_rw   :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ nrow        : int 300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpxXbTgT/file2e3c1a57d99d.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpxXbTgT/file2e3c1a57d99d.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpxXbTgT/file2e3c1a57d99d.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ file_size   : num 720000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..and 22 methods, of which 8 are  possibly relevant:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..  add_columns, bm, bm.desc, check_dimensions, check_write_permissions,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..  initialize, save, show#envRefClass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ sn_zscore  :Reference class 'FBM' [package "bigstatsr"] with 15 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ extptr      :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ extptr_rw   :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ nrow        : int 300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpxXbTgT/file2e3c4abe33a4.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpxXbTgT/file2e3c4abe33a4.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpxXbTgT/file2e3c4abe33a4.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ file_size   : num 720000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..and 22 methods, of which 8 are  possibly relevant:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..  add_columns, bm, bm.desc, check_dimensions, check_write_permissions,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..  initialize, save, show#envRefClass</span>
 </code></pre></div>
     </div>
   </div>

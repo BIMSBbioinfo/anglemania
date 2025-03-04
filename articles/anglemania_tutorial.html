@@ -83,7 +83,7 @@
       <h1 data-toc-skip>Running anglemania with
 SingleCellExperiment</h1>
             
-            <h4 data-toc-skip class="date">2025-02-10</h4>
+            <h4 data-toc-skip class="date">2025-03-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BIMSBbioinfo/anglemania/blob/master/vignettes/anglemania_tutorial.Rmd" class="external-link"><code>vignettes/anglemania_tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>anglemania_tutorial.Rmd</code></div>
@@ -115,12 +115,7 @@ Seurat objects.</p>
 from the bigstatsr package (<a href="https://github.com/privefl/bigstatsr/" class="external-link uri">https://github.com/privefl/bigstatsr/</a>) for fast and
 memory efficient computation.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RcppPlanc"</span>, repos <span class="op">=</span> <span class="st">"https://welch-lab.r-universe.dev"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Installing package into '/home/runner/work/_temp/Library'</span></span>
-<span><span class="co">## (as 'lib' is unspecified)</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># for LIGER integration, it as of now needs RcppPlanc</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioinformatics.mdc-berlin.de/anglemania" class="external-link">anglemania</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
@@ -129,7 +124,6 @@ memory efficient computation.</p>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/" class="external-link">scater</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MarioniLab/scran/" class="external-link">scran</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">bluster</span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://welch-lab.github.io/liger/" class="external-link">rliger</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">batchelor</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -137,7 +131,7 @@ memory efficient computation.</p>
 <h2 id="create-simulated-data-with-mild-batch-effects-and-mild-differences-between-the-groupscell-types">Create simulated data with mild batch effects and mild differences
 between the groups/cell types<a class="anchor" aria-label="anchor" href="#create-simulated-data-with-mild-batch-effects-and-mild-differences-between-the-groupscell-types"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">batch.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
 <span><span class="va">de.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
 <span><span class="va">nBatches</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
@@ -176,7 +170,7 @@ between the groups/cell types<a class="anchor" aria-label="anchor" href="#create
 <div class="section level2">
 <h2 id="unintegrated-data">unintegrated data<a class="anchor" aria-label="anchor" href="#unintegrated-data"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="va">sce</span></span>
 <span><span class="co"># Normalization.</span></span>
 <span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/logNormCounts.html" class="external-link">logNormCounts</a></span><span class="op">(</span><span class="va">sce_unintegrated</span><span class="op">)</span></span>
@@ -199,7 +193,7 @@ between the groups/cell types<a class="anchor" aria-label="anchor" href="#create
 <span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html" class="external-link">runUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, dimred <span class="op">=</span> <span class="st">"PCA"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-1-2.png" width="700"></p>
 </div>
@@ -231,7 +225,7 @@ the input and don’t specify a batch key</li>
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 4 columns</span></span>
 <span><span class="co">##              Cell       Batch    Group ExpLibSize</span></span>
@@ -242,7 +236,7 @@ the input and don’t specify a batch key</li>
 <span><span class="co">## Cell4       Cell4      Batch1   Group1    52319.5</span></span>
 <span><span class="co">## Cell5       Cell5      Batch1   Group3    37774.7</span></span>
 <span><span class="co">## Cell6       Cell6      Batch1   Group3    58112.3</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"Batch"</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span></span>
 <span>  <span class="va">sce</span>,</span>
@@ -254,7 +248,7 @@ the input and don’t specify a batch key</li>
 <pre><code><span><span class="co">## Filtering each batch to at least 1 cells per gene...</span></span></code></pre>
 <pre><code><span><span class="co">## Using the intersection of filtered genes from all batches...</span></span></code></pre>
 <pre><code><span><span class="co">## Number of genes in intersected set: 4970</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span></span></code></pre></div>
 <pre><code><span><span class="co">## anglemania_object</span></span>
 <span><span class="co">## --------------</span></span>
@@ -298,11 +292,11 @@ They are sorted by decreasing mean zscore</li>
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span> <span class="co"># optionally define a max number of genes. default is 2000</span></span>
+<span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span> <span class="co"># optionally define a max number of genes.</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Computing angles and transforming to z-scores...</span></span></code></pre>
 <pre><code><span><span class="co">## Computing statistics...</span></span></code></pre>
@@ -310,319 +304,79 @@ They are sorted by decreasing mean zscore</li>
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating sds...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
+<pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span></code></pre>
+<pre><code><span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 1698 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If you think the number of selected genes is too high or low you can adjust the thresholds:</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>                     zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span>
+<span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 348 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Inspect the anglemania genes</span></span>
 <span><span class="va">integration_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Gene71"   "Gene3527" "Gene2470" "Gene4030" "Gene355"  "Gene394"</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 348</span></span></code></pre>
-<ul>
-<li>We use LIGER <a href="https://github.com/welch-lab/liger" class="external-link uri">https://github.com/welch-lab/liger</a>, <a href="https://www.nature.com/articles/s41596-020-0391-8" class="external-link uri">https://www.nature.com/articles/s41596-020-0391-8</a> and
-fastMNN <a href="https://rdrr.io/github/LTLA/batchelor/" class="external-link uri">https://rdrr.io/github/LTLA/batchelor/</a>, <a href="https://www.nature.com/articles/nbt.4091" class="external-link uri">https://www.nature.com/articles/nbt.4091</a> and compare the
-results when we use HVGs and anglemania genes as the input</li>
-</ul>
-</div>
-</div>
-<div class="section level2">
-<h2 id="liger-integration">Liger integration<a class="anchor" aria-label="anchor" href="#liger-integration"></a>
-</h2>
-<div class="section level3">
-<h3 id="hvgs">HVGs<a class="anchor" aria-label="anchor" href="#hvgs"></a>
-</h3>
-<div class="section level4">
-<h4 id="low-number-of-hvgs">low number of HVGs<a class="anchor" aria-label="anchor" href="#low-number-of-hvgs"></a>
-</h4>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 320 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Finally 490 shared variable features are selected.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Generating UMAP on unaligned cell factor loadings</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Generating UMAP on unaligned cell factor loadings ... done</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> <span style="color: #00BB00;">DimRed</span> <span style="color: #0000BB;">"UMAP"</span> is now set as default.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in .check_reddim_names(x, value, withDimnames): non-NULL 'rownames(value)' should be the same as 'colnames(x)' for</span></span>
-<span><span class="co">## 'reducedDim&lt;-'. This will be an error in the next release of</span></span>
-<span><span class="co">## Bioconductor.</span></span></code></pre>
-</div>
-<div class="section level4">
-<h4 id="hvgs-1">2000 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-1"></a>
-</h4>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Selecting variable features for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> ... 2000 features selected out of 5000 shared features.</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Finally 2598 shared variable features are selected.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Generating UMAP on unaligned cell factor loadings</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Generating UMAP on unaligned cell factor loadings ... done</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> <span style="color: #00BB00;">DimRed</span> <span style="color: #0000BB;">"UMAP"</span> is now set as default.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in .check_reddim_names(x, value, withDimnames): non-NULL 'rownames(value)' should be the same as 'colnames(x)' for</span></span>
-<span><span class="co">## 'reducedDim&lt;-'. This will be an error in the next release of</span></span>
-<span><span class="co">## Bioconductor.</span></span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="anglemania">anglemania<a class="anchor" aria-label="anchor" href="#anglemania"></a>
-</h3>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human mitochondrial gene found in the union of dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human ribosomal gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #BBBB00;">!</span> No human hemoglobin gene found in the union of dataset <span style="color: #0000BB;">NA</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Updated QC variables: <span style="color: #0000BB;">"nUMI"</span>, <span style="color: #0000BB;">"nGene"</span>, <span style="color: #0000BB;">"mito"</span>, <span style="color: #0000BB;">"ribo"</span>, and <span style="color: #0000BB;">"hemo"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span><span style="color: #00BB00;">✔</span> calculating QC for dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch4"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span><span style="color: #00BB00;">✔</span> Normalizing datasets <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch1"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch2"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch3"</span> ... done</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Scaling dataset <span style="color: #0000BB;">"Batch4"</span> ... done</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Generating UMAP on unaligned cell factor loadings</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Generating UMAP on unaligned cell factor loadings ... done</span></span></code></pre>
-<pre><code><span><span class="co">## </span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #00BBBB;">ℹ</span> <span style="color: #00BB00;">DimRed</span> <span style="color: #0000BB;">"UMAP"</span> is now set as default.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in .check_reddim_names(x, value, withDimnames): non-NULL 'rownames(value)' should be the same as 'colnames(x)' for</span></span>
-<span><span class="co">## 'reducedDim&lt;-'. This will be an error in the next release of</span></span>
-<span><span class="co">## Bioconductor.</span></span></code></pre>
-</div>
-<div class="section level3">
-<h3 id="plot">Plot<a class="anchor" aria-label="anchor" href="#plot"></a>
-</h3>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 320 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 320 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 2000 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-3.png" width="700"></p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using top 2000 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-4.png" width="700"></p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using anglemania genes, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-5.png" width="700"></p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_liger_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Integration using anglemania genes, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-8-6.png" width="700"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="mnn-integration">MNN integration<a class="anchor" aria-label="anchor" href="#mnn-integration"></a>
 </h2>
 <div class="section level3">
-<h3 id="hvgs-2">HVGs<a class="anchor" aria-label="anchor" href="#hvgs-2"></a>
+<h3 id="hvgs">HVGs<a class="anchor" aria-label="anchor" href="#hvgs"></a>
 </h3>
 <div class="section level4">
-<h4 id="hvgs-3">320 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-3"></a>
+<h4 id="hvgs-1">320 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-1"></a>
 </h4>
 </div>
 <div class="section level4">
-<h4 id="hvgs-4">2000 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-4"></a>
+<h4 id="hvgs-2">2000 HVGs<a class="anchor" aria-label="anchor" href="#hvgs-2"></a>
 </h4>
 </div>
 </div>
 <div class="section level3">
-<h3 id="anglemania-1">anglemania<a class="anchor" aria-label="anchor" href="#anglemania-1"></a>
+<h3 id="anglemania">anglemania<a class="anchor" aria-label="anchor" href="#anglemania"></a>
 </h3>
 </div>
 <div class="section level3">
-<h3 id="plot-1">Plot<a class="anchor" aria-label="anchor" href="#plot-1"></a>
+<h3 id="plot">Plot<a class="anchor" aria-label="anchor" href="#plot"></a>
 </h3>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-3.png" width="700"></p>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-4.png" width="700"></p>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-4.png" width="700"></p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using anglemania genes, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-5.png" width="700"></p>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-5.png" width="700"></p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using anglemania genes, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-12-6.png" width="700"></p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-6.png" width="700"></p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.4.2 (2024-10-31)</span></span>
+<pre><code><span><span class="co">## R version 4.4.3 (2025-02-28)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.1 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.2 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -642,26 +396,25 @@ results when we use HVGs and anglemania genes as the input</li>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] batchelor_1.22.0            rliger_2.1.0               </span></span>
-<span><span class="co">##  [3] bluster_1.16.0              scran_1.34.0               </span></span>
-<span><span class="co">##  [5] scater_1.34.0               ggplot2_3.5.1              </span></span>
-<span><span class="co">##  [7] scuttle_1.16.0              splatter_1.30.0            </span></span>
-<span><span class="co">##  [9] SingleCellExperiment_1.28.1 SummarizedExperiment_1.36.0</span></span>
-<span><span class="co">## [11] Biobase_2.66.0              GenomicRanges_1.58.0       </span></span>
-<span><span class="co">## [13] GenomeInfoDb_1.42.3         IRanges_2.40.1             </span></span>
-<span><span class="co">## [15] S4Vectors_0.44.0            BiocGenerics_0.52.0        </span></span>
-<span><span class="co">## [17] MatrixGenerics_1.18.1       matrixStats_1.5.0          </span></span>
-<span><span class="co">## [19] Seurat_5.2.1                SeuratObject_5.0.2         </span></span>
-<span><span class="co">## [21] sp_2.2-0                    dplyr_1.1.4                </span></span>
-<span><span class="co">## [23] anglemania_0.99.0          </span></span>
+<span><span class="co">##  [1] batchelor_1.22.0            bluster_1.16.0             </span></span>
+<span><span class="co">##  [3] scran_1.34.0                scater_1.34.0              </span></span>
+<span><span class="co">##  [5] ggplot2_3.5.1               scuttle_1.16.0             </span></span>
+<span><span class="co">##  [7] splatter_1.30.0             SingleCellExperiment_1.28.1</span></span>
+<span><span class="co">##  [9] SummarizedExperiment_1.36.0 Biobase_2.66.0             </span></span>
+<span><span class="co">## [11] GenomicRanges_1.58.0        GenomeInfoDb_1.42.3        </span></span>
+<span><span class="co">## [13] IRanges_2.40.1              S4Vectors_0.44.0           </span></span>
+<span><span class="co">## [15] BiocGenerics_0.52.0         MatrixGenerics_1.18.1      </span></span>
+<span><span class="co">## [17] matrixStats_1.5.0           Seurat_5.2.1               </span></span>
+<span><span class="co">## [19] SeuratObject_5.0.2          sp_2.2-0                   </span></span>
+<span><span class="co">## [21] dplyr_1.1.4                 anglemania_0.99.0          </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] RcppAnnoy_0.0.22          splines_4.4.2            </span></span>
+<span><span class="co">##   [1] RcppAnnoy_0.0.22          splines_4.4.3            </span></span>
 <span><span class="co">##   [3] later_1.4.1               tibble_3.2.1             </span></span>
 <span><span class="co">##   [5] polyclip_1.10-7           fastDummies_1.7.5        </span></span>
 <span><span class="co">##   [7] lifecycle_1.0.4           edgeR_4.4.2              </span></span>
 <span><span class="co">##   [9] doParallel_1.0.17         globals_0.16.3           </span></span>
-<span><span class="co">##  [11] lattice_0.22-6            MASS_7.3-61              </span></span>
+<span><span class="co">##  [11] lattice_0.22-6            MASS_7.3-64              </span></span>
 <span><span class="co">##  [13] backports_1.5.0           magrittr_2.0.3           </span></span>
 <span><span class="co">##  [15] limma_3.62.2              plotly_4.10.4            </span></span>
 <span><span class="co">##  [17] sass_0.4.9                rmarkdown_2.29           </span></span>
@@ -669,7 +422,7 @@ results when we use HVGs and anglemania genes as the input</li>
 <span><span class="co">##  [21] bigparallelr_0.3.2        metapod_1.14.0           </span></span>
 <span><span class="co">##  [23] httpuv_1.6.15             sctransform_0.4.1        </span></span>
 <span><span class="co">##  [25] spam_2.11-1               spatstat.sparse_3.1-0    </span></span>
-<span><span class="co">##  [27] reticulate_1.40.0         cowplot_1.1.3            </span></span>
+<span><span class="co">##  [27] reticulate_1.41.0         cowplot_1.1.3            </span></span>
 <span><span class="co">##  [29] pbapply_1.7-2             RColorBrewer_1.1-3       </span></span>
 <span><span class="co">##  [31] ResidualMatrix_1.16.0     abind_1.4-8              </span></span>
 <span><span class="co">##  [33] zlibbioc_1.52.0           Rtsne_0.17               </span></span>
@@ -685,56 +438,56 @@ results when we use HVGs and anglemania genes as the input</li>
 <span><span class="co">##  [53] UCSC.utils_1.2.0          farver_2.1.2             </span></span>
 <span><span class="co">##  [55] viridis_0.6.5             ScaledMatrix_1.14.0      </span></span>
 <span><span class="co">##  [57] bigstatsr_1.6.1           spatstat.explore_3.3-4   </span></span>
-<span><span class="co">##  [59] flock_0.7                 jsonlite_1.8.9           </span></span>
+<span><span class="co">##  [59] flock_0.7                 jsonlite_1.9.1           </span></span>
 <span><span class="co">##  [61] BiocNeighbors_2.0.1       progressr_0.15.1         </span></span>
-<span><span class="co">##  [63] ggridges_0.5.6            survival_3.7-0           </span></span>
+<span><span class="co">##  [63] ggridges_0.5.6            survival_3.8-3           </span></span>
 <span><span class="co">##  [65] iterators_1.0.14          systemfonts_1.2.1        </span></span>
-<span><span class="co">##  [67] foreach_1.5.2             tools_4.4.2              </span></span>
+<span><span class="co">##  [67] foreach_1.5.2             tools_4.4.3              </span></span>
 <span><span class="co">##  [69] ragg_1.3.3                ica_1.0-3                </span></span>
 <span><span class="co">##  [71] Rcpp_1.0.14               glue_1.8.0               </span></span>
-<span><span class="co">##  [73] gridExtra_2.3             SparseArray_1.6.1        </span></span>
-<span><span class="co">##  [75] xfun_0.50                 withr_3.0.2              </span></span>
-<span><span class="co">##  [77] fastmap_1.2.0             rsvd_1.0.5               </span></span>
-<span><span class="co">##  [79] digest_0.6.37             R6_2.5.1                 </span></span>
+<span><span class="co">##  [73] gridExtra_2.3             SparseArray_1.6.2        </span></span>
+<span><span class="co">##  [75] xfun_0.51                 withr_3.0.2              </span></span>
+<span><span class="co">##  [77] fastmap_1.2.0             digest_0.6.37            </span></span>
+<span><span class="co">##  [79] rsvd_1.0.5                R6_2.6.1                 </span></span>
 <span><span class="co">##  [81] mime_0.12                 textshaping_1.0.0        </span></span>
 <span><span class="co">##  [83] colorspace_2.1-1          scattermore_1.2          </span></span>
 <span><span class="co">##  [85] tensor_1.5                spatstat.data_3.1-4      </span></span>
 <span><span class="co">##  [87] tidyr_1.3.1               generics_0.1.3           </span></span>
-<span><span class="co">##  [89] data.table_1.16.4         FNN_1.1.4.1              </span></span>
+<span><span class="co">##  [89] data.table_1.17.0         FNN_1.1.4.1              </span></span>
 <span><span class="co">##  [91] httr_1.4.7                htmlwidgets_1.6.4        </span></span>
-<span><span class="co">##  [93] S4Arrays_1.6.0            uwot_0.2.2               </span></span>
+<span><span class="co">##  [93] S4Arrays_1.6.0            uwot_0.2.3               </span></span>
 <span><span class="co">##  [95] pkgconfig_2.0.3           gtable_0.3.6             </span></span>
 <span><span class="co">##  [97] lmtest_0.9-40             XVector_0.46.0           </span></span>
 <span><span class="co">##  [99] htmltools_0.5.8.1         dotCall64_1.2            </span></span>
 <span><span class="co">## [101] scales_1.3.0              png_0.1-8                </span></span>
 <span><span class="co">## [103] spatstat.univar_3.1-1     knitr_1.49               </span></span>
 <span><span class="co">## [105] reshape2_1.4.4            checkmate_2.3.2          </span></span>
-<span><span class="co">## [107] nlme_3.1-166              cachem_1.1.0             </span></span>
-<span><span class="co">## [109] zoo_1.8-12                stringr_1.5.1            </span></span>
-<span><span class="co">## [111] rmio_0.4.0                KernSmooth_2.23-24       </span></span>
-<span><span class="co">## [113] vipor_0.4.7               parallel_4.4.2           </span></span>
+<span><span class="co">## [107] nlme_3.1-167              cachem_1.1.0             </span></span>
+<span><span class="co">## [109] zoo_1.8-13                stringr_1.5.1            </span></span>
+<span><span class="co">## [111] rmio_0.4.0                KernSmooth_2.23-26       </span></span>
+<span><span class="co">## [113] vipor_0.4.7               parallel_4.4.3           </span></span>
 <span><span class="co">## [115] miniUI_0.1.1.1            desc_1.4.3               </span></span>
-<span><span class="co">## [117] pillar_1.10.1             grid_4.4.2               </span></span>
+<span><span class="co">## [117] pillar_1.10.1             grid_4.4.3               </span></span>
 <span><span class="co">## [119] vctrs_0.6.5               RANN_2.6.2               </span></span>
 <span><span class="co">## [121] promises_1.3.2            BiocSingular_1.22.0      </span></span>
 <span><span class="co">## [123] ff_4.5.2                  beachmat_2.22.0          </span></span>
-<span><span class="co">## [125] xtable_1.8-4              cluster_2.1.6            </span></span>
+<span><span class="co">## [125] xtable_1.8-4              cluster_2.1.8            </span></span>
 <span><span class="co">## [127] beeswarm_0.4.0            evaluate_1.0.3           </span></span>
-<span><span class="co">## [129] cli_3.6.3                 locfit_1.5-9.11          </span></span>
-<span><span class="co">## [131] compiler_4.4.2            rlang_1.1.5              </span></span>
+<span><span class="co">## [129] cli_3.6.4                 locfit_1.5-9.11          </span></span>
+<span><span class="co">## [131] compiler_4.4.3            rlang_1.1.5              </span></span>
 <span><span class="co">## [133] crayon_1.5.3              future.apply_1.11.3      </span></span>
-<span><span class="co">## [135] labeling_0.4.3            ps_1.8.1                 </span></span>
+<span><span class="co">## [135] labeling_0.4.3            ps_1.9.0                 </span></span>
 <span><span class="co">## [137] ggbeeswarm_0.7.2          plyr_1.8.9               </span></span>
 <span><span class="co">## [139] fs_1.6.5                  stringi_1.8.4            </span></span>
 <span><span class="co">## [141] viridisLite_0.4.2         deldir_2.0-4             </span></span>
 <span><span class="co">## [143] BiocParallel_1.40.0       munsell_0.5.1            </span></span>
 <span><span class="co">## [145] lazyeval_0.2.2            spatstat.geom_3.3-5      </span></span>
-<span><span class="co">## [147] Matrix_1.7-1              RcppHNSW_0.6.0           </span></span>
+<span><span class="co">## [147] Matrix_1.7-2              RcppHNSW_0.6.0           </span></span>
 <span><span class="co">## [149] patchwork_1.3.0           sparseMatrixStats_1.18.0 </span></span>
 <span><span class="co">## [151] future_1.34.0             statmod_1.5.0            </span></span>
 <span><span class="co">## [153] shiny_1.10.0              ROCR_1.0-11              </span></span>
 <span><span class="co">## [155] igraph_2.1.4              bslib_0.9.0              </span></span>
-<span><span class="co">## [157] RcppPlanc_1.0.0           bit_4.5.0.1</span></span></code></pre>
+<span><span class="co">## [157] bit_4.5.0.1</span></span></code></pre>
 </div>
 </div>
   </div>

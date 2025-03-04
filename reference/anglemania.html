@@ -74,10 +74,10 @@ genes based on specified thresholds.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">anglemania</span><span class="op">(</span></span>
 <span>  <span class="va">angl</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span>
 <span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span></span>
+<span>  max_n_genes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"cosine"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -88,13 +88,6 @@ genes based on specified thresholds.</p>
 <dl><dt id="arg-angl">angl<a class="anchor" aria-label="anchor" href="#arg-angl"></a></dt>
 <dd><p>An <code><a href="anglemania_object-class.html">anglemania_object-class</a></code> containing gene
 expression data and associated metadata.</p></dd>
-
-
-<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>Character string specifying the method to use for calculating
-the relationship between gene pairs. Default is <code>"cosine"</code>.
-Other options include <code>"diem"</code>
-(see <a href="https://bytez.com/docs/arxiv/2407.08623/paper" class="external-link">https://bytez.com/docs/arxiv/2407.08623/paper</a>).</p></dd>
 
 
 <dt id="arg-zscore-mean-threshold">zscore_mean_threshold<a class="anchor" aria-label="anchor" href="#arg-zscore-mean-threshold"></a></dt>
@@ -110,6 +103,13 @@ signal-to-noise z-score. Default is <code>2.5</code>.</p></dd>
 <dt id="arg-max-n-genes">max_n_genes<a class="anchor" aria-label="anchor" href="#arg-max-n-genes"></a></dt>
 <dd><p>Integer specifying the maximum number of genes to select.
 Default is <code>2000</code>.</p></dd>
+
+
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
+<dd><p>Character string specifying the method to use for calculating
+the relationship between gene pairs. Default is <code>"cosine"</code>.
+Other options include <code>"diem"</code>
+(see <a href="https://bytez.com/docs/arxiv/2407.08623/paper" class="external-link">https://bytez.com/docs/arxiv/2407.08623/paper</a>).</p></dd>
 
 </dl></div>
     <div id="value">
@@ -159,12 +159,15 @@ across samples using <code><a href="get_list_stats.html">get_list_stats</a></cod
 <span class="r-in"><span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=01s, remaining~00s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=01s, remaining~01s  |==================================================| 100% elapsed=01s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 214 genes for integration."</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the selected genes</span></span></span>
