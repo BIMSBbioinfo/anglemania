@@ -53,7 +53,8 @@ setClass(
     list_stats = "list",
     intersect_genes = "character",
     min_cells_per_gene = "numeric",
-    integration_genes = "list"
+    integration_genes = "list",
+    assay = "character"
   ),
   prototype = list(
     matrix_list = list(),
@@ -67,7 +68,8 @@ setClass(
     integration_genes = list(
       info = "data.frame",
       genes = "character"
-    )
+    ),
+    assay = NA_character_
   )
 )
 
@@ -586,9 +588,13 @@ setMethod(
   "Seurat",
   function(
   object,
-  dataset_key = NA,
+  dataset_key = NA_character_,
   batch_key,
-  min_cells_per_gene = 1) {
+  min_cells_per_gene = 1,
+  assay = "RNA",
+  allow_missing_features = FALSE,
+  min_samples_per_gene = 2
+) {
   # Validate inputs
   checkmate::assert_class(object, "Seurat")
   meta <- .get_meta_data(object)
@@ -638,6 +644,19 @@ setMethod(
     )
   }
 
+  if (!checkmate::testString(assay) || !(assay %in% Assays(seurat_object))) {
+    stop(
+      "assay needs to be a character string of length 1 ",
+      "it needs to correspond to Assays(seurat)"
+    )
+  }
+
+  # Create unique batch key
+  seurat_object <- add_unique_batch_key(
+    seurat_object,
+    dataset_key,
+    batch_key
+  )
 
 
   # Get the barcodes corresponding to each batch
@@ -655,7 +674,7 @@ setMethod(
       object,
       cells = bc,
       layer = "counts",
-      assay = "RNA"
+      assay = assay
     )
     filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
     filt_features <- names(filt_features[filt_features])
@@ -663,21 +682,42 @@ setMethod(
     return(counts_matrix)
   })
 
-  # Reduce to intersection of genes between batches
-  message("Using the intersection of filtered genes from all batches...")
-  intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+  # checks whether the genes should be present in all samples or just a subset of samples
+  if(!allow_missing_features){
+    # Reduce to intersection of genes between batches
+    message("Using the intersection of filtered genes from all batches...")
+    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+  }else{
+    message("Using genes which are present in minimally ",min_samples_per_gene, " samples...")
+    intersect_genes <- table(unlist(lapply(matrix_list, rownames)))
+    intersect_genes <- sort(rownames(intersect_genes)[intersect_genes >= min_samples_per_gene])
+  }
   message("Number of genes in intersected set: ", length(intersect_genes))
 
+  
   matrix_list <- pbapply::pblapply(
     matrix_list,
     function(x) {
-      x <- x[intersect_genes, ]
-      x <- sparse_to_fbm(x)
+      genes_in = intersect(rownames(x), intersect_genes)
+      x_in <- x[genes_in, ]
+      # Checks whether matrix contains missing features
+      genes_out = setdiff(intersect_genes, rownames(x))
+      if(length(genes_out) > 0){
+        # this pads the matrix with missing features
+        x_out = Matrix::Matrix(0, nrow=length(genes_out), ncol = ncol(x_in))
+        rownames(x_out) = genes_out
+        colnames(x_out) = colnames(x_in)
+        x_in = rbind(x_in, x_out)
+        # IMPORTANT: keeps track that the missing features are ordered in the same way in all matrices
+        x_in = x_in[intersect_genes,]
+      }
+      x_in <- sparse_to_fbm(x_in)
     },
     cl = bigstatsr::nb_cores()
   )
 
-  if (checkmate::test_string(dataset_key)) {
+  if (checkmate::testString(dataset_key) && length(unique(meta[[dataset_key]])) > 1) {
+    # Calculate the weights only if there are more than two datasets 
     data_info <- meta %>%
       dplyr::select(
         batch,
@@ -691,20 +731,24 @@ setMethod(
         ) %>%
       dplyr::mutate(
         weight = 1 / n_samples / dplyr::n_groups(.)
-      )
+      ) %>%
+      ## Normalize weights so that their mean is 1 - this helps when the features are not present in all samples
+      ungroup() %>%
+      mutate(weight = weight / mean(weight))
 
     weights <- data_info$weight
     names(weights) <- data_info$batch
+
   } else {
+    # if there is only one dataset, weights should be set to one
     data_info <- meta %>%
       dplyr::select(batch, dplyr::all_of(batch_key)) %>%
       dplyr::distinct() %>%
-      dplyr::mutate(weight = 1 / nrow(.))
+      dplyr::mutate(weight = 1)
 
     weights <- data_info$weight
     names(weights) <- data_info$batch
   }
-
   # Create anglem object
   anglem_object <- new(
     "anglemania_object",
@@ -718,7 +762,8 @@ setMethod(
     data_info = data_info,
     weights = weights,
     min_cells_per_gene = min_cells_per_gene,
-    intersect_genes = intersect_genes
+    intersect_genes = intersect_genes,
+    assay = assay
   )
 
   return(anglem_object)
