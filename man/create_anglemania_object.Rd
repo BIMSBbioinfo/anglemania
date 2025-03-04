@@ -11,16 +11,16 @@ create_anglemania_object(object, ...)
 
 \S4method{create_anglemania_object}{Seurat}(
   object,
-  dataset_key = NA,
   batch_key,
-  min_cells_per_gene = 1
+  min_cells_per_gene = 1,
+  dataset_key = NA
 )
 
 \S4method{create_anglemania_object}{SingleCellExperiment}(
   object,
-  dataset_key = NA,
   batch_key,
-  min_cells_per_gene = 1
+  min_cells_per_gene = 1,
+  dataset_key = NA
 )
 
 \S4method{create_anglemania_object}{list}(object, min_cells_per_gene = 1)
@@ -32,17 +32,17 @@ containing single-cell RNA-seq data.}
 
 \item{...}{Additional arguments}
 
-\item{dataset_key}{A character string indicating the column name in the
-object metadata that identifies the dataset to which each cell
-belongs. If \code{NA}, all cells are assumed to belong to the same
-dataset.}
-
 \item{batch_key}{A character string indicating the column name(s) in the
 object metadata that identify the batch to which each cell belongs.}
 
 \item{min_cells_per_gene}{A numeric value indicating the minimum number of
 cells in which a gene must be expressed to be included in the analysis.
 Default is \code{1}.}
+
+\item{dataset_key}{A character string indicating the column name in the
+object metadata that identifies the dataset to which each cell
+belongs. If \code{NA}, all cells are assumed to belong to the same
+dataset.}
 }
 \value{
 An \code{\link{anglemania_object-class}} containing:

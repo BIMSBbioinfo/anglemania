@@ -6,20 +6,15 @@
 \usage{
 anglemania(
   angl,
-  method = "cosine",
   zscore_mean_threshold = 2.5,
   zscore_sn_threshold = 2.5,
-  max_n_genes = 2000
+  max_n_genes = NULL,
+  method = "cosine"
 )
 }
 \arguments{
 \item{angl}{An \code{\link{anglemania_object-class}} containing gene
 expression data and associated metadata.}
-
-\item{method}{Character string specifying the method to use for calculating
-the relationship between gene pairs. Default is \code{"cosine"}.
-Other options include \code{"diem"}
-(see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
 
 \item{zscore_mean_threshold}{Numeric value specifying the threshold
 for the mean z-score. Default is \code{2.5}.}
@@ -29,6 +24,11 @@ signal-to-noise z-score. Default is \code{2.5}.}
 
 \item{max_n_genes}{Integer specifying the maximum number of genes to select.
 Default is \code{2000}.}
+
+\item{method}{Character string specifying the method to use for calculating
+the relationship between gene pairs. Default is \code{"cosine"}.
+Other options include \code{"diem"}
+(see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
 }
 \value{
 An updated \code{\link{anglemania_object-class}} with computed statistics and

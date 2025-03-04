@@ -586,9 +586,9 @@ setMethod(
   "Seurat",
   function(
   object,
-  dataset_key = NA,
   batch_key,
-  min_cells_per_gene = 1) {
+  min_cells_per_gene = 1,
+  dataset_key = NA) {
   # Validate inputs
   checkmate::assert_class(object, "Seurat")
   meta <- .get_meta_data(object)
@@ -737,9 +737,9 @@ setMethod(
   "SingleCellExperiment",
   function(
       object,
-      dataset_key = NA,
       batch_key,
-      min_cells_per_gene = 1) {
+      min_cells_per_gene = 1,
+      dataset_key = NA) {
     # Validate inputs
     checkmate::assert_class(object, "SingleCellExperiment")
     meta <- .get_meta_data(object)

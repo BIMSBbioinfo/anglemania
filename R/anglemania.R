@@ -71,10 +71,10 @@
 #' @export
 anglemania <- function(
     angl,
-    method = "cosine",
     zscore_mean_threshold = 2.5,
     zscore_sn_threshold = 2.5,
-    max_n_genes = 2000) {
+    max_n_genes = NULL,
+    method = "cosine") {
   # Validate inputs
   if (!inherits(angl, "anglemania_object")) {
     stop("angl needs to be an anglemania_object")
@@ -117,6 +117,13 @@ anglemania <- function(
   invisible(gc())
 
   message("Filtering features...")
+  angl <- prefilter_angl(
+    angl,
+    zscore_mean_threshold = 1,
+    zscore_sn_threshold = 1
+  )
+
+  message("Selecting features...")
   angl <- select_genes(
     angl,
     zscore_mean_threshold = zscore_mean_threshold,

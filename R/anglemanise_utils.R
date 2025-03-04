@@ -292,9 +292,9 @@ get_list_stats <- function(angl) {
   )
 
   res <- list(
-    mean_zscore = mat_mean_zscore[],
-    sds_zscore  = mat_sds_zscore[],
-    sn_zscore   = mat_sn_zscore[]
+    mean_zscore = mat_mean_zscore,
+    sds_zscore  = mat_sds_zscore,
+    sn_zscore   = mat_sn_zscore
   )
 
   return(res)
@@ -339,6 +339,63 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
   return(unique_genes)
 }
 
+
+# ---------------------------------------------------------------------------
+#' Preselect Genes from an anglemania_object, to make subsequent filtering easier
+#'
+#' @param angl An \code{anglemania_object} containing statistical
+#'   matrices such as mean z-scores and SNR z-scores.
+#' @param zscore_mean_threshold Numeric value specifying the threshold for the
+#'   absolute mean z-score. Default is 1.
+#' @param zscore_sn_threshold Numeric value specifying the threshold for the
+#'   SNR z-score. Default is 1.
+#' @return The input \code{anglemania_object} with the
+#'   \code{integration_genes} slot updated to include the selected genes and
+#'   their statistical information.
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'  \item Checks if the input object is of class \code{\link{anglemania_object-class}}.
+#'  \item Identifies gene pairs where both the mean z-score and SNR z-score
+#'     exceed the specified thresholds.
+#' }
+#' @useDynLib anglemania, .registration = TRUE
+#' @keywords internal
+prefilter_angl <- function(
+    angl,
+    zscore_mean_threshold = 1,
+    zscore_sn_threshold = 1) {
+  if (!inherits(angl, "anglemania_object")) {
+    stop("angl needs to be an anglemania_object")
+  }
+  if (zscore_mean_threshold <= 0 || zscore_sn_threshold <= 0) {
+    stop("zscore_mean_threshold and zscore_sn_threshold need to be positive")
+  }
+  prefiltered_dt <- select_genes_cpp(
+    BM_sn = list_stats(angl)$sn_zscore,
+    BM_mean = list_stats(angl)$mean_zscore,
+    zscore_mean_threshold = zscore_mean_threshold,
+    zscore_sn_threshold = zscore_sn_threshold
+  )
+  while (nrow(prefiltered_dt) == 0) {
+    if (zscore_mean_threshold <= 0 || zscore_sn_threshold <= 0) {
+      stop("zscore_mean_threshold and zscore_sn_threshold need to be positive")
+    }
+    message("No genes passed the cutoff. Decreasing thresholds by 0.1...")
+    zscore_mean_threshold <- zscore_mean_threshold - 0.1
+    zscore_sn_threshold <- zscore_sn_threshold - 0.1
+    prefiltered_dt <- select_genes_cpp(
+      BM_sn = list_stats(angl)$sn_zscore,
+      BM_mean = list_stats(angl)$mean_zscore,
+      zscore_mean_threshold = zscore_mean_threshold,
+      zscore_sn_threshold = zscore_sn_threshold
+    )
+  }
+
+  list_stats(angl)$prefiltered <- prefiltered_dt
+  return(angl)
+}
+
 # ---------------------------------------------------------------------------
 #' Select Genes Based on Statistical Thresholds from an anglemania_object
 #'
@@ -361,6 +418,7 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #'   \code{integration_genes} slot updated to include the selected genes and
 #'   their statistical information.
 #' @importFrom stats quantile
+#' @importFrom dplyr filter
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
@@ -404,89 +462,123 @@ select_genes <- function(
     max_n_genes <- length(intersect_genes(angl))
   }
 
-  gene_ind <- which(
-    upper.tri(list_stats(angl)$sn_zscore) &
-      (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
-      (abs(list_stats(angl)$mean_zscore) >= zscore_mean_threshold),
-    arr.ind = TRUE
-  )
-
+  # Filter DF by thresholds
+  filtered_genes_df <- list_stats(angl)$prefiltered %>%
+    dplyr::filter(
+      abs(mean_zscore) >= zscore_mean_threshold &
+        sn_zscore >= zscore_sn_threshold
+    )
   # Adjust thresholds if no genes passed the cutoff
-  if (nrow(gene_ind) == 0) {
-    message("No genes passed the cutoff.")
-    quantile95mean <- stats::quantile(
-      abs(list_stats(angl)$mean_zscore),
-      0.95,
-      na.rm = TRUE
-    )
-    quantile95sn <- stats::quantile(
-      list_stats(angl)$sn_zscore,
-      0.95,
-      na.rm = TRUE
-    )
-    if (quantile95mean < zscore_mean_threshold) {
-      zscore_mean_threshold <- quantile95mean
+  while (nrow(filtered_genes_df) == 0) {
+    if (zscore_mean_threshold >= 0){
+      message("No genes passed the cutoff.")
+      zscore_mean_threshold <- zscore_mean_threshold - 0.1
+        message(
+          paste0(
+            "Decreasing zscore_mean_threshold by 0.1: ",
+            zscore_mean_threshold
+          )
+        )
+
+      zscore_sn_threshold <- zscore_sn_threshold - 0.1
       message(
         paste0(
-          "zscore_mean_threshold is lower than the 95% quantile of the ",
-          "absolute mean z-scores. Setting zscore_mean_threshold to: ",
-          zscore_mean_threshold
+          "Decreasing zscore_sn_threshold by 0.1: ",
+          zscore_sn_threshold
         )
       )
-    }
-    if (quantile95sn < zscore_sn_threshold) {
-      zscore_sn_threshold <- quantile95sn
-      message(
-        paste0(
-          "zscore_sn_threshold is higher than 95% quantile. Setting ",
-          "zscore_sn_threshold to: ",
-          round(zscore_sn_threshold, 2)
+      filtered_genes_df <- list_stats(angl)$prefiltered %>%
+        dplyr::filter(
+          abs(mean_zscore) >= zscore_mean_threshold &
+            sn_zscore >= zscore_sn_threshold
         )
-      )
+    } else {
+      stop("No genes passed the cutoff.")
     }
-    print(
-      paste0(
-        "zscore_mean_threshold: ", zscore_mean_threshold,
-        " zscore_sn_threshold: ", round(zscore_sn_threshold, 2)
-      )
-    )
-
-    # Re-run the selection
-    gene_ind <- which(
-      upper.tri(list_stats(angl)$sn_zscore) &
-        (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
-        (abs(list_stats(angl)$mean_zscore) >= zscore_mean_threshold),
-      arr.ind = TRUE
-    )
-
-    message(
-      "If desired, you can re-run the selection of genes with a lower ",
-      "zscore_mean_threshold and/or zscore_sn_threshold by using the ",
-      "'select_genes' function. e.g.: angl <- select_genes(",
-      "angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, ",
-      "max_n_genes = 2000)"
-    )
-    message(
-      "Please inspect get_anglemania_genes(angl)$info",
-      " for info on the scores of the selected gene pairs."
-    )
   }
 
-  top_n <- data.frame(
-    geneA = gene_ind[, 1],
-    geneB = gene_ind[, 2],
-    zscore = list_stats(angl)$mean_zscore[gene_ind],
-    snscore = list_stats(angl)$sn_zscore[gene_ind]
+  message(
+    "If desired, you can re-run the selection of genes with a lower ",
+    "zscore_mean_threshold and/or zscore_sn_threshold by using the ",
+    "'select_genes' function. e.g.: angl <- select_genes(",
+    "angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, ",
+    "max_n_genes = 2000)"
+  )
+  message(
+    "Please inspect get_anglemania_genes(angl)$info",
+    " for info on the scores of the selected gene pairs."
   )
 
+
+
   # Order data frame
-  top_n <- top_n[order(abs(top_n$zscore), decreasing = TRUE), ]
-  angl@integration_genes$info <- top_n
-  selected_genes <- extract_rows_for_unique_genes(top_n, max_n_genes)
+  filtered_genes_df <- filtered_genes_df[order(abs(filtered_genes_df$mean_zscore), decreasing = TRUE), ]
+  angl@integration_genes$info <- filtered_genes_df
+  selected_genes <- extract_rows_for_unique_genes(filtered_genes_df, max_n_genes)
   angl@integration_genes$genes <- 
     intersect_genes(angl)[selected_genes]
   print(paste0(
     "Selected ", length(selected_genes), " genes for integration."
   ))
   return(angl)
+}
+
+
+# ---------------------------------------------------------------------------
+#' Adjusted big_cor function with different scaling function.
+#' In comparison to big_scale(), we don't stop the scaling if there is a gene
+#' with 0 variance.
+#' #' Correlation
+#'
+#' Compute the correlation matrix of a Filebacked Big Matrix.
+#' @param X An object of class [FBM][FBM-class].
+#' @param backingfile The path to the backing file of the FBM.
+#' @import bigstatsr
+#' @return An FBM object with the correlation matrix of the data in X.
+#' @examples
+#' X <- bigstatsr::FBM(13, 17, init = rnorm(221))
+#' angl_cor(X)
+#' @export
+angl_cor <- function(X,
+                     backingfile = tempfile(tmpdir = getOption("FBM.dir"))) {
+  # Adjusted scaling function: does not stop on 0 variance
+
+  ind.row <- bigstatsr::rows_along(X)
+  ind.col <- bigstatsr::cols_along(X)
+  block.size <- bigstatsr::block_size(nrow(X))
+  adj_big_scale <- function(center = TRUE, scale = TRUE) {
+    function(X, ind.row, ind.col, ncores = 1) {
+      bigstatsr:::check_args()
+      m <- length(ind.col)
+
+      if (center) {
+        stats <- bigstatsr::big_colstats(X, ind.row, ind.col, ncores = ncores)
+        means <- stats$sum / length(ind.row)
+        sds <- if (scale) sqrt(stats$var) else rep(1, m)
+        # Replace near-zero standard deviations with 1 (or a small constant)
+        sds[sds < .Machine$double.eps] <- 1e-5
+      } else {
+        means <- rep(0, m)
+        sds <- rep(1, m)
+      }
+
+      # Note: we do not check for near-zero sds here, so genes with zero variance are allowed.
+      data.frame(center = means, scale = sds)
+    }
+  }
+
+  # Scaling function for correlation that adjusts the standard deviation.
+  cor.scaling <- function(X, ind.row, ind.col) {
+    ms <- adj_big_scale(center = TRUE, scale = TRUE)(X, ind.row, ind.col)
+    ms$scale <- ms$scale * sqrt(length(ind.row) - 1)
+    ms
+  }
+
+  bigstatsr::big_crossprodSelf(X,
+    fun.scaling = cor.scaling,
+    ind.row = ind.row,
+    ind.col = ind.col,
+    block.size = block.size,
+    backingfile = backingfile
+  )
 }
