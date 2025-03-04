@@ -532,20 +532,19 @@ select_genes <- function(
 #'
 #' Compute the correlation matrix of a Filebacked Big Matrix.
 #' @param X An object of class [FBM][FBM-class].
-#' @param backingfile The path to the backing file of the FBM.
+#' @param block.size Number of columns to process at a time.
 #' @import bigstatsr
-#' @return An FBM object with the correlation matrix of the data in X.
+#' @return An FBM object with the (pearson) correlation matrix of the data in X.
 #' @examples
 #' X <- bigstatsr::FBM(13, 17, init = rnorm(221))
 #' angl_cor(X)
 #' @export
 angl_cor <- function(X,
-                     backingfile = tempfile(tmpdir = getOption("FBM.dir"))) {
+                     block.size = 1000) {
   # Adjusted scaling function: does not stop on 0 variance
 
   ind.row <- bigstatsr::rows_along(X)
   ind.col <- bigstatsr::cols_along(X)
-  block.size <- bigstatsr::block_size(nrow(X))
   adj_big_scale <- function(center = TRUE, scale = TRUE) {
     function(X, ind.row, ind.col, ncores = 1) {
       bigstatsr:::check_args()
@@ -578,7 +577,6 @@ angl_cor <- function(X,
     fun.scaling = cor.scaling,
     ind.row = ind.row,
     ind.col = ind.col,
-    block.size = block.size,
-    backingfile = backingfile
+    block.size = block.size
   )
 }

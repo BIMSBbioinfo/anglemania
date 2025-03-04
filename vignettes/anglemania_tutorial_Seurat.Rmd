@@ -128,7 +128,7 @@ angl
 angl <- anglemania(angl,
   zscore_mean_threshold = 2,
   zscore_sn_threshold = 2,
-  max_n_genes = 2000 # optionally define a max number of genes. default is 2000
+  max_n_genes = 2000 # optionally define a max number of genes.
 )
 angl <- select_genes(angl,
                      zscore_mean_threshold = 2.5,
