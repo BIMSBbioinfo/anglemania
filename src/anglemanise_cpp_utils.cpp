@@ -66,15 +66,13 @@ DataFrame select_genes_cpp(Environment BM_sn,
     }
   }
   
-  // Create the DataFrame and assign the data.table class
+  // Create the DataFrame
   DataFrame df = DataFrame::create(
     _["geneA"]  = rows,
     _["geneB"]  = cols,
     _["sn_zscore"]   = sn_vals,
     _["mean_zscore"] = mean_vals
   );
-  
-  df.attr("class") = CharacterVector::create("data.table", "data.frame");
   
   return df;
 }

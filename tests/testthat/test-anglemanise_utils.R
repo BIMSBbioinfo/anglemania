@@ -196,7 +196,7 @@ test_that("select_genes selects genes correctly based on thresholds", {
   )
 
   # Extract expected gene pairs
-  expected_info_df <- data.table::data.table(
+  expected_info_df <- data.frame(
     geneA = expected_indices[, 1],
     geneB = expected_indices[, 2],
     sn_zscore = sn_zscore_matrix[expected_indices],
