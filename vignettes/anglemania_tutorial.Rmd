@@ -39,8 +39,6 @@ Under the hood, anglemania works with file-backed big matrices (FBMs) from the b
 (https://github.com/privefl/bigstatsr/) for fast and memory efficient computation.
 
 ```{r, load libraries}
-install.packages("RcppPlanc", repos = "https://welch-lab.r-universe.dev")
-# for LIGER integration, it as of now needs RcppPlanc
 suppressPackageStartupMessages({
   library(anglemania)
   library(dplyr)
@@ -50,7 +48,6 @@ suppressPackageStartupMessages({
   library(scater)
   library(scran)
   library(bluster)
-  library(rliger)
   library(batchelor)
 })
 ```
@@ -161,91 +158,6 @@ head(integration_genes)
 length(integration_genes)
 ```
 
-* We use LIGER https://github.com/welch-lab/liger, https://www.nature.com/articles/s41596-020-0391-8 
-  and fastMNN https://rdrr.io/github/LTLA/batchelor/, https://www.nature.com/articles/nbt.4091
-  and compare the results when we use HVGs and anglemania genes as the input
-
-# Liger integration
-## HVGs
-### low number of HVGs
-```{r, echo=FALSE, results="hide"}
-barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
-sce_list <- lapply(barcodes_by_batch, function(x) sce[,x])
-sce_lig <- rliger::createLiger(sce_list, "rna")
-sce_lig <- sce_lig %>%
-  rliger::normalize() %>%
-  rliger::selectGenes(nGenes = 320) %>%
-  # because we chose 319 genes with anglemania we only keep 320 HVGs for better comparability
-  rliger::scaleNotCenter()
-sce_lig <- rliger::runIntegration(sce_lig, k = 20)
-sce_lig
-```
-
-```{r, echo=FALSE, results="hide"}
-sce_lig <- runUMAP(sce_lig)
-sce_lig
-umap_rliger <- rliger::dimRed(sce_lig, "UMAP")
-rownames(umap_rliger) <- sapply(rownames(umap_rliger), function(x) stringr::str_split(x, "_")[[1]][2])
-reducedDim(sce, "umap_liger_hvg_320") <- umap_rliger
-```
-
-### 2000 HVGs 
-```{r, echo=FALSE, results="hide"}
-barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
-sce_list <- lapply(barcodes_by_batch, function(x) sce[,x])
-sce_lig <- rliger::createLiger(sce_list, "rna")
-sce_lig <- sce_lig %>%
-  rliger::normalize() %>%
-  rliger::selectGenes(nGenes = 2000) %>%
-  rliger::scaleNotCenter()
-sce_lig <- rliger::runIntegration(sce_lig, k = 20)
-sce_lig
-```
-
-```{r, echo=FALSE, results="hide"}
-sce_lig <- runUMAP(sce_lig)
-sce_lig
-umap_rliger <- rliger::dimRed(sce_lig, "UMAP")
-rownames(umap_rliger) <- sapply(rownames(umap_rliger), function(x) stringr::str_split(x, "_")[[1]][2])
-reducedDim(sce, "umap_liger_hvg_2000") <- umap_rliger
-```
-
-
-## anglemania
-```{r, echo=FALSE, results="hide"}
-barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
-sce_list <- lapply(barcodes_by_batch, function(x) sce[,x])
-sce_lig <- rliger::createLiger(sce_list, "rna")
-sce_lig <- rliger::normalize(sce_lig)
-varFeatures(sce_lig) <- integration_genes # just act like the anglemania genes are the "variable features"
-sce_lig <- rliger::scaleNotCenter(sce_lig)
-sce_lig <- rliger::runIntegration(sce_lig, k = 20)
-sce_lig
-```
-
-```{r, echo=FALSE, results="hide"}
-sce_lig <- runUMAP(sce_lig)
-sce_lig
-umap_rliger <- rliger::dimRed(sce_lig, "UMAP")
-rownames(umap_rliger) <- sapply(rownames(umap_rliger), function(x) stringr::str_split(x, "_")[[1]][2])
-reducedDim(sce, "umap_liger_anglemania") <- umap_rliger
-```
-
-## Plot
-```{r}
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_liger_hvg_320") +
-  ggtitle("Integration using top 320 HVGs, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_liger_hvg_320") +
-  ggtitle("Integration using top 320 HVGs, colored by Group")
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_liger_hvg_2000") +
-  ggtitle("Integration using top 2000 HVGs, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_liger_hvg_2000") +
-  ggtitle("Integration using top 2000 HVGs, colored by Group")
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_liger_anglemania") +
-  ggtitle("Integration using anglemania genes, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_liger_anglemania") +
-  ggtitle("Integration using anglemania genes, colored by Group")
-```
 
 # MNN integration
 ## HVGs
@@ -306,6 +218,7 @@ plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_anglemania") +
 plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_anglemania") +
   ggtitle("MNN integration using anglemania genes, colored by Group")
 ```
+
 
 
 ```{r}
