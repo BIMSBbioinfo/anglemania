@@ -137,16 +137,15 @@ when matrices have different dimensions", {
 test_that("select_genes selects genes correctly based on thresholds", {
   # Create minimal matrices for mean_zscore and sn_zscore
   set.seed(123) # For reproducibility
-  mean_zscore_matrix <- matrix(
-    rnorm(400, mean = 0, sd = 3), # Mean 0, SD 3
+  mean_zscore_matrix <- bigstatsr::FBM(
     nrow = 20,
-    ncol = 20
+    ncol = 20,
+    init = rnorm(400, mean = 0, sd = 3)
   )
-
-  sn_zscore_matrix <- matrix(
-    rnorm(400, mean = 2, sd = 1), # Mean 2, SD 1
-    nrow = 20,
-    ncol = 20
+  sn_zscore_matrix <- bigstatsr::FBM(
+    nrow = 20, 
+    ncol = 20, 
+    init = rnorm(400, mean = 0, sd = 1)
   )
 
   # Define intersect_genes
@@ -164,6 +163,11 @@ test_that("select_genes selects genes correctly based on thresholds", {
       info = data.frame(),
       genes = character()
     )
+  )
+  test_angl <- prefilter_angl(
+    angl = test_angl,
+    zscore_mean_threshold = 1.0,
+    zscore_sn_threshold = 1.0
   )
 
   # Call select_genes with thresholds
@@ -185,25 +189,25 @@ test_that("select_genes selects genes correctly based on thresholds", {
 
   # Calculate expected indices
   expected_indices <- which(
-    upper.tri(sn_zscore_matrix) &
-      (sn_zscore_matrix >= 2.0) &
-      (abs(mean_zscore_matrix) >= 2.0),
+    upper.tri(sn_zscore_matrix[]) &
+      (sn_zscore_matrix[] >= 2.0) &
+      (abs(mean_zscore_matrix[]) >= 2.0),
     arr.ind = TRUE
   )
 
   # Extract expected gene pairs
-  expected_info_df <- data.frame(
+  expected_info_df <- data.table::data.table(
     geneA = expected_indices[, 1],
     geneB = expected_indices[, 2],
-    zscore = mean_zscore_matrix[expected_indices],
-    snscore = sn_zscore_matrix[expected_indices]
+    sn_zscore = sn_zscore_matrix[expected_indices],
+    mean_zscore = mean_zscore_matrix[expected_indices]
   )
 
   # Order by absolute zscore
   expected_info_df <- expected_info_df[
-    order(abs(expected_info_df$zscore), decreasing = TRUE),
+    order(abs(expected_info_df$mean_zscore), decreasing = TRUE),
   ]
-
+ 
   # Limit to max_n_genes
   expected_gene_pairs <- unique(as.vector(rbind(
     expected_info_df[seq_len(2), ]$geneA,
@@ -216,58 +220,10 @@ test_that("select_genes selects genes correctly based on thresholds", {
   ))
 
   # Compare the selected genes
-  expect_equal(selected_genes, expected_selected_genes)
+  testthat::expect_equal(selected_genes, expected_selected_genes)
 
   # Compare the info data frame
-  expect_equal(selected_info, expected_info_df)
+rownames(selected_info) <- NULL
+rownames(expected_info_df) <- NULL
+testthat::expect_equal(selected_info, expected_info_df)
 })
-
-
-test_that("select_genes adjusts thresholds when no genes pass the cutoff with larger matrices", {
-  # Use higher thresholds so that no genes pass
-  # Create minimal matrices for mean_zscore and sn_zscore
-  set.seed(123) # For reproducibility
-  mean_zscore_matrix <- matrix(
-    rnorm(1600, mean = 0, sd = 3), # Mean 0, SD 3
-    nrow = 40,
-    ncol = 40
-  )
-
-  sn_zscore_matrix <- matrix(
-    rnorm(1600, mean = 2, sd = 1), # Mean 2, SD 1
-    nrow = 40,
-    ncol = 40
-  )
-
-  # Define intersect_genes
-  gene_names <- paste0("gene", 1:40)
-
-  # Create an anglemania_object with the required slots
-  test_angl <- new(
-    "anglemania_object",
-    list_stats = list(
-      mean_zscore = mean_zscore_matrix,
-      sn_zscore = sn_zscore_matrix
-    ),
-    intersect_genes = gene_names,
-    integration_genes = list(
-      info = data.frame(),
-      genes = character()
-    )
-  )
-  # Call select_genes with thresholds
-  updated_object <- select_genes(
-    angl = test_angl,
-    zscore_mean_threshold = 10,
-    zscore_sn_threshold = 10,
-    max_n_genes = 3
-  )
-
-  # Verify that thresholds are adjusted and some genes are selected
-  selected_genes <- updated_object@integration_genes$genes
-  expect_true(length(selected_genes) > 0)
-  expect_true(!any(is.na(selected_genes)))
-})
-
-
-

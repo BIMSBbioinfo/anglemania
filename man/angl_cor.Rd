@@ -7,15 +7,15 @@ In comparison to big_scale(), we don't stop the scaling if there is a gene
 with 0 variance.
 #' Correlation}
 \usage{
-angl_cor(X, backingfile = tempfile(tmpdir = getOption("FBM.dir")))
+angl_cor(X, block.size = 1000)
 }
 \arguments{
 \item{X}{An object of class \link[=FBM-class]{FBM}.}
 
-\item{backingfile}{The path to the backing file of the FBM.}
+\item{block.size}{Number of columns to process at a time.}
 }
 \value{
-An FBM object with the correlation matrix of the data in X.
+An FBM object with the (pearson) correlation matrix of the data in X.
 }
 \description{
 Compute the correlation matrix of a Filebacked Big Matrix.

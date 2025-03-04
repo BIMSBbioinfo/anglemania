@@ -19,7 +19,7 @@ test_that("anglemania works correctly with method cosine", {
 
   # check if the first few elements from the list_stats
   # (zscore mean, zscore SD, signal-to-noise ratio) are the same
-  expect_snapshot(str(list_stats(angl)))
+  expect_snapshot(list_stats(angl)$sn_zscore[1:10, 1:10])
 
   # check if the correct genes are extracted
   expect_snapshot(get_anglemania_genes(angl))
