@@ -149,13 +149,13 @@ big_mat_list_mean <- function(angl) {
         
         # calculates the number of samples in which the feature is present, weighted
         # by the dataset weight
-        nmat <- (!is.na(batch_mat) + 0) * anglemania_object@weights[batch]
+        nmat <- (!is.na(batch_mat) + 0) * angl@weights[batch]
         final_mat <- final_mat + batch_mat
         final_mat[is.na(final_mat)] = 0
         list(final_mat, nmat)
       }
       # Run function in Reduce statement on names of weights vector
-      lmats <- lapply(names(anglemania_object@weights), function(batch){
+      lmats <- lapply(names(angl@weights), function(batch){
         wrap_mean(X.sub, batch)
       })
       # this sums up the z-scores across samples
@@ -209,7 +209,7 @@ get_list_stats <- function(angl) {
 
   message("Weighting matrix_list...")
   message("Calculating mean...")
-  mat_mean_zscore <- big_mat_list_mean(anglemania_object)
+  mat_mean_zscore <- big_mat_list_mean(angl)
 
   n_col <- ncol(matrix_list(angl)[[1]])
   n_row <- nrow(matrix_list(angl)[[1]])
@@ -222,22 +222,22 @@ get_list_stats <- function(angl) {
     a.FUN = function(X, ind) {
       X.sub <- X[, ind, drop = FALSE]
       wrap_mean <- function(final_mat, batch) {
-        batch_mat <- matrix_list(anglemania_object)[[batch]][
+        batch_mat <- matrix_list(angl)[[batch]][
           , ind,
           drop = FALSE
         ] 
         
         # calculates the number of samples in which the feature is present, weighted
         # by the dataset weight
-        nmat <- (!is.na(batch_mat) + 0) * anglemania_object@weights[batch]
+        nmat <- (!is.na(batch_mat) + 0) * angl@weights[batch]
 
         # calculates the weighted standard deviation
-        final_mat <- final_mat + (batch_mat - mat_mean_zscore[, ind, drop=FALSE])^2 * anglemania_object@weights[batch]
+        final_mat <- final_mat + (batch_mat - mat_mean_zscore[, ind, drop=FALSE])^2 * angl@weights[batch]
         final_mat[is.na(final_mat)] = 0
         list(final_mat, nmat)
       }
       # Run function in Reduce statement on names of weights vector
-      lmats <- lapply(names(anglemania_object@weights), function(batch){
+      lmats <- lapply(names(angl@weights), function(batch){
         wrap_mean(X.sub, batch)
       })
       # this sums up the z-scores across samples
@@ -440,7 +440,7 @@ select_genes <- function(
     direction   = "both",
     adjust_thresholds = TRUE
 ) {
-  if (!inherits(anglemania_object, "anglemaniaObject")) {
+  if (!inherits(angl, "anglemaniaObject")) {
     stop("anglemania_object needs to be an anglemaniaObject")
   }
   if (!direction %in% c("both","positive","negative"))
@@ -455,23 +455,23 @@ select_genes <- function(
   # Selects the direction of conserved genes
   if(direction == "both"){
     gene_ind <- which(
-      upper.tri(list_stats(anglemania_object)$sn_zscore) &
-        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
-        (abs(list_stats(anglemania_object)$mean_zscore) >= zscore_mean_threshold),
+      upper.tri(list_stats(angl)$sn_zscore) &
+        (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
+        (abs(list_stats(angl)$mean_zscore) >= zscore_mean_threshold),
       arr.ind = TRUE
     )
   }else if(direction == "positive"){
     gene_ind <- which(
-      upper.tri(list_stats(anglemania_object)$sn_zscore) &
-        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
-        (list_stats(anglemania_object)$mean_zscore >= zscore_mean_threshold),
+      upper.tri(list_stats(angl)$sn_zscore) &
+        (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
+        (list_stats(angl)$mean_zscore >= zscore_mean_threshold),
       arr.ind = TRUE
     )
   }else if(direction == "negative"){
     gene_ind <- which(
-      upper.tri(list_stats(anglemania_object)$sn_zscore) &
-        (list_stats(anglemania_object)$sn_zscore >= zscore_sn_threshold) &
-        (list_stats(anglemania_object)$mean_zscore <= zscore_mean_threshold),
+      upper.tri(list_stats(angl)$sn_zscore) &
+        (list_stats(angl)$sn_zscore >= zscore_sn_threshold) &
+        (list_stats(angl)$mean_zscore <= zscore_mean_threshold),
       arr.ind = TRUE
     )
   }
@@ -480,12 +480,12 @@ select_genes <- function(
   if (nrow(gene_ind) == 0 && adjust_thresholds) {
     message("No genes passed the cutoff.")
     quantile95mean <- stats::quantile(
-      abs(list_stats(anglemania_object)$mean_zscore),
+      abs(list_stats(angl)$mean_zscore),
       0.95,
       na.rm = TRUE
     )
     quantile95sn <- stats::quantile(
-      list_stats(anglemania_object)$sn_zscore,
+      list_stats(angl)$sn_zscore,
       0.95,
       na.rm = TRUE
     )
@@ -510,10 +510,10 @@ select_genes <- function(
   top_n = data.frame(
     geneA = gene_ind[, 1],
     geneB = gene_ind[, 2],
-    zscore  = list_stats(anglemania_object)$mean_zscore[gene_ind],
-    snscore = list_stats(anglemania_object)$sn_zscore[gene_ind],
-    gene_nameA = intersect_genes(anglemania_object)[gene_ind[, 1]],
-    gene_nameB = intersect_genes(anglemania_object)[gene_ind[, 2]]
+    zscore  = list_stats(angl)$mean_zscore[gene_ind],
+    snscore = list_stats(angl)$sn_zscore[gene_ind],
+    gene_nameA = intersect_genes(angl)[gene_ind[, 1]],
+    gene_nameB = intersect_genes(angl)[gene_ind[, 2]]
   )
   message(
     "Please inspect get_anglemania_genes(angl)$info",
