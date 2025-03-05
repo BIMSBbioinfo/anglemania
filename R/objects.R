@@ -557,7 +557,8 @@ add_unique_batch_key <- function(
 # Generic function
 setGeneric(
   "create_anglemania_object",
-  function(object, ...) standardGeneric("create_anglemania_object"))
+  function(object, ...) standardGeneric("create_anglemania_object")
+)
 
 #' Internal helper function to get metadata from a Seurat or SCE object
 #' @import checkmate
@@ -592,7 +593,8 @@ setMethod(
   min_cells_per_gene = 1,
   dataset_key = NA_character_,
   allow_missing_features = FALSE,
-  min_samples_per_gene = 2
+  min_samples_per_gene = 2,
+  assay = "RNA"
 ) {
   # Validate inputs
   checkmate::assert_class(object, "Seurat")
@@ -643,20 +645,12 @@ setMethod(
     )
   }
 
-  if (!checkmate::testString(assay) || !(assay %in% Assays(seurat_object))) {
+  if (!checkmate::testString(assay) || !(assay %in% Assays(object))) {
     stop(
       "assay needs to be a character string of length 1 ",
       "it needs to correspond to Assays(seurat)"
     )
   }
-
-  # Create unique batch key
-  seurat_object <- add_unique_batch_key(
-    seurat_object,
-    dataset_key,
-    batch_key
-  )
-
 
   # Get the barcodes corresponding to each batch
   barcodes_by_batch <- split(rownames(meta), meta$batch)

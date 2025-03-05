@@ -125,7 +125,7 @@ anglemania <- function(
 
   # this corrects sn values when sds is zero - can happen if only one pair of the gene is found 
   # in one sample
-  list_stats(anglemania_object)$sn_zscore[list_stats(anglemania_object)$sds_zscore == 0] = 0
+  list_stats(angl)$sn_zscore[list_stats(angl)$sds_zscore == 0] = 0
 
   message("Filtering features...")
   angl <- prefilter_angl(
