@@ -79,7 +79,7 @@ factorise <- function(
     x_mat,
     method = "cosine",
     seed = 1,
-    permute_row_or_column = "columns",
+    permute_row_or_column = "column",
     permutation_function = "sample"
   ) {
   # Initialize empty FBM to store permuted correlation matrix

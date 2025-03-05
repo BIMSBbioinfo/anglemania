@@ -77,7 +77,7 @@ anglemania <- function(
     zscore_sn_threshold = 2.5,
     max_n_genes = NULL,
     method = "cosine",
-    permute_row_or_column = "columns",
+    permute_row_or_column = "column",
     permutation_function = "sample"
 ) {
   # Validate inputs
