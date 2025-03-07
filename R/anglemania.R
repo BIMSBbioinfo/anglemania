@@ -39,7 +39,7 @@
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
 #' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
 #' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
-#'   Default is \code{2000}.
+#' @param prefilter_threshold Numeric value specifying the threshold prefiltering genes - speeds up gene selection
 #'
 #' @return An updated \code{\link{anglemania_object-class}} with computed statistics and
 #'   selected genes based on the specified thresholds.
@@ -78,7 +78,8 @@ anglemania <- function(
     max_n_genes = NULL,
     method = "cosine",
     permute_row_or_column = "column",
-    permutation_function = "sample"
+    permutation_function = "sample",
+    prefilter_threshold = 0.5
 ) {
   # Validate inputs
   if (!inherits(angl, "anglemania_object")) {
@@ -122,16 +123,16 @@ anglemania <- function(
   message("Computing statistics...")
   list_stats(angl) <- get_list_stats(angl)
   invisible(gc())
-
+  
   # this corrects sn values when sds is zero - can happen if only one pair of the gene is found 
   # in one sample
-  list_stats(angl)$sn_zscore[list_stats(angl)$sds_zscore == 0] = 0
+  # list_stats(angl)$sn_zscore[list_stats(angl)$sds_zscore == 0] = 0
 
   message("Filtering features...")
   angl <- prefilter_angl(
     angl,
-    zscore_mean_threshold = 1,
-    zscore_sn_threshold = 1
+    zscore_mean_threshold = prefilter_threshold,
+    zscore_sn_threshold   = prefilter_threshold
   )
 
   message("Selecting features...")
