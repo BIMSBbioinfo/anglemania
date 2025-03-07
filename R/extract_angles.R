@@ -86,8 +86,8 @@ extract_angles <- function(
     })
   }
 
-  # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
-  x_mat <- angl_cor(x_mat, block.size = 1000)
+  x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
+  # x_mat <- angl_cor(x_mat, block.size = 1000)
   # The big_cor function from bigstatsr scales and centers the
   # count matrix and calculates the covariance (cross product X^T X)
   diag(x_mat) <- NA
