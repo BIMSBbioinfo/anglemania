@@ -344,10 +344,10 @@ extract_rows_for_unique_genes <- function(dt, max_n_genes) {
 #' @useDynLib anglemania, .registration = TRUE
 #' @keywords internal
 prefilter_angl <- function(
-  angl,
-  zscore_mean_threshold = 1,
-  zscore_sn_threshold = 1
-) {
+    angl,
+    zscore_mean_threshold = 1,
+    zscore_sn_threshold = 1
+  ) {
   if (!inherits(angl, "anglemania_object")) {
     stop("angl needs to be an anglemania_object")
   }
@@ -552,32 +552,28 @@ replace_with_na = function(v) {
 }
 
 
+
 # ---------------------------------------------------------------------------
-#' @describeIn anglemanise_utils Overlap of Variable Genes Across Thresholds.
-#' This function computes the overlap between variable genes identified in a
-#' Seurat object and the gene sets selected from an "anglemania" analysis
-#' object (`ang_obj`) at multiple threshold levels. For each threshold, genes
-#' are selected from `ang_obj` by applying `select_genes`, and the intersection
-#' of these genes with the variable features of the Seurat object is calculated.
-#' The result is a summary data frame that includes the number and percentage of
-#' variable genes overlapping with the anglemania-selected genes, as well as the
-#' number of genes selected at each threshold.
-#' @param seu A Seurat object. If variable features have not been identified,
-#'   they will be computed using \code{\link[Seurat]{FindVariableFeatures}}.
-#' @param ang_obj An anglemania analysis object. This is used by `select_genes`
-#'  and `get_anglemania_genes` to select genes based on the provided thresholds.
-#' @param zscore_mean_thresholds A numeric vector of zscore mean thresholds used
-#'   for gene selection from `ang_obj`. Default is \code{c(0.5, 1:15)}.
-#' @param zscore_sn_thresholds A numeric vector of zscore signal to noise ratio
-#'   thresholds used for gene selection from `ang_obj`. Default is
-#'   \code{c(0.5, 1:15)}.
-#' @param adjust_thresholds Logical. Whether to use adaptive thresholding in
-#'   `select_genes`. Default is FALSE.
+
+#' Overlap of Variable Genes Across Thresholds
+#'
+#' This function computes the overlap between variable genes identified in a Seurat object and the gene sets selected 
+#' from an "anglemania" analysis object (`ang_obj`) at multiple threshold levels. For each threshold, genes are 
+#' selected from `ang_obj` by applying `select_genes`, and the intersection of these genes with the variable features 
+#' of the Seurat object is calculated. The result is a summary data frame that includes the number and percentage of 
+#' variable genes overlapping with the anglemania-selected genes, as well as the number of genes selected at each 
+#' threshold.
+#'
+#' @param seu A Seurat object. If variable features have not been identified, they will be computed using 
+#'   \code{\link[Seurat]{FindVariableFeatures}}.
+#' @param ang_obj An anglemania analysis object. This is used by `select_genes` and `get_anglemania_genes` to select genes 
+#'   based on the provided thresholds.
+#' @param zscore_mean_thresholds A numeric vector of thresholds used for gene selection from `ang_obj`. Default is \code{NULL}. The thresholds will be chosen uniformly from the range of zscore_mean values.
+#' @param zscore_sn_thresholds A numeric vector of thresholds used for gene selection from `ang_obj`. Default is \code{NULL}. The thresholds will be chosen uniformly from the range of zscore_sds values.
+#' @param length_out An integer that defines the number of values to use as thresholds. Default is \code{6}. 
 #' @param layer Character. The assay layer in the Seurat object to use when
 #'   calculating variable features (e.g., "counts", "data", or "logcounts").
 #'   Default is \code{"data"}.
-#' @importFrom Seurat FindVariableFeatures
-#' @importFrom SeuratObject VariableFeatures
 #' @return A data frame with the following columns:
 #' \describe{
 #'   \item{threshold}{The threshold value used for gene selection.}
@@ -601,33 +597,42 @@ replace_with_na = function(v) {
 #' head(variable_genes_overlap(seu, angl))
 #' @export
 variable_genes_overlap = function(
-  seu,
-  ang_obj,
-  zscore_mean_thresholds = c(0.5, 1:15),
-  zscore_sn_thresholds = c(0.5, 1:15),
-  adjust_thresholds = FALSE,
-  layer = "data"
-) {
-  # Check if the Seurat object has variable features. If not, compute them.
-  if (length(SeuratObject::VariableFeatures(seu)) == 0) {
-    seu = Seurat::FindVariableFeatures(seu, layer = layer)
-  }
+    seu, 
+    ang_obj,
+    zscore_mean_thresholds = NULL,
+    zscore_sn_thresholds   = NULL,
+    adjust_thresholds      = FALSE,
+    layer                  = "data",
+    length_out             = 6
+){
+    # Check if the Seurat object has variable features. If not, compute them.
+    if(length(VariableFeatures(seu)) == 0) {
+        seu = FindVariableFeatures(seu, layer = layer)
+    }
 
-  # For each threshold, select genes from ang_obj and extract their names.
-  dparams = expand.grid(zscore_mean_thresholds, zscore_sn_thresholds)
-  colnames(dparams) = c("zscore_mean_thresholds", "zscore_sn_thresholds")
-  lg = lapply(1:nrow(dparams), function(i) {
-    angl = select_genes(
-      ang_obj,
-      zscore_mean_threshold = dparams$zscore_mean_thresholds[i],
-      zscore_sn_threshold = dparams$zscore_sn_thresholds[i],
-      direction = "both",
-      adjust_thresholds = adjust_thresholds
-    )
-    gg = get_anglemania_genes(angl)
-    if (length(gg) < 0) gg = ""
-    return(gg)
-  })
+    if(is.null(zscore_mean_thresholds)){
+      zscore_mean_thresholds = seq(0.5, max(ang@list_stats$mean_zscore[], na.rm = TRUE), length.out = length_out)
+    }
+    if(is.null(zscore_mean_thresholds)){
+      zscore_sn_thresholds = seq(0.5, max(ang@list_stats$zscore_sn_thresholds[], na.rm = TRUE), length.out = length_out)
+    }
+
+    # For each threshold, select genes from ang_obj and extract their names.
+    dparams = expand.grid(zscore_mean_thresholds, zscore_sn_thresholds)
+    colnames(dparams) = c("zscore_mean_thresholds","zscore_sn_thresholds")
+    lg = lapply(1:nrow(dparams), function(i){
+        angl = select_genes(
+            ang_obj,
+            zscore_mean_threshold = dparams$zscore_mean_thresholds[i],
+            zscore_sn_threshold   = dparams$zscore_sn_thresholds[i], 
+            direction = "both",
+            adjust_thresholds = adjust_thresholds
+        )
+        gg = get_anglemania_genes(angl)
+        if(length(gg) < 0)
+          gg = ""
+        return(gg)
+    })
 
   # NOTE: There seems to be a variable "mseu" that is not defined in the
   # original code.
