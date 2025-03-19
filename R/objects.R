@@ -132,7 +132,6 @@ setMethod("show", "anglemania_object", function(object) {
   }
   cat("Min cells per gene:", object@min_cells_per_gene, "\n")
 })
-
 # ---------------------------------------------------------------------------
 # Accessor and Mutator Methods for the anglemania_object Class
 # ---------------------------------------------------------------------------
