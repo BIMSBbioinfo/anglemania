@@ -26,6 +26,8 @@
 #'   cells in which a gene must be expressed to be included in the analysis.
 #' @slot integration_genes A list containing information about integration genes
 #'   and their statistics.
+#' @slot assay A character vector specifying the Seurat assay, the counts were 
+#' extracted from.
 #' @return An object of class 'anglemania_object'
 #' @name anglemania_object-class
 #' @aliases anglemania_object
@@ -535,7 +537,7 @@ add_unique_batch_key <- function(
 #' }
 #'
 #' @importFrom SeuratObject LayerData
-#' @importFrom SummarizedExperiment assay
+#' @importFrom SingleCellExperiment counts
 #' @importFrom tidyr unite
 #' @importFrom Matrix rowSums
 #' @importFrom pbapply pblapply
@@ -575,7 +577,234 @@ setGeneric(
   }
 }
 
+#' Internal Helper function to calculate and set weights for anglemania object
+#' @importFrom dplyr select distinct group_by add_count mutate n_groups
+#' @importFrom bigstatsr nb_cores
+#' @keywords internal
+#' @noRd
+.set_weights <- function(metadata, batch_key, dataset_key = NA_character_) {
+  if (checkmate::testString(dataset_key) &&
+    length(unique(metadata[[dataset_key]])) > 1) {
+      data_info <- metadata %>%
+        dplyr::select(batch, dplyr::all_of(c(dataset_key, batch_key))) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(dplyr::across(dplyr::all_of(dataset_key))) %>%
+        dplyr::add_count(name = "n_samples") %>%
+        dplyr::mutate(weight = 1 / n_samples / dplyr::n_groups(.)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(weight = weight / mean(weight))
+    } else {
+      data_info <- metadata %>%
+        dplyr::select(batch, dplyr::all_of(batch_key)) %>%
+        dplyr::distinct() %>%
+        dplyr::mutate(weight = 1)
+    }
+    data_info
+}
+
+
+#' Internal helper function to get counts from a Seurat or SCE object
+#' @import checkmate
+#' @importFrom SingleCellExperiment counts
+#' @importFrom SeuratObject LayerData Assays
+#' @keywords internal
+#' @noRd
+.get_counts <- function(object, seurat_assay = "RNA", cells = NULL) {
+  if (checkmate::test_class(object, "Seurat")) {
+    if (seurat_assay %in% SeuratObject::Assays(object)) {
+      return(
+        SeuratObject::LayerData(
+          object,
+          assay = seurat_assay,
+          layer = "counts",
+          cells = cells
+        )
+      )
+    } else {
+      stop("seurat_assay must be an assay present in the Seurat object")
+    }
+  } else if (checkmate::test_class(object, "SingleCellExperiment")) {
+    if (is.null(cells)) {
+      return(
+        SingleCellExperiment::counts(object)
+      )
+    } else {
+      return(
+        SingleCellExperiment::counts(object)[, cells, drop = FALSE]
+      )
+    }
+  } else {
+    stop("object must be a Seurat or SingleCellExperiment object")
+  }
+}
+
 #' @rdname create_anglemania_object
+# Core function for creating anglemania objects
+#' @param meta A data frame containing metadata for the dataset. Will be extracted from
+#' the Seurat or SingleCellExperiment object or constructed from a list of objects.
+#' @param matrix_list A list of count matrices for each batch.
+#' @param batch_key Column name for batch information
+#' @param dataset_key Column name for dataset information (optional)
+#' @param min_cells_per_gene Minimum cells expressing a gene
+#' @param seurat_assay Assay of the Seurat object to extract counts from
+#' @param allow_missing_features Logical; allow genes missing in some batches
+#' @param min_samples_per_gene Minimum samples required if
+#' allow_missing_features is TRUE
+#' @importFrom dplyr select distinct group_by add_count mutate n_groups
+#' @importFrom Matrix rowSums
+#' @importFrom pbapply pblapply
+#' @importFrom bigstatsr nb_cores
+#' @return anglemania_object
+#' @examples 
+#' sce <- sce_example()
+#' batch_key <- "batch"
+#' meta <- SingleCellExperiment::colData(sce) %>% 
+#'   as.data.frame() %>% 
+#'   add_unique_batch_key(batch_key=batch_key)
+#'
+#' matrix_list <- lapply(unique(meta[[batch_key]]), function(batch) {
+#'   batch_cells <- rownames(meta[meta[[batch_key]] == batch, ])
+#'   batch_mat <- SingleCellExperiment::counts(sce[, batch_cells])
+#'   return(batch_mat)
+#' })
+#'
+#' angl <- .core_create_anglemania_object(
+#'   meta = meta,
+#'   matrix_list = matrix_list,
+#'   batch_key = batch_key
+#' )
+#'
+#' angl
+#' @export
+.core_create_anglemania_object <- function(
+  meta,
+  matrix_list,
+  batch_key,
+  dataset_key = NA_character_,
+  min_cells_per_gene = 1,
+  seurat_assay = "RNA",
+  allow_missing_features = FALSE,
+  min_samples_per_gene = 2
+) {
+  #------ CHECK INPUTS ------#
+  if (checkmate::test_string(dataset_key)) {
+    if (length(dataset_key) != 1) {
+      stop(
+        "dataset_key needs to be a character string of length 1 ",
+        "corresponding to the column in the metadata of the Seurat ",
+        "object that indicates which dataset the cells belong to"
+      )
+    } else if (!(dataset_key %in% colnames(meta))) {
+      stop(
+        "dataset_key needs to be a column in the metadata of the Seurat ",
+        "object that indicates which dataset the cells belong to"
+      )
+    }
+    message(
+      "Using dataset_key: ",
+      dataset_key
+    )
+  } else if (checkmate::test_scalar_na(dataset_key, null.ok = TRUE)) {
+    message(
+      "No dataset_key specified.\n",
+      "Assuming that all samples belong to the same dataset ",
+      "and are separated by batch_key: ",
+      batch_key
+    )
+  } else {
+    stop(
+      "dataset_key needs to be NA/NULL or a character string of length 1 ",
+      "corresponding to the column in the metadata of the Seurat ",
+      "object that indicates which dataset the cells belong to"
+    )
+  }
+
+  if (
+    !checkmate::test_string(batch_key) ||
+      length(batch_key) != 1 ||
+      !(batch_key %in% colnames(meta))
+  ) {
+    stop(
+      "batch_key needs to be a character string of length 1 ",
+      "corresponding to the column in the metadata of the Seurat ",
+      "object that indicates which batch the cells belong to"
+    )
+  }
+
+  #------ INTERSECT GENES ------#
+  # checks whether the genes should be present in all samples or just a subset of samples
+  if (!allow_missing_features) {
+    # Reduce to intersection of genes between batches
+    message("Using the intersection of filtered genes from all batches...")
+    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+  } else {
+    message(
+      "Using genes which are present in minimally ",
+      min_samples_per_gene,
+      " samples..."
+    )
+    intersect_genes <- table(unlist(lapply(matrix_list, rownames)))
+    intersect_genes <- sort(rownames(intersect_genes)[
+      intersect_genes >= min_samples_per_gene
+    ])
+  }
+  message("Number of genes in intersected set: ", length(intersect_genes))
+  
+  #------ PADDING MATRICES & FBM CONVERSION ------#
+  # Extract counts for each batch
+  message("Extracting count matrices...")
+  message(
+    "Filtering each batch to at least ",
+    min_cells_per_gene,
+    " cells per gene..."
+  )
+  matrix_list <- pbapply::pblapply(
+    matrix_list,
+    function(x) {
+      # Checks whether matrix contains missing features
+      missing <- setdiff(intersect_genes, rownames(x))
+      if (length(missing) > 0) {
+        pad <- Matrix::Matrix(
+          0,
+          length(missing),
+          ncol(x),
+          dimnames = list(missing, colnames(x))
+        )
+        x <- rbind(x, pad)[intersect_genes, ]
+        # IMPORTANT: keeps track that the missing features are ordered in the same way in all matrices
+      } else {
+        x <- x[match(intersect_genes, rownames(x)), ]
+      }
+      sparse_to_fbm(x)
+    },
+    cl = min(4, bigstatsr::nb_cores())
+  )
+
+  #------ DATA INFO & WEIGHTS ------#
+  data_info <- .set_weights(meta, batch_key, dataset_key)
+  weights <- data_info$weight
+  names(weights) <- data_info$batch
+  names(matrix_list) <- data_info$batch
+
+  #------ CREATE ANGLEMANIA OBJECT ------#
+  new(
+    "anglemania_object",
+    matrix_list = matrix_list,
+    dataset_key = dataset_key,
+    batch_key = batch_key,
+    data_info = data_info,
+    weights = weights,
+    min_cells_per_gene = min_cells_per_gene,
+    intersect_genes = intersect_genes,
+    assay = seurat_assay
+  )
+}
+
+
+#' @param object A Seurat object
+#' @param batch_key A character string that names the column in the metadata
+#' that contains the batch information
+#' @param ... Additional arguments passed to .core_create_anglemania_object
 #' @export
 #' @examples
 #' sce <- sce_example()
@@ -584,186 +813,42 @@ setGeneric(
 #' angl <- create_anglemania_object(se, batch_key = "batch")
 #' angl
 #' @method create_anglemania_object Seurat
+
+#' @rdname create_anglemania_object
+#' @export
 setMethod(
   "create_anglemania_object",
   "Seurat",
-  function(
-  object,
-  batch_key,
-  min_cells_per_gene = 1,
-  dataset_key = NA_character_,
-  allow_missing_features = FALSE,
-  min_samples_per_gene = 2,
-  assay = "RNA"
-) {
-  # Validate inputs
-  checkmate::assert_class(object, "Seurat")
-  meta <- .get_meta_data(object)
-  # Create unique batch key
-  meta <- add_unique_batch_key(
-    meta,
-    dataset_key,
-    batch_key
-  )
-  if (checkmate::test_string(dataset_key)) {
-    if (length(dataset_key) != 1) {
-     stop(
-       "dataset_key needs to be a character string of length 1 ",
-       "corresponding to the column in the metadata of the Seurat ",
-       "object that indicates which dataset the cells belong to"
-     ) 
-    } else if (!(dataset_key %in% colnames(meta))) {
-       stop(
-         "dataset_key needs to be a column in the metadata of the Seurat ",
-         "object that indicates which dataset the cells belong to"
-       )
-    }
-    message(
-      "Using dataset_key: ", dataset_key
+  function(object, batch_key, dataset_key = NA_character_, 
+           min_cells_per_gene = 1, allow_missing_features = FALSE, 
+           min_samples_per_gene = 2, seurat_assay = "RNA", ...) {
+    
+    # Metadata extraction
+    meta <- .get_meta_data(object)
+    meta <- add_unique_batch_key(meta, dataset_key, batch_key)
+    barcodes_by_batch <- split(rownames(meta), meta$batch)
+
+    # Matrix list creation
+    matrix_list <- lapply(barcodes_by_batch, function(bc) {
+      counts <- .get_counts(object, seurat_assay, cells = bc)
+      counts[Matrix::rowSums(counts > 0) >= min_cells_per_gene, ]
+    })
+
+    # Call core function
+    angl <- .core_create_anglemania_object(
+      meta, matrix_list, batch_key, dataset_key,
+      min_cells_per_gene, seurat_assay,
+      allow_missing_features, min_samples_per_gene, ...
     )
-  } else if (checkmate::test_scalar_na(dataset_key, null.ok = TRUE)) {
-      message(
-        "No dataset_key specified.\n",
-        "Assuming that all samples belong to the same dataset ",
-        "and are separated by batch_key: ", batch_key
-      )
+    angl
   }
-  else {
-    stop(
-      "dataset_key needs to be NA/NULL or a character string of length 1 ",
-      "corresponding to the column in the metadata of the Seurat ",
-      "object that indicates which dataset the cells belong to"
-    )
-  }
-
-  if (!checkmate::test_string(batch_key) || length(batch_key) != 1 || 
-      !(batch_key %in% colnames(meta))) {
-    stop(
-      "batch_key needs to be a character string of length 1 ",
-      "corresponding to the column in the metadata of the Seurat ",
-      "object that indicates which batch the cells belong to"
-    )
-  }
-
-  if (!checkmate::testString(assay) || !(assay %in% Assays(object))) {
-    stop(
-      "assay needs to be a character string of length 1 ",
-      "it needs to correspond to Assays(seurat)"
-    )
-  }
-
-  # Get the barcodes corresponding to each batch
-  barcodes_by_batch <- split(rownames(meta), meta$batch)
-
-  # Extract counts for each batch
-  message("Extracting count matrices...")
-  message(
-    "Filtering each batch to at least ",
-    min_cells_per_gene,
-    " cells per gene..."
-  )
-  matrix_list <- lapply(barcodes_by_batch, function(bc) {
-    counts_matrix <- SeuratObject::LayerData(
-      object,
-      cells = bc,
-      layer = "counts",
-      assay = assay
-    )
-    filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
-    filt_features <- names(filt_features[filt_features])
-    counts_matrix <- counts_matrix[filt_features, ]
-    return(counts_matrix)
-  })
-
-  # checks whether the genes should be present in all samples or just a subset of samples
-  if(!allow_missing_features){
-    # Reduce to intersection of genes between batches
-    message("Using the intersection of filtered genes from all batches...")
-    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
-  }else{
-    message("Using genes which are present in minimally ",min_samples_per_gene, " samples...")
-    intersect_genes <- table(unlist(lapply(matrix_list, rownames)))
-    intersect_genes <- sort(rownames(intersect_genes)[intersect_genes >= min_samples_per_gene])
-  }
-  message("Number of genes in intersected set: ", length(intersect_genes))
-
-  
-  matrix_list <- pbapply::pblapply(
-    matrix_list,
-    function(x) {
-      genes_in = intersect(rownames(x), intersect_genes)
-      x_in <- x[genes_in, ]
-      # Checks whether matrix contains missing features
-      genes_out = setdiff(intersect_genes, rownames(x))
-      if(length(genes_out) > 0){
-        # this pads the matrix with missing features
-        x_out = Matrix::Matrix(0, nrow=length(genes_out), ncol = ncol(x_in))
-        rownames(x_out) = genes_out
-        colnames(x_out) = colnames(x_in)
-        x_in = rbind(x_in, x_out)
-        # IMPORTANT: keeps track that the missing features are ordered in the same way in all matrices
-        x_in = x_in[intersect_genes,]
-      }
-      x_in <- sparse_to_fbm(x_in)
-    },
-    cl = bigstatsr::nb_cores()
-  )
-
-  if (checkmate::testString(dataset_key) && length(unique(meta[[dataset_key]])) > 1) {
-    # Calculate the weights only if there are more than two datasets 
-    data_info <- meta %>%
-      dplyr::select(
-        batch,
-        dplyr::all_of(c(dataset_key, batch_key))
-      ) %>%
-      dplyr::distinct() %>%
-      dplyr::group_by(dplyr::across(dplyr::all_of(dataset_key))) %>%
-      dplyr::add_count(
-        dplyr::across(dplyr::all_of(dataset_key)), 
-        name = "n_samples"
-        ) %>%
-      dplyr::mutate(
-        weight = 1 / n_samples / dplyr::n_groups(.)
-      ) %>%
-      ## Normalize weights so that their mean is 1 - this helps when the features are not present in all samples
-      ungroup() %>%
-      mutate(weight = weight / mean(weight))
-
-    weights <- data_info$weight
-    names(weights) <- data_info$batch
-
-  } else {
-    # if there is only one dataset, weights should be set to one
-    data_info <- meta %>%
-      dplyr::select(batch, dplyr::all_of(batch_key)) %>%
-      dplyr::distinct() %>%
-      dplyr::mutate(weight = 1)
-
-    weights <- data_info$weight
-    names(weights) <- data_info$batch
-  }
-  # Create anglem object
-  anglem_object <- new(
-    "anglemania_object",
-    matrix_list = matrix_list,
-    dataset_key = ifelse(
-      checkmate::test_string(dataset_key),
-      dataset_key,
-      NA_character_
-    ),
-    batch_key = batch_key,
-    data_info = data_info,
-    weights = weights,
-    min_cells_per_gene = min_cells_per_gene,
-    intersect_genes = intersect_genes,
-    assay = assay
-  )
-
-  return(anglem_object)
-}
 )
 
 #' @rdname create_anglemania_object
+#' @param object A SingleCellExperiment object
+#' @param batch_key A character string that names the column in the metadata
+#' that contains the batch information
+#' @param ... Additional arguments passed to .core_create_anglemania_object
 #' @export
 #' @examples
 #' sce <- sce_example()
@@ -774,142 +859,40 @@ setMethod(
   "create_anglemania_object",
   "SingleCellExperiment",
   function(
-      object,
-      batch_key,
-      min_cells_per_gene = 1,
-      dataset_key = NA) {
-    # Validate inputs
-    checkmate::assert_class(object, "SingleCellExperiment")
+    object,
+    batch_key,
+    dataset_key = NA_character_,
+    min_cells_per_gene = 1,
+    allow_missing_features = FALSE,
+    min_samples_per_gene = 2,
+    ...
+  ) {
     meta <- .get_meta_data(object)
-    # Create unique batch key
-    meta <- add_unique_batch_key(
-      meta,
-      dataset_key,
-      batch_key
-    )
-    if (checkmate::test_string(dataset_key)) {
-      if (length(dataset_key) != 1) {
-        stop(
-          "dataset_key needs to be a character string of length 1 ",
-          "corresponding to the column in the metadata of the Seurat ",
-          "object that indicates which dataset the cells belong to"
-        )
-      } else if (!(dataset_key %in% colnames(meta))) {
-        stop(
-          "dataset_key needs to be a column in the metadata of the Seurat ",
-          "object that indicates which dataset the cells belong to"
-        )
-      }
-      message(
-        "Using dataset_key: ", dataset_key
-      )
-    } else if (checkmate::test_scalar_na(dataset_key, null.ok = TRUE)) {
-      message(
-        "No dataset_key specified.\n",
-        "Assuming that all samples belong to the same dataset ",
-        "and are separated by batch_key: ", batch_key
-      )
-    } else {
-      stop(
-        "dataset_key needs to be NA/NULL or a character string of length 1 ",
-        "corresponding to the column in the metadata of the Seurat ",
-        "object that indicates which dataset the cells belong to"
-      )
-    }
-
-    if (!checkmate::test_string(batch_key) || length(batch_key) != 1 ||
-      !(batch_key %in% colnames(meta))) {
-      stop(
-        "batch_key needs to be a character string of length 1 ",
-        "corresponding to the column in the metadata of the Seurat ",
-        "object that indicates which batch the cells belong to"
-      )
-    }
-
-
-
-    # Get the barcodes corresponding to each batch
+    meta <- add_unique_batch_key(meta, dataset_key, batch_key)
     barcodes_by_batch <- split(rownames(meta), meta$batch)
 
-    # Extract counts for each batch
-    message("Extracting count matrices...")
-    message(
-      "Filtering each batch to at least ",
-      min_cells_per_gene,
-      " cells per gene..."
-    )
     matrix_list <- lapply(barcodes_by_batch, function(bc) {
-      counts_matrix <- SummarizedExperiment::assay(object, "counts")[, bc, drop = FALSE]
-      filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
-      filt_features <- names(filt_features[filt_features])
-      counts_matrix <- counts_matrix[filt_features, ]
-      return(counts_matrix)
+      counts <- .get_counts(object, cells = bc)
+      counts[Matrix::rowSums(counts > 0) >= min_cells_per_gene, ]
     })
 
-    # Reduce to intersection of genes between batches
-    message("Using the intersection of filtered genes from all batches...")
-    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
-    message("Number of genes in intersected set: ", length(intersect_genes))
-
-    matrix_list <- pbapply::pblapply(
+    angl <- .core_create_anglemania_object(
+      meta,
       matrix_list,
-      function(x) {
-        x <- x[intersect_genes, ]
-        x <- sparse_to_fbm(x)
-      },
-      cl = bigstatsr::nb_cores()
+      batch_key,
+      dataset_key,
+      min_cells_per_gene,
+      seurat_assay = "counts",
+      allow_missing_features,
+      min_samples_per_gene,
+      ...
     )
-
-    if (checkmate::test_string(dataset_key)) {
-      data_info <- meta %>%
-        dplyr::select(
-          batch,
-          dplyr::all_of(c(dataset_key, batch_key))
-        ) %>%
-        dplyr::distinct() %>%
-        dplyr::group_by(dplyr::across(dplyr::all_of(dataset_key))) %>%
-        dplyr::add_count(
-          dplyr::across(dplyr::all_of(dataset_key)),
-          name = "n_samples"
-        ) %>%
-        dplyr::mutate(
-          weight = 1 / n_samples / dplyr::n_groups(.)
-        )
-
-      weights <- data_info$weight
-      names(weights) <- data_info$batch
-    } else {
-      data_info <- meta %>%
-        dplyr::select(batch, dplyr::all_of(batch_key)) %>%
-        dplyr::distinct() %>%
-        dplyr::mutate(weight = 1 / nrow(.))
-
-      weights <- data_info$weight
-      names(weights) <- data_info$batch
-    }
-
-    # Create anglem object
-    anglem_object <- new(
-      "anglemania_object",
-      matrix_list = matrix_list,
-      dataset_key = ifelse(
-        checkmate::test_string(dataset_key),
-        dataset_key,
-        NA_character_
-      ),
-      batch_key = batch_key,
-      data_info = data_info,
-      weights = weights,
-      min_cells_per_gene = min_cells_per_gene,
-      intersect_genes = intersect_genes
-    )
-
-    return(anglem_object)
+    angl
   }
 )
-
-
 #' @rdname create_anglemania_object
+#' @param object A list of Seurat or SingleCellExperiment objects
+#' @param ... Additional arguments passed to .core_create_anglemania_object
 #' @export
 #' @examples
 #' sce <- sce_example()
@@ -926,76 +909,45 @@ setMethod(
   "create_anglemania_object",
   "list",
   function(
-      object,
-      min_cells_per_gene = 1) {
+    object,
+    min_cells_per_gene = 1,
+    allow_missing_features = FALSE,
+    min_samples_per_gene = 2,
+    seurat_assay = "RNA",
+    ...
+  ) {
     checkmate::assert_list(object, types = c("Seurat", "SingleCellExperiment"))
 
+    if (is.null(names(object))) {
+      names(object) <- paste0("batch", seq_along(object))
+    }
+    batch_key <- "batch"
+    dataset_key <- NA_character_
+    meta_list <- lapply(names(object), function(batch_name) {
+      meta <- .get_meta_data(object[[batch_name]])
+      meta$batch <- batch_name
+      meta
+    })
+    meta <- do.call(rbind, meta_list)
+    meta <- add_unique_batch_key(meta, dataset_key, batch_key)
 
-    #------ MATRIX LIST ------#
-    # Extract counts for each batch
-    message("Extracting count matrices...")
-    message(
-      "Filtering each batch to at least ",
-      min_cells_per_gene,
-      " cells per gene..."
-    )
-    matrix_list <- lapply(object, function(object) {
-      if (checkmate::test_class(object, "Seurat")) {
-        counts_matrix <- SeuratObject::LayerData(
-          object,
-          layer = "counts",
-          assay = "RNA"
-        )
-      } else if (checkmate::test_class(object, "SingleCellExperiment")) {
-        counts_matrix <- SummarizedExperiment::assay(object, "counts")
-      }
-      filt_features <- Matrix::rowSums(counts_matrix > 0) >= min_cells_per_gene
-      filt_features <- names(filt_features[filt_features])
-      counts_matrix <- counts_matrix[filt_features, ]
-      return(counts_matrix)
+    matrix_list <- lapply(names(object), function(batch_name) {
+      obj <- object[[batch_name]]
+      counts <- .get_counts(obj, seurat_assay = seurat_assay)
+      counts[Matrix::rowSums(counts > 0) >= min_cells_per_gene, ]
     })
 
-    # Reduce to intersection of genes between batches
-    message("Using the intersection of filtered genes from all batches...")
-    intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
-    message("Number of genes in intersected set: ", length(intersect_genes))
-
-    matrix_list <- pbapply::pblapply(
+    angl <- .core_create_anglemania_object(
+      meta,
       matrix_list,
-      function(x) {
-        x <- x[intersect_genes, ]
-        x <- sparse_to_fbm(x)
-      },
-      cl = bigstatsr::nb_cores()
+      batch_key,
+      dataset_key,
+      min_cells_per_gene,
+      seurat_assay,
+      allow_missing_features,
+      min_samples_per_gene,
+      ...
     )
-
-    #------- DATA INFO ------#
-    if (checkmate::test_names(names(object), "named")) {
-      data_info <- data.frame(batch = names(object)) %>%
-        dplyr::mutate(weight = 1 / nrow(.))
-      weights <- data_info$weight
-      names(weights) <- data_info$batch
-    } else {
-      names(object) <- paste0("batch", seq_along(object))
-      data_info <- data.frame(batch = names(object)) %>%
-        dplyr::mutate(weight = 1 / nrow(.))
-      weights <- data_info$weight
-      names(weights) <- data_info$batch
-    }
-
-
-    #------- CREATE ANGLEM OBJECT ------#
-    anglem_object <- new(
-      "anglemania_object",
-      matrix_list = matrix_list,
-      dataset_key = NA_character_,
-      batch_key = "batch",
-      data_info = data_info,
-      weights = weights,
-      min_cells_per_gene = min_cells_per_gene,
-      intersect_genes = intersect_genes
-    )
-
-    return(anglem_object)
+    angl
   }
 )
