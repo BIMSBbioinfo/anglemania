@@ -32,7 +32,8 @@ anglemania can be used on top of SingleCellExperiment or Seurat objects.
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
-  library(anglemania)
+  # library(anglemania)
+  devtools::load_all()
   library(dplyr)
   library(Seurat)
   library(splatter)
@@ -65,8 +66,10 @@ sim <- splatSimulate(
 )
 
 se <- CreateSeuratObject(counts = counts(sim), meta.data = as.data.frame(colData(sim)))
-rm(sim)
+# rm(sim)
 se
+Layers(se)
+Seurat::Assays(se)
 head(se[[]])
 ```
 
@@ -104,7 +107,8 @@ batch_key <- "Batch"
 
 angl <- create_anglemania_object(se,
   batch_key = batch_key,
-  min_cells_per_gene = 1
+  min_cells_per_gene = 1,
+  seurat_assay = "RNA"
 )
 angl
 ```
@@ -163,16 +167,17 @@ Seurat::DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Group")
 ```
 
 # Comparison to using HVGs
-## get HVGs
+## using HVGs
+### get HVGs
 ```{r, get HVGs}
 se_list <- SplitObject(se, split.by = batch_key)
 se_list <- lapply(se_list, NormalizeData)
-# anglemania chose only 319 genes based on the thresholds
-#   to make it comparable we only choose 320 highly variable genes:
-hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 320) 
+# anglemania chose only 324 genes based on the thresholds
+#   to make it comparable we only choose 324 highly variable genes:
+hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 324)
 ```
 
-## integration
+### integration
 ```{r, integration option 2}
 suppressWarnings({
   seurat_integrated_hvg <- integrate_seurat_list(se_list,
@@ -183,15 +188,34 @@ suppressWarnings({
 seurat_integrated_hvg
 ```
 
-## plot integration
+### plot integration
 ```{r}
 Seurat::DimPlot(seurat_integrated_hvg, reduction = "umap", group.by = "Batch")
 Seurat::DimPlot(seurat_integrated_hvg, reduction = "umap", group.by = "Group")
 ```
 
+## using 2000 HVGs
+### get HVGs
+```{r}
+hvg_features <- Seurat::SelectIntegrationFeatures(se_list, nfeatures = 2000)
+```
+
+```{r}
+suppressWarnings({
+  seurat_integrated_hvg_2000 <- integrate_seurat_list(se_list,
+    features = hvg_features,
+    process = TRUE
+  )
+})
+seurat_integrated_hvg_2000
+```
+
+### plot integration
+```{r}
+Seurat::DimPlot(seurat_integrated_hvg_2000, reduction = "umap", group.by = "Batch")
+Seurat::DimPlot(seurat_integrated_hvg_2000, reduction = "umap", group.by = "Group")
+```
+
 ```{r}
 sessionInfo()
 ```
-
-
-

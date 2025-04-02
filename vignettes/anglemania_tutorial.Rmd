@@ -40,7 +40,8 @@ Under the hood, anglemania works with file-backed big matrices (FBMs) from the b
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
-  library(anglemania)
+  # library(anglemania)
+  devtools::load_all()
   library(dplyr)
   library(Seurat)
   library(splatter)
@@ -54,7 +55,7 @@ suppressPackageStartupMessages({
 
 # Create simulated data with mild batch effects and mild differences between the groups/cell types
 ```{r, create simulated data}
-batch.facLoc <- 0.1
+batch.facLoc <- 0.3
 de.facLoc <- 0.1
 nBatches <- 4
 nGroups <- 3
@@ -62,24 +63,27 @@ nGenes <- 5000
 groupCells <- 300
 
 sce <- splatSimulate(
-    batchCells = rep(groupCells * nGroups, nBatches),
-    batch.facLoc = batch.facLoc,
-    group.prob = rep(1/nGroups, nGroups),
-    nGenes = nGenes,
-    batch.facScale = 0.1,
-    method = "groups",
-    verbose = FALSE,
-    out.prob    = 0.001,
-    de.prob     = 0.1, # mild
-    de.facLoc   = de.facLoc,
-    de.facScale = 0.1,
-    bcv.common  = 0.1,
-    seed = 42
+  batchCells = rep(groupCells * nGroups, nBatches),
+  batch.facLoc = batch.facLoc,
+  group.prob = rep(1 / nGroups, nGroups),
+  nGenes = nGenes,
+  batch.facScale = 0.1,
+  method = "groups",
+  verbose = FALSE,
+  out.prob = 0.001,
+  de.prob = 0.1, # mild
+  de.facLoc = de.facLoc,
+  de.facScale = 0.1,
+  bcv.common = 0.1,
+  seed = 42
 )
 sce
+assays(sce)
+
 ```
 
 # unintegrated data
+* clusters are driven by batch effects
 ```{r}
 sce_unintegrated <- sce
 # Normalization.
@@ -104,6 +108,8 @@ sce_unintegrated <- scater::runUMAP(sce_unintegrated, dimred = "PCA")
 plotUMAP(sce_unintegrated, colour_by = "Batch")
 plotUMAP(sce_unintegrated, colour_by = "Group")
 ```
+
+
 
 # run anglemania
 ## create anglemania object
@@ -205,6 +211,10 @@ sce <- scater::runUMAP(sce, dimred = "MNN_anglemania", name = "umap_MNN_angleman
 
 ## Plot
 ```{r}
+plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_anglemania") +
+  ggtitle("MNN integration using anglemania genes, colored by Batch")
+plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_anglemania") +
+  ggtitle("MNN integration using anglemania genes, colored by Group")
 plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_320") +
   ggtitle("MNN integration using top 320 HVGs, colored by Batch")
 plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_320") +
@@ -213,10 +223,7 @@ plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_2000") +
   ggtitle("MNN integration using top 2000 HVGs, colored by Batch")
 plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_2000") +
   ggtitle("MNN integration using top 2000 HVGs, colored by Group")
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_anglemania") +
-  ggtitle("MNN integration using anglemania genes, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_anglemania") +
-  ggtitle("MNN integration using anglemania genes, colored by Group")
+
 ```
 
 
