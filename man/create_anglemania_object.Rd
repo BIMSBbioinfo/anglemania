@@ -2,6 +2,7 @@
 % Please edit documentation in R/objects.R
 \name{create_anglemania_object}
 \alias{create_anglemania_object}
+\alias{.core_create_anglemania_object}
 \alias{create_anglemania_object,Seurat-method}
 \alias{create_anglemania_object,SingleCellExperiment-method}
 \alias{create_anglemania_object,list-method}
@@ -9,40 +10,70 @@
 \usage{
 create_anglemania_object(object, ...)
 
+.core_create_anglemania_object(
+  meta,
+  matrix_list,
+  batch_key,
+  dataset_key = NA_character_,
+  min_cells_per_gene = 1,
+  seurat_assay = "RNA",
+  allow_missing_features = FALSE,
+  min_samples_per_gene = 2
+)
+
 \S4method{create_anglemania_object}{Seurat}(
   object,
   batch_key,
+  dataset_key = NA_character_,
   min_cells_per_gene = 1,
-  dataset_key = NA
+  allow_missing_features = FALSE,
+  min_samples_per_gene = 2,
+  seurat_assay = "RNA",
+  ...
 )
 
 \S4method{create_anglemania_object}{SingleCellExperiment}(
   object,
   batch_key,
+  dataset_key = NA_character_,
   min_cells_per_gene = 1,
-  dataset_key = NA
+  allow_missing_features = FALSE,
+  min_samples_per_gene = 2,
+  ...
 )
 
-\S4method{create_anglemania_object}{list}(object, min_cells_per_gene = 1)
+\S4method{create_anglemania_object}{list}(
+  object,
+  min_cells_per_gene = 1,
+  allow_missing_features = FALSE,
+  min_samples_per_gene = 2,
+  seurat_assay = "RNA",
+  ...
+)
 }
 \arguments{
-\item{object}{A \code{\link[Seurat]{Seurat}} or
-\code{\link[SingleCellExperiment]{SingleCellExperiment}} object
-containing single-cell RNA-seq data.}
+\item{object}{A list of Seurat or SingleCellExperiment objects}
 
-\item{...}{Additional arguments}
+\item{...}{Additional arguments passed to .core_create_anglemania_object}
 
-\item{batch_key}{A character string indicating the column name(s) in the
-object metadata that identify the batch to which each cell belongs.}
+\item{meta}{A data frame containing metadata for the dataset. Will be extracted from
+the Seurat or SingleCellExperiment object or constructed from a list of objects.}
 
-\item{min_cells_per_gene}{A numeric value indicating the minimum number of
-cells in which a gene must be expressed to be included in the analysis.
-Default is \code{1}.}
+\item{matrix_list}{A list of count matrices for each batch.}
 
-\item{dataset_key}{A character string indicating the column name in the
-object metadata that identifies the dataset to which each cell
-belongs. If \code{NA}, all cells are assumed to belong to the same
-dataset.}
+\item{batch_key}{A character string that names the column in the metadata
+that contains the batch information}
+
+\item{dataset_key}{Column name for dataset information (optional)}
+
+\item{min_cells_per_gene}{Minimum cells expressing a gene}
+
+\item{seurat_assay}{Assay of the Seurat object to extract counts from}
+
+\item{allow_missing_features}{Logical; allow genes missing in some batches}
+
+\item{min_samples_per_gene}{Minimum samples required if
+allow_missing_features is TRUE}
 }
 \value{
 An \code{\link{anglemania_object-class}} containing:
@@ -62,6 +93,8 @@ least the specified number of cells across all batches.}
 \item{\code{min_cells_per_gene}}{The minimum number of cells per gene
 threshold used for filtering.}
 }
+
+anglemania_object
 }
 \description{
 Constructs an \code{\link{anglemania_object-class}} from a given
@@ -87,6 +120,25 @@ The function performs the following steps:
 \examples{
 sce <- sce_example()
 angl <- create_anglemania_object(sce, batch_key = "batch")
+angl
+sce <- sce_example()
+batch_key <- "batch"
+meta <- SingleCellExperiment::colData(sce) \%>\% 
+  as.data.frame() \%>\% 
+  add_unique_batch_key(batch_key=batch_key)
+
+matrix_list <- lapply(unique(meta[[batch_key]]), function(batch) {
+  batch_cells <- rownames(meta[meta[[batch_key]] == batch, ])
+  batch_mat <- SingleCellExperiment::counts(sce[, batch_cells])
+  return(batch_mat)
+})
+
+angl <- .core_create_anglemania_object(
+  meta = meta,
+  matrix_list = matrix_list,
+  batch_key = batch_key
+)
+
 angl
 sce <- sce_example()
 se <- Seurat::as.Seurat(sce, data = "counts")

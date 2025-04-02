@@ -4,7 +4,13 @@
 \alias{factorise}
 \title{Factorize Angle Matrices into Z-Scores}
 \usage{
-factorise(x_mat, method = "cosine", seed = 1)
+factorise(
+  x_mat,
+  method = "cosine",
+  seed = 1,
+  permute_row_or_column = "column",
+  permutation_function = "sample"
+)
 }
 \arguments{
 \item{x_mat}{A \code{\link[bigstatsr]{FBM}} object representing the
@@ -12,11 +18,14 @@ normalized and scaled gene expression matrix.}
 
 \item{method}{A character string specifying the method for calculating the
 relationship between gene pairs. Default is \code{"cosine"}. Other options
-include \code{"spearman"} and \code{"diem"} (see
-\url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
+include \code{"spearman"}}
 
 \item{seed}{An integer value for setting the seed for reproducibility during
 permutation. Default is \code{1}.}
+
+\item{permute_row_or_column}{Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}}
+
+\item{permutation_function}{Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}}
 }
 \value{
 An \code{\link[bigstatsr]{FBM}} object containing the
@@ -37,9 +46,6 @@ existing angles, creating a null distribution.
 original and permuted matrices using \code{\link{extract_angles}}.
 \item \strong{Method-Specific Processing}:
 \itemize{
-\item If \code{method = "diem"}, computes Euclidean distances and scales
-the angles accordingly, based on the methodology from the DIEM
-algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
 \item For other methods (\code{"cosine"}, \code{"spearman"}),
 statistical measures are computed from the permuted data.
 }

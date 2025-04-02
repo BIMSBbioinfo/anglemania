@@ -76,7 +76,11 @@ sce <- sce_example()
 se <- Seurat::as.Seurat(sce, data = "counts")
 se <- SeuratObject::RenameAssays(se, "originalexp", "RNA")
 angl <- create_anglemania_object(se, batch_key = "batch")
-angl <- anglemania(angl)
+angl <- anglemania(
+  angl, 
+  zscore_mean_threshold = 2,
+  zscore_sn_threshold = 2
+)
 options(future.globals.maxSize = 4000 * 1024^2)
 integrated_object <- integrate_by_features(se, angl)
 }

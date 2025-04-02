@@ -43,6 +43,9 @@ cells in which a gene must be expressed to be included in the analysis.}
 
 \item{\code{integration_genes}}{A list containing information about integration genes
 and their statistics.}
+
+\item{\code{assay}}{A character vector specifying the Seurat assay, the counts were
+extracted from.}
 }}
 
 \examples{

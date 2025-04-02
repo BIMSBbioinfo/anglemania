@@ -9,7 +9,10 @@ anglemania(
   zscore_mean_threshold = 2.5,
   zscore_sn_threshold = 2.5,
   max_n_genes = NULL,
-  method = "cosine"
+  method = "cosine",
+  permute_row_or_column = "column",
+  permutation_function = "sample",
+  prefilter_threshold = 0.5
 )
 }
 \arguments{
@@ -22,13 +25,18 @@ for the mean z-score. Default is \code{2.5}.}
 \item{zscore_sn_threshold}{Numeric value specifying the threshold for the
 signal-to-noise z-score. Default is \code{2.5}.}
 
-\item{max_n_genes}{Integer specifying the maximum number of genes to select.
-Default is \code{2000}.}
+\item{max_n_genes}{Integer specifying the maximum number of genes to select.}
 
 \item{method}{Character string specifying the method to use for calculating
 the relationship between gene pairs. Default is \code{"cosine"}.
 Other options include \code{"diem"}
 (see \url{https://bytez.com/docs/arxiv/2407.08623/paper}).}
+
+\item{permute_row_or_column}{Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}}
+
+\item{permutation_function}{Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}}
+
+\item{prefilter_threshold}{Numeric value specifying the threshold prefiltering genes - speeds up gene selection}
 }
 \value{
 An updated \code{\link{anglemania_object-class}} with computed statistics and

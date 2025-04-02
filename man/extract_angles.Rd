@@ -19,9 +19,6 @@ genes.
 \item \code{"spearman"}: Computes the Spearman rank correlation
 coefficient by rank-transforming the data before computing the
 correlation.
-\item \code{"diem"}: Computes the Dimension Insensitive Euclidean
-Metric between genes. Note that this is done in the
-\code{\link{factorise}} function.
 }}
 }
 \value{
