@@ -40,8 +40,7 @@ Under the hood, anglemania works with file-backed big matrices (FBMs) from the b
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
-  # library(anglemania)
-  devtools::load_all()
+  library(anglemania)
   library(dplyr)
   library(Seurat)
   library(splatter)
