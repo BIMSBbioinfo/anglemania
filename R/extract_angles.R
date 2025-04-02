@@ -17,9 +17,6 @@
 #'     \item \code{"spearman"}: Computes the Spearman rank correlation
 #'       coefficient by rank-transforming the data before computing the
 #'       correlation.
-#'     \item \code{"diem"}: Computes the Dimension Insensitive Euclidean
-#'       Metric between genes. Note that this is done in the
-#'       \code{\link{factorise}} function.
 #'   }
 #'
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the gene-gene
@@ -28,7 +25,7 @@
 #'   The diagonal elements are set to \code{NA}.
 #'
 #' @importFrom bigstatsr FBM big_apply big_transpose big_cor
-#' @examples 
+#' @examples
 #'
 #' mat <- matrix(
 #'  c(
@@ -56,16 +53,18 @@
 #'
 #' @export
 extract_angles <- function(
-    x_mat,
-    method = "cosine"
-  ) {
+  x_mat,
+  method = "cosine"
+) {
+  checkmate::assertChoice(method, c("cosine", "spearman"))
+  checkmate::assertClass(x_mat, "FBM")
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- X[, ind, drop = FALSE]
     # Normalize the data:
     #   divide gene counts by the number of total counts per cell,
     #   multiply by 10,000 (scaling factor like in Seurat)
     # +1 prevents NaN values when working with partial features
-    X.sub <- t(t(X.sub) / (colSums(X.sub)+1) * 10000)
+    X.sub <- t(t(X.sub) / (colSums(X.sub)) * 10000)
     X.sub <- log1p(X.sub)
 
     X[, ind] <- X.sub
@@ -86,7 +85,8 @@ extract_angles <- function(
     })
   }
 
-  x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
+  # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
+  x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
   # x_mat <- angl_cor(x_mat, block.size = 1000)
   # The big_cor function from bigstatsr scales and centers the
   # count matrix and calculates the covariance (cross product X^T X)
@@ -94,14 +94,14 @@ extract_angles <- function(
 
   # replaces NaN with NA values in the matrix
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
-      X.sub <- apply(X[, ind, drop = FALSE], 2, function(x){
-        xx = x
-        xx[is.nan(xx)] = NA
-        xx
-      })
-      x_mat[, ind] <- X.sub
-      NULL
+    X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
+      xx = x
+      xx[is.nan(xx)] = NA
+      xx
     })
+    x_mat[, ind] <- X.sub
+    NULL
+  })
 
   return(x_mat)
 }

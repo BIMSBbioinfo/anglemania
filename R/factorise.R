@@ -15,9 +15,6 @@
 #'     original and permuted matrices using \code{\link{extract_angles}}.
 #'   \item **Method-Specific Processing**:
 #'   \itemize{
-#'     \item If \code{method = "diem"}, computes Euclidean distances and scales
-#'       the angles accordingly, based on the methodology from the DIEM
-#'       algorithm (\url{https://bytez.com/docs/arxiv/2407.08623/paper}).
 #'     \item For other methods (\code{"cosine"}, \code{"spearman"}),
 #'       statistical measures are computed from the permuted data.
 #'   }
@@ -34,8 +31,7 @@
 #'   normalized and scaled gene expression matrix.
 #' @param method A character string specifying the method for calculating the
 #'   relationship between gene pairs. Default is \code{"cosine"}. Other options
-#'   include \code{"spearman"} and \code{"diem"} (see
-#'   \url{https://bytez.com/docs/arxiv/2407.08623/paper}).
+#'   include \code{"spearman"}
 #' @param seed An integer value for setting the seed for reproducibility during
 #'   permutation. Default is \code{1}.
 #' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
@@ -44,9 +40,10 @@
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the
 #'   z-score-transformed angle matrix.
 #'
-#' @importFrom bigstatsr FBM big_apply
+#' @importFrom bigstatsr FBM big_apply rows_along
 #' @importFrom checkmate assertClass assertString assertChoice
 #' @importFrom withr with_seed
+#' @importFrom digest digest
 #'
 #' @examples
 #' mat <- matrix(
@@ -82,24 +79,21 @@ factorise <- function(
     permute_row_or_column = "column",
     permutation_function = "sample"
   ) {
-  # Initialize empty FBM to store permuted correlation matrix
-
-  
   # Validate input
   checkmate::assertClass(x_mat, "FBM")
   checkmate::assertString(method)
-  checkmate::assertChoice(method, c("cosine", "spearman", "diem"))
+  checkmate::assertChoice(method, c("cosine", "spearman"))
   checkmate::assertString(permute_row_or_column)
   checkmate::assertChoice(permute_row_or_column, c("row", "column"))
   checkmate::assertString(permutation_function)
   checkmate::assertChoice(permutation_function, c("sample", "permute_nonzero"))
-  set.seed(seed)
   tmpfile = tempfile()
   x_mat_perm <- bigstatsr::FBM(
     nrow = nrow(x_mat),
     ncol = ncol(x_mat),
-    backingfile = file.path(tmpfile, digest::digest(tmpfile,length=10))
+    backingfile = file.path(tmpfile, digest::digest(tmpfile, length = 10))
   )
+
   if(permutation_function == "sample"){
     permutation_function = base::sample
   }else{
@@ -124,53 +118,23 @@ factorise <- function(
       x_mat_perm[ind, ] <- X.sub
     }
   }
-
-  # Permute matrix
-  bigstatsr::big_apply(
-    x_mat,
-    a.FUN = a_fun,
-    a.combine = "c",
-    ind = ind_fun,
-    block.size = 1000
-  )
+  withr::with_seed(seed, {
+    # Permute matrix
+    bigstatsr::big_apply(
+      x_mat,
+      a.FUN = a_fun,
+      a.combine = "c",
+      ind = ind_fun,
+      block.size = 1000
+    )
+  })
 
   # Compute correlation matrix for both original and permuted matrix
   x_mat_corr <- extract_angles(x_mat, method = method)
   x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
 
-  if (method == "diem") {
-    bigstatsr::big_apply(
-      x_mat_corr,
-      a.FUN = function(X, ind) {
-        # 1. Calculate Euclidean distance from cosine similarity:
-        #    dij = sqrt(2 * (1 - rij))
-        X.sub <- X[, ind, drop = FALSE]
-        X.sub <- sqrt(2 * (1 - X.sub))
-        x_mat_corr[, ind] <- X.sub
-        NULL
-      },
-      a.combine = "c",
-      block.size = 1000
-    )
-
-    dstat <- get_dstat(x_mat_corr)
-    scale_factor <- (dstat$min - dstat$max) / dstat$var
-    bigstatsr::big_apply(
-      x_mat_corr,
-      a.FUN = function(X, ind) {
-        # 2. Calculate DIEM by subtracting the mean and scaling
-        X.sub <- X[, ind, drop = FALSE]
-        X.sub <- scale_factor * (X.sub - dstat$mean)
-        x_mat_corr[, ind] <- X.sub
-        NULL
-      },
-      a.combine = "c",
-      block.size = 1000
-    )
-  } else {
-    dstat <- get_dstat(x_mat_perm_corr)
-  }
-  # Transform original correlation matrix into z-scores
+  # Transform original correlation matrix into z-scores.
+  dstat <- get_dstat(x_mat_perm_corr)
   bigstatsr::big_apply(
     x_mat_corr,
     a.FUN = function(X, ind) {
@@ -179,22 +143,27 @@ factorise <- function(
       # the mean is zero
       zscores[is.na(zscores)] = 0
       X[, ind] <- zscores
-      X[is.na(X[,ind]), ind] = 0
       NULL
     },
     a.combine = "c",
     block.size = 1000
   )
-
   return(x_mat_corr)
 }
 
 
 # ---------------------------------------------------------------------------
 #' permute non-zero elements of vectors
-#'
 #' @description
-permute_nonzero = function(v){
+#' Permutes the non-zero elements of a numeric vector.
+#' @param v A numeric vector.
+#' @return A numeric vector with non-zero elements permuted.
+#' @examples
+#' v <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) # put in some zeroes
+#' v = c(v, 0, 0, 0)
+#' permute_nonzero(v)
+#' @export
+permute_nonzero = function(v) {
   ind = v > 0
   v[ind] = sample(v[ind])
   v
