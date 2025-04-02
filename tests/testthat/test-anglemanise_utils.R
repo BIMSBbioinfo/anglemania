@@ -32,13 +32,19 @@ test_that("get_dstat computes statistics correctly for an FBM", {
   # Important to know that we deal with symmetric matrices!!!
   mat <- matrix(
     c(
-      NA, 0.1, -0.2, -1, 
-      0.1, NA, -1, -0.1, 
-      -0.2, -1, NA, 0.2, 
-      -1, -0.1, 0.2, NA
+      NA, 0.1, -0.2, -1, 0.1, -0.5, 0.7, -0.3, 0.2, -0.1,
+      0.1, NA, -1, 0.1, -0.3, -0.2, 0.5, -0.1, -0.2, 0.3,
+      -0.2, -1, NA, 0.2, -0.1, 0.4, -0.3, -0.2, 0.1, -0.5,
+      -1, 0.1, 0.2, NA, 0.3, -0.5, 0.1, -0.2, 0.7, 0.3,
+      0.1, -0.3, -0.1, 0.3, NA, -0.2, -0.5, 0.1, -0.7, 0.2,
+      -0.5, -0.2, 0.4, -0.5, -0.2, NA, 0.3, 0.2, -0.1, 0.4,
+      0.7, 0.5, -0.3, 0.1, -0.5, 0.3, NA, -0.2, -0.1, -0.3,
+      -0.3, -0.1, -0.2, -0.2, 0.1, 0.2, -0.2, NA, 0.5, -0.4,
+      0.2, -0.2, 0.1, 0.7, -0.7, -0.1, -0.1, 0.5, NA, -0.3,
+      -0.1, 0.3, -0.5, 0.3, 0.2, 0.4, -0.3, -0.4, -0.3, NA
     ),
-    nrow = 4,
-    ncol = 4,
+    nrow = 10,
+    ncol = 10,
     byrow = TRUE
   )
 
@@ -56,18 +62,16 @@ test_that("get_dstat computes statistics correctly for an FBM", {
   n_expected <- length(mat[!is.na(mat)])
   # this n is used in anglemania because
   # we use the entire matrix not only the upper.tri
-  mean_expected <- mean(mat[upper.tri(mat, diag = FALSE)], na.rm = TRUE)
-  var_expected <- var(mat[upper.tri(mat, diag = FALSE)], na.rm = TRUE)
-  sd_expected <- sd(mat[upper.tri(mat, diag = FALSE)], na.rm = TRUE)
-  min_expected <- min(mat[upper.tri(mat, diag = FALSE)], na.rm = TRUE)
-  max_expected <- max(mat[upper.tri(mat, diag = FALSE)], na.rm = TRUE)
-  sn_expected <- sd_expected / mean_expected
+  mean_expected <- Matrix::colMeans(mat, na.rm = TRUE)
+  var_expected <- matrixStats::colVars(mat, na.rm = TRUE)
+  sd_expected <- matrixStats::colSds(mat, na.rm = TRUE)
+  min_expected <- matrixStats::colMins(mat, na.rm = TRUE)
+  max_expected <- matrixStats::colMaxs(mat, na.rm = TRUE)
 
   # Check that the computed values match the expected values
   expect_equal(result$mean, mean_expected)
   expect_equal(result$var, var_expected)
   expect_equal(result$sd, sd_expected)
-  expect_equal(result$sn, sn_expected)
   expect_equal(result$min, min_expected)
   expect_equal(result$max, max_expected)
 })
@@ -200,7 +204,9 @@ test_that("select_genes selects genes correctly based on thresholds", {
     geneA = expected_indices[, 1],
     geneB = expected_indices[, 2],
     sn_zscore = sn_zscore_matrix[expected_indices],
-    mean_zscore = mean_zscore_matrix[expected_indices]
+    mean_zscore = mean_zscore_matrix[expected_indices],
+    gene_nameA = gene_names[expected_indices[, 1]],
+    gene_nameB = gene_names[expected_indices[, 2]]
   )
 
   # Order by absolute zscore

@@ -3,7 +3,7 @@ test_that("extract_angles extracts cosine similarities correctly", {
     c(0, 0, 0, 4, 2,
       1, 2, 3, 4, 5,
       5, 4, 3, 2, 1,
-      0, 1, 0, 1, 0),
+      0, 0, 0, 0, 0),
     nrow = 4,
     ncol = 5,
     byrow = TRUE
@@ -24,7 +24,9 @@ test_that("extract_angles extracts cosine similarities correctly", {
   # log_normalized_data <- log1p(normalized_data)
   
   transposed_data <- t(log_normalized_data)
-  expected_correlation <- cor(transposed_data, use = "pairwise.complete.obs")
+  suppressWarnings({
+    expected_correlation <- cor(transposed_data, use = "pairwise.complete.obs")
+  })
   
   diag(expected_correlation) <- NA
   
@@ -40,7 +42,7 @@ test_that("extract_angles extracts spearman correlations correctly", {
       0, 0, 0, 4, 2,
       1, 2, 3, 4, 5,
       5, 4, 3, 2, 1,
-      0, 1, 0, 1, 0
+      0, 0, 0, 0, 0
     ),
     nrow = 4,
     ncol = 5,
@@ -62,11 +64,13 @@ test_that("extract_angles extracts spearman correlations correctly", {
   # log_normalized_data <- log1p(normalized_data)
 
   transposed_data <- t(log_normalized_data)
-  expected_correlation <- cor(
-    transposed_data, 
-    use = "pairwise.complete.obs",
-    method = "spearman"
-  )
+  suppressWarnings({
+    expected_correlation <- cor(
+      transposed_data,
+      method = "spearman"
+    )
+  }) # warning thrown because of standard deviation equal to zero but
+  # we allow for this because t
 
   diag(expected_correlation) <- NA
 

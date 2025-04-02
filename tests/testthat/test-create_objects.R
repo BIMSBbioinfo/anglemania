@@ -53,7 +53,7 @@ in case of no dataset_key", {
     dplyr::mutate(batch = groups) %>%
     dplyr::select(batch, all_of(batch_key)) %>%
     dplyr::distinct() %>%
-    dplyr::mutate(weight = 1 / nrow(.))
+    dplyr::mutate(weight = 1)
   
   # check data_info
   angl <- create_anglemania_object(se, batch_key = batch_key)
@@ -93,11 +93,13 @@ test_that(
         all_of(c(dataset_key, batch_key))
       ) %>%
       dplyr::distinct() %>%
-      dplyr::group_by(across(all_of(dataset_key))) %>%
-      dplyr::add_count(across(all_of(dataset_key)), name = "n_samples") %>%
-      dplyr::mutate(
-        weight = 1 / n_samples / dplyr::n_groups(.)
-      )
+        dplyr::group_by(across(all_of(dataset_key))) %>%
+        dplyr::add_count(across(all_of(dataset_key)), name = "n_samples") %>%
+        dplyr::mutate(
+          weight = 1 / n_samples / dplyr::n_groups(.)
+        ) %>%
+        dplyr::mutate(weight = weight / mean(weight)) %>%
+          dplyr::ungroup()
     # check data_info
     angl <- create_anglemania_object(
       se,
