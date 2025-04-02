@@ -24,33 +24,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// colmean_no_diag_FBM
-NumericVector colmean_no_diag_FBM(Environment BM);
-RcppExport SEXP _anglemania_colmean_no_diag_FBM(SEXP BMSEXP) {
+// scaleK
+void scaleK(Environment BM, const NumericVector& sums, const NumericVector& mu, const NumericVector& delta, int nrow);
+RcppExport SEXP _anglemania_scaleK(SEXP BMSEXP, SEXP sumsSEXP, SEXP muSEXP, SEXP deltaSEXP, SEXP nrowSEXP) {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Environment >::type BM(BMSEXP);
-    rcpp_result_gen = Rcpp::wrap(colmean_no_diag_FBM(BM));
-    return rcpp_result_gen;
-END_RCPP
-}
-// colmedian_no_diag_FBM
-NumericVector colmedian_no_diag_FBM(Environment BM);
-RcppExport SEXP _anglemania_colmedian_no_diag_FBM(SEXP BMSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Environment >::type BM(BMSEXP);
-    rcpp_result_gen = Rcpp::wrap(colmedian_no_diag_FBM(BM));
-    return rcpp_result_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type sums(sumsSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< int >::type nrow(nrowSEXP);
+    scaleK(BM, sums, mu, delta, nrow);
+    return R_NilValue;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_anglemania_select_genes_cpp", (DL_FUNC) &_anglemania_select_genes_cpp, 4},
-    {"_anglemania_colmean_no_diag_FBM", (DL_FUNC) &_anglemania_colmean_no_diag_FBM, 1},
-    {"_anglemania_colmedian_no_diag_FBM", (DL_FUNC) &_anglemania_colmedian_no_diag_FBM, 1},
+    {"_anglemania_scaleK", (DL_FUNC) &_anglemania_scaleK, 5},
     {NULL, NULL, 0}
 };
 

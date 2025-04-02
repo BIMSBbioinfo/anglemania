@@ -77,103 +77,29 @@ DataFrame select_genes_cpp(Environment BM_sn,
   return df;
 }
 
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(bigstatsr, rmio)]]
-#include <bigstatsr/BMAcc.h>
-#include <Rcpp.h>
-using namespace Rcpp;
-using std::size_t;
 
+// For a square FBM
+// Adapted from bigstatsr::scaleK for export in this package
+// Source: https://github.com/privefl/bigstatsr
+// License: GPL-3
 // [[Rcpp::export]]
-NumericVector colmean_no_diag_FBM(Environment BM) {
-  // Retrieve the FBM pointer from the "address_rw" slot
+void scaleK(Environment BM,
+            const NumericVector& sums,
+            const NumericVector& mu,
+            const NumericVector& delta,
+            int nrow) {
+
   XPtr<FBM_RW> xpBM = BM["address_rw"];
-  
-  // Check that the FBM is of double type (matrix_type == 8)
-  if(xpBM->matrix_type() != 8)
-    stop("Only FBMs with double type are supported.");
-  
-  // Create an accessor and get dimensions
-  BMAcc_RW<double> acc(xpBM);
-  size_t n = acc.nrow();
-  size_t m = acc.ncol();
-  
-  // For a symmetric matrix with a diagonal, n should equal m
-  if(n != m)
-    stop("Matrix must be square when ignoring the diagonal.");
-  
-  // Prepare a NumericVector to store the column means
-  NumericVector means(m);
-  
-  // Compute the mean for each column, ignoring the diagonal element
-  for (size_t j = 0; j < m; j++) {
-    double sum = 0.0;
+  BMAcc_RW<double> K(xpBM);
+
+  size_t n = K.nrow();
+  myassert_size(K.ncol(), n);
+
+  for (size_t j = 0; j < n; j++) {
     for (size_t i = 0; i < n; i++) {
-      if (i == j) continue;  // Skip the diagonal element
-      sum += acc(i, j);
+      K(i, j) -= sums[i] * mu[j] + mu[i] * sums[j];
+      K(i, j) += nrow * mu[i] * mu[j];
+      K(i, j) /= delta(i) * delta(j);
     }
-    // Divide by (n-1) because we omitted one element
-    means[j] = sum / (n - 1);
   }
-  
-  return means;
-}
-
-
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(bigstatsr, rmio)]]
-#include <bigstatsr/BMAcc.h>
-#include <Rcpp.h>
-#include <algorithm>  // for std::sort
-#include <vector>
-using namespace Rcpp;
-using std::size_t;
-
-// [[Rcpp::export]]
-NumericVector colmedian_no_diag_FBM(Environment BM) {
-  // Retrieve the FBM pointer from the "address_rw" slot.
-  XPtr<FBM_RW> xpBM = BM["address_rw"];
-  
-  // Check that the FBM is of double type.
-  if (xpBM->matrix_type() != 8)
-    stop("Only FBMs with double type are supported.");
-  
-  // Create an accessor and get dimensions.
-  BMAcc_RW<double> acc(xpBM);
-  size_t n = acc.nrow();
-  size_t m = acc.ncol();
-  
-  // The matrix should be square for a symmetric matrix.
-  if (n != m)
-    stop("Matrix must be square when ignoring the diagonal.");
-  
-  // Prepare a NumericVector to store the medians for each column.
-  NumericVector medians(m);
-  
-  // Compute the median for each column, ignoring the diagonal element.
-  for (size_t j = 0; j < m; j++) {
-    std::vector<double> values;
-    values.reserve(n - 1);  // Reserve space for off-diagonal elements.
-    
-    for (size_t i = 0; i < n; i++) {
-      if (i == j) continue; // Skip the diagonal.
-      values.push_back(acc(i, j));
-    }
-    
-    // Sort the collected values.
-    std::sort(values.begin(), values.end());
-    
-    // Calculate the median.
-    size_t L = values.size();
-    double median;
-    if (L % 2 == 1) {
-      median = values[L / 2];
-    } else {
-      median = (values[L / 2 - 1] + values[L / 2]) / 2.0;
-    }
-    
-    medians[j] = median;
-  }
-  
-  return medians;
 }

@@ -5,11 +5,7 @@ select_genes_cpp <- function(BM_sn, BM_mean, zscore_sn_threshold, zscore_mean_th
     .Call(`_anglemania_select_genes_cpp`, BM_sn, BM_mean, zscore_sn_threshold, zscore_mean_threshold)
 }
 
-colmean_no_diag_FBM <- function(BM) {
-    .Call(`_anglemania_colmean_no_diag_FBM`, BM)
-}
-
-colmedian_no_diag_FBM <- function(BM) {
-    .Call(`_anglemania_colmedian_no_diag_FBM`, BM)
+scaleK <- function(BM, sums, mu, delta, nrow) {
+    invisible(.Call(`_anglemania_scaleK`, BM, sums, mu, delta, nrow))
 }
 
