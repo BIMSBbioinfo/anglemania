@@ -255,7 +255,7 @@ to the dataset</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="anglemania.html">anglemania</a></code> <code><a href="get_list_stats.html">get_list_stats</a></code></p></div>
+    <div class="dont-index"><p><code><a href="anglemania.html">anglemania</a></code> <code><a href="anglemanise_utils.html">get_list_stats</a></code></p></div>
     </div>
 
     <div id="ref-examples">
@@ -264,23 +264,25 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=00s, remaining~00s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e5441f35815" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e546d0146c3" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 36 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 25 genes for integration."</span>
 <span class="r-in"><span><span class="fu">show</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> anglemania_object</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --------------</span>
@@ -298,23 +300,25 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=00s, remaining~00s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e547b7b69c5" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e54328ef41" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 36 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 25 genes for integration."</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">matrix_list</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ batch1:Reference class 'FBM' [package "bigstatsr"] with 15 fields</span>
@@ -324,12 +328,12 @@ to the dataset</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/Rtmpa1WtuS/file1d243fd54322.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpY05f7q/file2e543af4033f.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/Rtmpa1WtuS/file1d243fd54322.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/Rtmpa1WtuS/file1d243fd54322.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpY05f7q/file2e543af4033f.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpY05f7q/file2e543af4033f.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -344,12 +348,12 @@ to the dataset</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/Rtmpa1WtuS/file1d247a14c525.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpY05f7q/file2e543027e5d0.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/Rtmpa1WtuS/file1d247a14c525.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/Rtmpa1WtuS/file1d247a14c525.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpY05f7q/file2e543027e5d0.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpY05f7q/file2e543027e5d0.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -365,10 +369,10 @@ to the dataset</p></li>
 <span class="r-in"><span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using dataset_key: dataset</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="fu">dataset_key</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "dataset"</span>
@@ -376,10 +380,10 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="fu">batch_key</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "batch"</span>
@@ -387,10 +391,10 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="fu">batch_key</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "batch"</span>
@@ -398,37 +402,39 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="fu">batch_key</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "batch"</span>
 <span class="r-in"><span><span class="fu">angl_weights</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> batch1 batch2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0.5    0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      1      1 </span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=00s, remaining~00s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e542b3d3221" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e5410aea498" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 36 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 25 genes for integration."</span>
 <span class="r-in"><span><span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu">list_stats</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">stats</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 4</span>
@@ -439,12 +445,12 @@ to the dataset</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/Rtmpa1WtuS/file1d2471675075.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpY05f7q/file2e54de15a27.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/Rtmpa1WtuS/file1d2471675075.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/Rtmpa1WtuS/file1d2471675075.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpY05f7q/file2e54de15a27.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpY05f7q/file2e54de15a27.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -459,12 +465,12 @@ to the dataset</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/Rtmpa1WtuS/file1d245c3b7707.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpY05f7q/file2e5458d5eefc.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/Rtmpa1WtuS/file1d245c3b7707.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/Rtmpa1WtuS/file1d245c3b7707.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpY05f7q/file2e5458d5eefc.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpY05f7q/file2e5458d5eefc.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -479,12 +485,12 @@ to the dataset</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/Rtmpa1WtuS/file1d247841732a.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpY05f7q/file2e54578c988f.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/Rtmpa1WtuS/file1d247841732a.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/Rtmpa1WtuS/file1d247841732a.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpY05f7q/file2e54578c988f.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpY05f7q/file2e54578c988f.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -492,20 +498,20 @@ to the dataset</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..and 22 methods, of which 8 are  possibly relevant:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..  add_columns, bm, bm.desc, check_dimensions, check_write_permissions,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..  initialize, save, show#envRefClass</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ prefiltered:'data.frame':	6413 obs. of  4 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ geneA      : int [1:6413] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ geneB      : int [1:6413] 2 9 11 19 26 31 33 49 64 67 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ sn_zscore  : num [1:6413] 4.88 1.71 62.47 22.62 3.64 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ mean_zscore: num [1:6413] -1.47 1.29 -1.5 -1.58 1.29 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ prefiltered:'data.frame':	18986 obs. of  4 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ geneA      : int [1:18986] 1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ geneB      : int [1:18986] 2 3 4 9 10 11 12 17 19 26 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ sn_zscore  : num [1:18986] 3.88 3.72 1.56 1.23 0.94 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ mean_zscore: num [1:18986] -1.477 -0.669 0.81 1.324 0.552 ...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="fu">intersect_genes</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] "gene1"   "gene2"   "gene3"   "gene4"   "gene5"   "gene6"   "gene7"  </span>
@@ -555,23 +561,25 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=00s, remaining~00s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e546c40d77d" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e54522ef864" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 36 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 25 genes for integration."</span>
 <span class="r-in"><span><span class="co"># extract the genes identified by anglemania()</span></span></span>
 <span class="r-in"><span><span class="va">anglemania_genes</span> <span class="op">&lt;-</span> <span class="fu">get_anglemania_genes</span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -579,10 +587,10 @@ to the dataset</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">sce</span>,</span></span>
@@ -591,10 +599,10 @@ to the dataset</p></li>
 <span class="r-in"><span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using dataset_key: dataset</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=00s, remaining~00s  |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">SingleCellExperiment</span><span class="fu">::</span><span class="fu">colData</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 6 rows and 2 columns</span>

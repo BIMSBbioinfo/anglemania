@@ -77,7 +77,10 @@ genes based on specified thresholds.</p>
 <span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>  max_n_genes <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"cosine"</span></span>
+<span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span>
+<span>  permute_row_or_column <span class="op">=</span> <span class="st">"column"</span>,</span>
+<span>  permutation_function <span class="op">=</span> <span class="st">"sample"</span>,</span>
+<span>  prefilter_threshold <span class="op">=</span> <span class="fl">0.5</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -101,8 +104,7 @@ signal-to-noise z-score. Default is <code>2.5</code>.</p></dd>
 
 
 <dt id="arg-max-n-genes">max_n_genes<a class="anchor" aria-label="anchor" href="#arg-max-n-genes"></a></dt>
-<dd><p>Integer specifying the maximum number of genes to select.
-Default is <code>2000</code>.</p></dd>
+<dd><p>Integer specifying the maximum number of genes to select.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -110,6 +112,18 @@ Default is <code>2000</code>.</p></dd>
 the relationship between gene pairs. Default is <code>"cosine"</code>.
 Other options include <code>"diem"</code>
 (see <a href="https://bytez.com/docs/arxiv/2407.08623/paper" class="external-link">https://bytez.com/docs/arxiv/2407.08623/paper</a>).</p></dd>
+
+
+<dt id="arg-permute-row-or-column">permute_row_or_column<a class="anchor" aria-label="anchor" href="#arg-permute-row-or-column"></a></dt>
+<dd><p>Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is <code>"column"</code></p></dd>
+
+
+<dt id="arg-permutation-function">permutation_function<a class="anchor" aria-label="anchor" href="#arg-permutation-function"></a></dt>
+<dd><p>Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is <code>"sample"</code></p></dd>
+
+
+<dt id="arg-prefilter-threshold">prefilter_threshold<a class="anchor" aria-label="anchor" href="#arg-prefilter-threshold"></a></dt>
+<dd><p>Numeric value specifying the threshold prefiltering genes - speeds up gene selection</p></dd>
 
 </dl></div>
     <div id="value">
@@ -124,17 +138,17 @@ selected genes based on the specified thresholds.</p>
 <code><a href="factorise.html">factorise</a></code>.</p></li>
 <li><p>Transforms the angles to z-scores.</p></li>
 <li><p>Computes statistical measures (mean z-score, signal-to-noise ratio)
-across samples using <code><a href="get_list_stats.html">get_list_stats</a></code>.</p></li>
+across samples using <code><a href="anglemanise_utils.html">get_list_stats</a></code>.</p></li>
 <li><p>Selects genes based on specified z-score thresholds using
-<code><a href="select_genes.html">select_genes</a></code>.</p></li>
+<code><a href="anglemanise_utils.html">select_genes</a></code>.</p></li>
 </ol><p>The computed statistics and selected genes are added to the
 <code>angl</code>, which is returned.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="create_anglemania_object.html">create_anglemania_object</a></code>,
-<code><a href="get_list_stats.html">get_list_stats</a></code>,
-<code><a href="select_genes.html">select_genes</a></code>,
+<code><a href="anglemanise_utils.html">get_list_stats</a></code>,
+<code><a href="anglemanise_utils.html">select_genes</a></code>,
 <code><a href="factorise.html">factorise</a></code>,
 <code><a href="https://privefl.github.io/bigstatsr/reference/big_apply.html" class="external-link">big_apply</a></code>,
 <a href="https://arxiv.org/abs/1306.0256" class="external-link">https://arxiv.org/abs/1306.0256</a></p></div>
@@ -147,10 +161,10 @@ across samples using <code><a href="get_list_stats.html">get_list_stats</a></cod
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using the intersection of filtered genes from all batches...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Number of genes in intersected set: 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting count matrices...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering each batch to at least 1 cells per gene...</span>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu">anglemania</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">angl</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span></span>
@@ -159,22 +173,24 @@ across samples using <code><a href="get_list_stats.html">get_list_stats</a></cod
 <span class="r-in"><span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |=========================                         | 50% elapsed=01s, remaining~01s  |==================================================| 100% elapsed=01s, remaining~00s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e54691ce7bd" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpY05f7q/file2e542139cd4c" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=01s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 214 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 194 genes for integration."</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the selected genes</span></span></span>
 <span class="r-in"><span><span class="va">selected_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">selected_genes</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "gene43"  "gene207" "gene119" "gene130" "gene69"  "gene184" "gene25" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "gene209" "gene53"  "gene113"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "gene43"  "gene207" "gene119" "gene130" "gene25"  "gene209" "gene82" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "gene114" "gene53"  "gene113"</span>
 </code></pre></div>
     </div>
   </div>

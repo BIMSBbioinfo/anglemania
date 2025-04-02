@@ -83,7 +83,7 @@
       <h1 data-toc-skip>Running anglemania with
 SingleCellExperiment</h1>
             
-            <h4 data-toc-skip class="date">2025-03-04</h4>
+            <h4 data-toc-skip class="date">2025-04-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BIMSBbioinfo/anglemania/blob/master/vignettes/anglemania_tutorial.Rmd" class="external-link"><code>vignettes/anglemania_tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>anglemania_tutorial.Rmd</code></div>
@@ -132,7 +132,7 @@ memory efficient computation.</p>
 between the groups/cell types<a class="anchor" aria-label="anchor" href="#create-simulated-data-with-mild-batch-effects-and-mild-differences-between-the-groupscell-types"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">batch.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
+<code class="sourceCode R"><span><span class="va">batch.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.3</span></span>
 <span><span class="va">de.facLoc</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
 <span><span class="va">nBatches</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">nGroups</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
@@ -140,19 +140,19 @@ between the groups/cell types<a class="anchor" aria-label="anchor" href="#create
 <span><span class="va">groupCells</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
 <span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://oshlack.github.io/splatter/reference/splatSimulate.html" class="external-link">splatSimulate</a></span><span class="op">(</span></span>
-<span>    batchCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">groupCells</span> <span class="op">*</span> <span class="va">nGroups</span>, <span class="va">nBatches</span><span class="op">)</span>,</span>
-<span>    batch.facLoc <span class="op">=</span> <span class="va">batch.facLoc</span>,</span>
-<span>    group.prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">nGroups</span>, <span class="va">nGroups</span><span class="op">)</span>,</span>
-<span>    nGenes <span class="op">=</span> <span class="va">nGenes</span>,</span>
-<span>    batch.facScale <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"groups"</span>,</span>
-<span>    verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    out.prob    <span class="op">=</span> <span class="fl">0.001</span>,</span>
-<span>    de.prob     <span class="op">=</span> <span class="fl">0.1</span>, <span class="co"># mild</span></span>
-<span>    de.facLoc   <span class="op">=</span> <span class="va">de.facLoc</span>,</span>
-<span>    de.facScale <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>    bcv.common  <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>    seed <span class="op">=</span> <span class="fl">42</span></span>
+<span>  batchCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">groupCells</span> <span class="op">*</span> <span class="va">nGroups</span>, <span class="va">nBatches</span><span class="op">)</span>,</span>
+<span>  batch.facLoc <span class="op">=</span> <span class="va">batch.facLoc</span>,</span>
+<span>  group.prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="va">nGroups</span>, <span class="va">nGroups</span><span class="op">)</span>,</span>
+<span>  nGenes <span class="op">=</span> <span class="va">nGenes</span>,</span>
+<span>  batch.facScale <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"groups"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  out.prob <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  de.prob <span class="op">=</span> <span class="fl">0.1</span>, <span class="co"># mild</span></span>
+<span>  de.facLoc <span class="op">=</span> <span class="va">de.facLoc</span>,</span>
+<span>  de.facScale <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  bcv.common <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">42</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">sce</span></span></code></pre></div>
 <pre><code><span><span class="co">## class: SingleCellExperiment </span></span>
@@ -166,11 +166,18 @@ between the groups/cell types<a class="anchor" aria-label="anchor" href="#create
 <span><span class="co">## reducedDimNames(0):</span></span>
 <span><span class="co">## mainExpName: NULL</span></span>
 <span><span class="co">## altExpNames(0):</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assays</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## List of length 6</span></span>
+<span><span class="co">## names(6): BatchCellMeans BaseCellMeans BCV CellMeans TrueCounts counts</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="unintegrated-data">unintegrated data<a class="anchor" aria-label="anchor" href="#unintegrated-data"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<ul>
+<li>clusters are driven by batch effects</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="va">sce</span></span>
 <span><span class="co"># Normalization.</span></span>
 <span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/logNormCounts.html" class="external-link">logNormCounts</a></span><span class="op">(</span><span class="va">sce_unintegrated</span><span class="op">)</span></span>
@@ -193,7 +200,7 @@ between the groups/cell types<a class="anchor" aria-label="anchor" href="#create
 <span><span class="va">sce_unintegrated</span> <span class="op">&lt;-</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html" class="external-link">runUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, dimred <span class="op">=</span> <span class="st">"PCA"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce_unintegrated</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-1-2.png" width="700"></p>
 </div>
@@ -225,7 +232,7 @@ the input and don’t specify a batch key</li>
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 4 columns</span></span>
 <span><span class="co">##              Cell       Batch    Group ExpLibSize</span></span>
@@ -236,7 +243,7 @@ the input and don’t specify a batch key</li>
 <span><span class="co">## Cell4       Cell4      Batch1   Group1    52319.5</span></span>
 <span><span class="co">## Cell5       Cell5      Batch1   Group3    37774.7</span></span>
 <span><span class="co">## Cell6       Cell6      Batch1   Group3    58112.3</span></span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"Batch"</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span></span>
 <span>  <span class="va">sce</span>,</span>
@@ -244,11 +251,11 @@ the input and don’t specify a batch key</li>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## No dataset_key specified.</span></span>
 <span><span class="co">## Assuming that all samples belong to the same dataset and are separated by batch_key: Batch</span></span></code></pre>
+<pre><code><span><span class="co">## Using the intersection of filtered genes from all batches...</span></span></code></pre>
+<pre><code><span><span class="co">## Number of genes in intersected set: 4964</span></span></code></pre>
 <pre><code><span><span class="co">## Extracting count matrices...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering each batch to at least 1 cells per gene...</span></span></code></pre>
-<pre><code><span><span class="co">## Using the intersection of filtered genes from all batches...</span></span></code></pre>
-<pre><code><span><span class="co">## Number of genes in intersected set: 4970</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span></span></code></pre></div>
 <pre><code><span><span class="co">## anglemania_object</span></span>
 <span><span class="co">## --------------</span></span>
@@ -258,7 +265,7 @@ the input and don’t specify a batch key</li>
 <span><span class="co">## Total number of batches: 4 </span></span>
 <span><span class="co">## Batches (showing first 5):</span></span>
 <span><span class="co">## Batch1, Batch2, Batch3, Batch4 </span></span>
-<span><span class="co">## Number of intersected genes: 4970 </span></span>
+<span><span class="co">## Number of intersected genes: 4964 </span></span>
 <span><span class="co">## Intersected genes (showing first 10):</span></span>
 <span><span class="co">## Gene1, Gene2, Gene3, Gene4, Gene5, Gene6, Gene7, Gene8, Gene9, Gene10 , ...</span></span>
 <span><span class="co">## Min cells per gene: 1</span></span></code></pre>
@@ -292,38 +299,38 @@ They are sorted by decreasing mean zscore</li>
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span> <span class="co"># optionally define a max number of genes.</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Computing angles and transforming to z-scores...</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/Rtmpghf9Qn/file30682a3db882" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/Rtmpghf9Qn/file30681ec2624e" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/Rtmpghf9Qn/file306817ef0e6b" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/Rtmpghf9Qn/file306852a76055" which didn't exist..</span></span></code></pre>
 <pre><code><span><span class="co">## Computing statistics...</span></span></code></pre>
 <pre><code><span><span class="co">## Weighting matrix_list...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating sds...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
 <pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
-<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span></code></pre>
-<pre><code><span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
-<pre><code><span><span class="co">## [1] "Selected 1698 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] "Selected 1496 genes for integration."</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If you think the number of selected genes is too high or low you can adjust the thresholds:</span></span>
-<span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
+<span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemanise_utils.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>                     zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## If desired, you can re-run the selection of genes with a lower zscore_mean_threshold and/or zscore_sn_threshold by using the 'select_genes' function. e.g.: angl &lt;- select_genes(angl, zscore_mean_threshold = 1, zscore_sn_threshold = 1, max_n_genes = 2000)</span></span>
-<span><span class="co">## Please inspect get_anglemania_genes(angl)$info for info on the scores of the selected gene pairs.</span></span></code></pre>
-<pre><code><span><span class="co">## [1] "Selected 348 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] "Selected 306 genes for integration."</span></span></code></pre>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Inspect the anglemania genes</span></span>
 <span><span class="va">integration_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "Gene71"   "Gene3527" "Gene2470" "Gene4030" "Gene355"  "Gene394"</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] "Gene394"  "Gene3527" "Gene71"   "Gene5000" "Gene1055" "Gene4201"</span></span></code></pre>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">integration_genes</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 348</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 306</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -348,31 +355,31 @@ They are sorted by decreasing mean zscore</li>
 <div class="section level3">
 <h3 id="plot">Plot<a class="anchor" aria-label="anchor" href="#plot"></a>
 </h3>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-4.png" width="700"></p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using anglemania genes, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-5.png" width="700"></p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_anglemania"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using anglemania genes, colored by Group"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-6.png" width="700"></p>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_320"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 320 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-4.png" width="700"></p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Batch"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Batch"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-5.png" width="700"></p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plotReducedDim.html" class="external-link">plotReducedDim</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"Group"</span>, dimred <span class="op">=</span> <span class="st">"umap_MNN_hvg_2000"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"MNN integration using top 2000 HVGs, colored by Group"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="anglemania_tutorial_files/figure-html/unnamed-chunk-5-6.png" width="700"></p>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.4.3 (2025-02-28)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
@@ -397,7 +404,7 @@ They are sorted by decreasing mean zscore</li>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
 <span><span class="co">##  [1] batchelor_1.22.0            bluster_1.16.0             </span></span>
-<span><span class="co">##  [3] scran_1.34.0                scater_1.34.0              </span></span>
+<span><span class="co">##  [3] scran_1.34.0                scater_1.34.1              </span></span>
 <span><span class="co">##  [5] ggplot2_3.5.1               scuttle_1.16.0             </span></span>
 <span><span class="co">##  [7] splatter_1.30.0             SingleCellExperiment_1.28.1</span></span>
 <span><span class="co">##  [9] SummarizedExperiment_1.36.0 Biobase_2.66.0             </span></span>
@@ -422,23 +429,23 @@ They are sorted by decreasing mean zscore</li>
 <span><span class="co">##  [21] bigparallelr_0.3.2        metapod_1.14.0           </span></span>
 <span><span class="co">##  [23] httpuv_1.6.15             sctransform_0.4.1        </span></span>
 <span><span class="co">##  [25] spam_2.11-1               spatstat.sparse_3.1-0    </span></span>
-<span><span class="co">##  [27] reticulate_1.41.0         cowplot_1.1.3            </span></span>
+<span><span class="co">##  [27] reticulate_1.42.0         cowplot_1.1.3            </span></span>
 <span><span class="co">##  [29] pbapply_1.7-2             RColorBrewer_1.1-3       </span></span>
 <span><span class="co">##  [31] ResidualMatrix_1.16.0     abind_1.4-8              </span></span>
 <span><span class="co">##  [33] zlibbioc_1.52.0           Rtsne_0.17               </span></span>
 <span><span class="co">##  [35] purrr_1.0.4               bigassertr_0.1.6         </span></span>
 <span><span class="co">##  [37] GenomeInfoDbData_1.2.13   ggrepel_0.9.6            </span></span>
 <span><span class="co">##  [39] irlba_2.3.5.1             listenv_0.9.1            </span></span>
-<span><span class="co">##  [41] spatstat.utils_3.1-2      goftest_1.2-3            </span></span>
+<span><span class="co">##  [41] spatstat.utils_3.1-3      goftest_1.2-3            </span></span>
 <span><span class="co">##  [43] RSpectra_0.16-2           dqrng_0.4.1              </span></span>
-<span><span class="co">##  [45] spatstat.random_3.3-2     fitdistrplus_1.2-2       </span></span>
-<span><span class="co">##  [47] parallelly_1.42.0         DelayedMatrixStats_1.28.1</span></span>
+<span><span class="co">##  [45] spatstat.random_3.3-3     fitdistrplus_1.2-2       </span></span>
+<span><span class="co">##  [47] parallelly_1.43.0         DelayedMatrixStats_1.28.1</span></span>
 <span><span class="co">##  [49] pkgdown_2.1.1             codetools_0.2-20         </span></span>
 <span><span class="co">##  [51] DelayedArray_0.32.0       tidyselect_1.2.1         </span></span>
 <span><span class="co">##  [53] UCSC.utils_1.2.0          farver_2.1.2             </span></span>
 <span><span class="co">##  [55] viridis_0.6.5             ScaledMatrix_1.14.0      </span></span>
-<span><span class="co">##  [57] bigstatsr_1.6.1           spatstat.explore_3.3-4   </span></span>
-<span><span class="co">##  [59] flock_0.7                 jsonlite_1.9.1           </span></span>
+<span><span class="co">##  [57] bigstatsr_1.6.1           spatstat.explore_3.4-2   </span></span>
+<span><span class="co">##  [59] flock_0.7                 jsonlite_2.0.0           </span></span>
 <span><span class="co">##  [61] BiocNeighbors_2.0.1       progressr_0.15.1         </span></span>
 <span><span class="co">##  [63] ggridges_0.5.6            survival_3.8-3           </span></span>
 <span><span class="co">##  [65] iterators_1.0.14          systemfonts_1.2.1        </span></span>
@@ -447,11 +454,11 @@ They are sorted by decreasing mean zscore</li>
 <span><span class="co">##  [71] Rcpp_1.0.14               glue_1.8.0               </span></span>
 <span><span class="co">##  [73] gridExtra_2.3             SparseArray_1.6.2        </span></span>
 <span><span class="co">##  [75] xfun_0.51                 withr_3.0.2              </span></span>
-<span><span class="co">##  [77] fastmap_1.2.0             digest_0.6.37            </span></span>
-<span><span class="co">##  [79] rsvd_1.0.5                R6_2.6.1                 </span></span>
-<span><span class="co">##  [81] mime_0.12                 textshaping_1.0.0        </span></span>
+<span><span class="co">##  [77] fastmap_1.2.0             rsvd_1.0.5               </span></span>
+<span><span class="co">##  [79] digest_0.6.37             R6_2.6.1                 </span></span>
+<span><span class="co">##  [81] mime_0.13                 textshaping_1.0.0        </span></span>
 <span><span class="co">##  [83] colorspace_2.1-1          scattermore_1.2          </span></span>
-<span><span class="co">##  [85] tensor_1.5                spatstat.data_3.1-4      </span></span>
+<span><span class="co">##  [85] tensor_1.5                spatstat.data_3.1-6      </span></span>
 <span><span class="co">##  [87] tidyr_1.3.1               generics_0.1.3           </span></span>
 <span><span class="co">##  [89] data.table_1.17.0         FNN_1.1.4.1              </span></span>
 <span><span class="co">##  [91] httr_1.4.7                htmlwidgets_1.6.4        </span></span>
@@ -460,7 +467,7 @@ They are sorted by decreasing mean zscore</li>
 <span><span class="co">##  [97] lmtest_0.9-40             XVector_0.46.0           </span></span>
 <span><span class="co">##  [99] htmltools_0.5.8.1         dotCall64_1.2            </span></span>
 <span><span class="co">## [101] scales_1.3.0              png_0.1-8                </span></span>
-<span><span class="co">## [103] spatstat.univar_3.1-1     knitr_1.49               </span></span>
+<span><span class="co">## [103] spatstat.univar_3.1-2     knitr_1.50               </span></span>
 <span><span class="co">## [105] reshape2_1.4.4            checkmate_2.3.2          </span></span>
 <span><span class="co">## [107] nlme_3.1-167              cachem_1.1.0             </span></span>
 <span><span class="co">## [109] zoo_1.8-13                stringr_1.5.1            </span></span>
@@ -473,21 +480,21 @@ They are sorted by decreasing mean zscore</li>
 <span><span class="co">## [123] ff_4.5.2                  beachmat_2.22.0          </span></span>
 <span><span class="co">## [125] xtable_1.8-4              cluster_2.1.8            </span></span>
 <span><span class="co">## [127] beeswarm_0.4.0            evaluate_1.0.3           </span></span>
-<span><span class="co">## [129] cli_3.6.4                 locfit_1.5-9.11          </span></span>
+<span><span class="co">## [129] cli_3.6.4                 locfit_1.5-9.12          </span></span>
 <span><span class="co">## [131] compiler_4.4.3            rlang_1.1.5              </span></span>
 <span><span class="co">## [133] crayon_1.5.3              future.apply_1.11.3      </span></span>
 <span><span class="co">## [135] labeling_0.4.3            ps_1.9.0                 </span></span>
 <span><span class="co">## [137] ggbeeswarm_0.7.2          plyr_1.8.9               </span></span>
-<span><span class="co">## [139] fs_1.6.5                  stringi_1.8.4            </span></span>
+<span><span class="co">## [139] fs_1.6.5                  stringi_1.8.7            </span></span>
 <span><span class="co">## [141] viridisLite_0.4.2         deldir_2.0-4             </span></span>
 <span><span class="co">## [143] BiocParallel_1.40.0       munsell_0.5.1            </span></span>
-<span><span class="co">## [145] lazyeval_0.2.2            spatstat.geom_3.3-5      </span></span>
+<span><span class="co">## [145] lazyeval_0.2.2            spatstat.geom_3.3-6      </span></span>
 <span><span class="co">## [147] Matrix_1.7-2              RcppHNSW_0.6.0           </span></span>
 <span><span class="co">## [149] patchwork_1.3.0           sparseMatrixStats_1.18.0 </span></span>
 <span><span class="co">## [151] future_1.34.0             statmod_1.5.0            </span></span>
 <span><span class="co">## [153] shiny_1.10.0              ROCR_1.0-11              </span></span>
 <span><span class="co">## [155] igraph_2.1.4              bslib_0.9.0              </span></span>
-<span><span class="co">## [157] bit_4.5.0.1</span></span></code></pre>
+<span><span class="co">## [157] bit_4.6.0</span></span></code></pre>
 </div>
 </div>
   </div>
