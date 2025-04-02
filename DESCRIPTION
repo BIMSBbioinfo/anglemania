@@ -19,7 +19,6 @@ LinkingTo:
     Rcpp, rmio, bigstatsr
 Imports:
     Matrix,
-    matrixStats,
     stats,
     checkmate,
     Seurat,
@@ -41,6 +40,7 @@ Suggests:
     rmarkdown,
     covr,
     DT,
+    matrixStats,
     scran,
     scater,
     batchelor,
