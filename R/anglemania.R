@@ -79,7 +79,8 @@ anglemania <- function(
     method = "cosine",
     permute_row_or_column = "column",
     permutation_function = "sample",
-    prefilter_threshold = 0.5
+    prefilter_threshold = 0.5,
+    normalization_method = "divide_by_total_counts"
 ) {
   # Validate inputs
   if (!inherits(angl, "anglemania_object")) {
@@ -115,7 +116,8 @@ anglemania <- function(
         method = method,
         seed = 1,
         permute_row_or_column = permute_row_or_column,
-        permutation_function  = permutation_function
+        permutation_function  = permutation_function,
+        normalization_method  = normalization_method
       )
     }
   )

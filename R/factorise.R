@@ -77,7 +77,8 @@ factorise <- function(
     method = "cosine",
     seed = 1,
     permute_row_or_column = "column",
-    permutation_function = "sample"
+    permutation_function = "sample",
+    normalization_method = "divide_by_total_counts"
   ) {
   # Validate input
   checkmate::assertClass(x_mat, "FBM")
@@ -99,6 +100,9 @@ factorise <- function(
   }else{
     permutation_function = permute_nonzero
   }
+
+  # normalizes the matrix before permutation
+  x_mat = normalize_matrix(x_mat, normalization_method = normalization_method)
 
   # default permutation is by columns
   ind_fun = bigstatsr::cols_along(x_mat)

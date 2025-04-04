@@ -53,23 +53,10 @@
 #'
 #' @export
 extract_angles <- function(
-  x_mat,
-  method = "cosine"
-) {
-  checkmate::assertChoice(method, c("cosine", "spearman"))
-  checkmate::assertClass(x_mat, "FBM")
-  bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
-    X.sub <- X[, ind, drop = FALSE]
-    # Normalize the data:
-    #   divide gene counts by the number of total counts per cell,
-    #   multiply by 10,000 (scaling factor like in Seurat)
-    # +1 prevents NaN values when working with partial features
-    X.sub <- t(t(X.sub) / (colSums(X.sub)) * 10000)
-    X.sub <- log1p(X.sub)
-
-    X[, ind] <- X.sub
-    NULL
-  })
+    x_mat,
+    method = "cosine"
+  ) {
+ 
 
   # First transpose the matrix because big_cor calculates the covariance
   # (X^T X)
