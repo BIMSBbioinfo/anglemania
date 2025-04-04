@@ -243,9 +243,9 @@ get_list_stats <- function(angl) {
       # this sums up the z-scores across samples
       m_sd <- Reduce("+", lapply(lmats, '[[', 1))
       # this gets the number of samples in which the feature was present
-      w_m_sum <- Reduce("+", lapply(lmats, '[[', 2))
-      w_m_sum_sq <- Reduce("+", lapply(lmats, function(x) x[[2]]^2))
-
+      w_m_sum    <- Reduce("+", lapply(lmats, function(x)x[[2]]  ))
+      w_m_sum_sq <- Reduce("+", lapply(lmats, function(x)x[[2]]^2))
+      
       # creates an unbiased esitmator for a sample based wighted variance calculation
       denominator = w_m_sum - (w_m_sum_sq / w_m_sum)
 
@@ -654,4 +654,35 @@ variable_genes_overlap = function(
     dplyr::mutate(perc_ang_genes = intersecting_genes / number_angl_genes)
 
   return(dg_int)
+}
+
+# ---------------------------------------------------------------------------
+normalize_matrix = function(
+  x_mat,
+  normalization_method = "divide_by_total_counts"
+
+){
+
+  checkmate::assertChoice(normalization_method, c("divide_by_total_counts", "find_residuals"))
+
+  bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+    X.sub <- X[, ind, drop = FALSE]
+    if(normalization_method == "divide_by_total_counts"){
+      # Normalize the data:
+      #   divide gene counts by the number of total counts per cell,
+      #   multiply by 10,000 (scaling factor like in Seurat)
+      # +1 prevents NaN values when working with partial features
+    
+      X.sub <- t(t(X.sub) / (colSums(X.sub)+1) * 10000)
+      X.res <- log1p(X.sub)
+    } else if(normalization_method == "find_residuals"){
+      total <- log1p(colSums(X.sub))
+      X.sub <- log1p(X.sub)
+      X.res = t(apply(X.sub, 1, function(x)residuals(lm(x ~ total))))
+    }
+
+    X[, ind] <- X.res
+    NULL
+  })
+  x_mat
 }
