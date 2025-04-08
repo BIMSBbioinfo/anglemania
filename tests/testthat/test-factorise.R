@@ -26,14 +26,12 @@ matrix correctly with method 'cosine'", {
 
   # Manually compute the expected result
 
-  # Step 1: Permute the matrix column-wise
-  set.seed(1)
-  permuted_data <- apply(mat, 2, sample)
-
-  # Step 2: Normalize and scale both original and permuted data
+  # Step 1: Normalize and scale both original and permuted data
   log_normalized <- Seurat::NormalizeData(mat)
-  permuted_log_normalized <- Seurat::NormalizeData(permuted_data)
 
+  # Step 2: Permute the matrix column-wise
+  set.seed(1)
+  permuted_log_normalized <- apply(log_normalized, 2, sample)
 
   # Step 3: Compute cosine correlation matrices
   original_correlation <- cor(
@@ -77,6 +75,7 @@ matrix correctly with method 'spearman'", {
     byrow = TRUE
   )
 
+
   # Convert to FBM
   x_mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
 
@@ -88,14 +87,12 @@ matrix correctly with method 'spearman'", {
 
   # Manually compute the expected result
 
-  # Step 1: Permute the matrix column-wise
-  set.seed(1)
-  permuted_data <- apply(mat, 2, sample)
-
-  # Step 2: Normalize and scale both original and permuted data
+  # Step 1: Normalize and scale both original and permuted data
   log_normalized <- Seurat::NormalizeData(mat)
-  permuted_log_normalized <- Seurat::NormalizeData(permuted_data)
 
+  # Step 2: Permute the matrix column-wise
+  set.seed(1)
+  permuted_log_normalized <- apply(log_normalized, 2, sample)
 
   # Step 3: Compute cosine correlation matrices
   original_correlation <- cor(
@@ -108,7 +105,6 @@ matrix correctly with method 'spearman'", {
     use = "pairwise.complete.obs",
     method = "spearman"
   )
-
 
   # Step 4: Compute mean and standard deviation
   # from the permuted correlation matrix

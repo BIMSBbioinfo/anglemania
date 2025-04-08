@@ -19,11 +19,11 @@ test_that("extract_angles extracts cosine similarities correctly", {
   result_matrix <- result_fbm[]
   
   # Manually compute the expected result
-  log_normalized_data <- Seurat::NormalizeData(mat)
+  # log_normalized_data <- Seurat::NormalizeData(mat)
   # normalized_data <- t(t(mat) / colSums(mat) * 10000)
   # log_normalized_data <- log1p(normalized_data)
   
-  transposed_data <- t(log_normalized_data)
+  transposed_data <- t(mat)
   suppressWarnings({
     expected_correlation <- cor(transposed_data, use = "pairwise.complete.obs")
   })
@@ -59,11 +59,11 @@ test_that("extract_angles extracts spearman correlations correctly", {
   result_matrix <- result_fbm[]
 
   # Manually compute the expected result
-  log_normalized_data <- Seurat::NormalizeData(mat)
+  # log_normalized_data <- Seurat::NormalizeData(mat)
   # normalized_data <- t(t(mat) / colSums(mat) * 10000)
   # log_normalized_data <- log1p(normalized_data)
 
-  transposed_data <- t(log_normalized_data)
+  transposed_data <- t(mat)
   suppressWarnings({
     expected_correlation <- cor(
       transposed_data,
