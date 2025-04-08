@@ -97,12 +97,15 @@ for manipulating FBMs, calculating statistics, and selecting genes.</p>
 <span></span>
 <span><span class="fu">variable_genes_overlap</span><span class="op">(</span></span>
 <span>  <span class="va">seu</span>,</span>
-<span>  <span class="va">ang_obj</span>,</span>
-<span>  zscore_mean_thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span>,</span>
-<span>  zscore_sn_thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span>,</span>
+<span>  <span class="va">angl</span>,</span>
+<span>  zscore_mean_thresholds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zscore_sn_thresholds <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  adjust_thresholds <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  layer <span class="op">=</span> <span class="st">"data"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>  layer <span class="op">=</span> <span class="st">"data"</span>,</span>
+<span>  length_out <span class="op">=</span> <span class="fl">6</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">normalize_matrix</span><span class="op">(</span><span class="va">x_mat</span>, normalization_method <span class="op">=</span> <span class="st">"divide_by_total_counts"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -118,8 +121,8 @@ for manipulating FBMs, calculating statistics, and selecting genes.</p>
 
 
 <dt id="arg-angl">angl<a class="anchor" aria-label="anchor" href="#arg-angl"></a></dt>
-<dd><p>An <code>anglemania_object</code> containing statistical
-matrices such as mean z-scores and SNR z-scores.</p></dd>
+<dd><p>An anglemania analysis object. This is used by <code>select_genes</code>
+and <code>get_anglemania_genes</code> to select genes based on the provided thresholds.</p></dd>
 
 
 <dt id="arg-dt">dt<a class="anchor" aria-label="anchor" href="#arg-dt"></a></dt>
@@ -162,11 +165,6 @@ mean z-scores. Default is "both"</p></dd>
 they will be computed using <code><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html" class="external-link">FindVariableFeatures</a></code>.</p></dd>
 
 
-<dt id="arg-ang-obj">ang_obj<a class="anchor" aria-label="anchor" href="#arg-ang-obj"></a></dt>
-<dd><p>An anglemania analysis object. This is used by <code>select_genes</code>
-and <code>get_anglemania_genes</code> to select genes based on the provided thresholds.</p></dd>
-
-
 <dt id="arg-zscore-mean-thresholds">zscore_mean_thresholds<a class="anchor" aria-label="anchor" href="#arg-zscore-mean-thresholds"></a></dt>
 <dd><p>A numeric vector of zscore mean thresholds used
 for gene selection from <code>ang_obj</code>. Default is <code>c(0.5, 1:15)</code>.</p></dd>
@@ -182,6 +180,21 @@ thresholds used for gene selection from <code>ang_obj</code>. Default is
 <dd><p>Character. The assay layer in the Seurat object to use when
 calculating variable features (e.g., "counts", "data", or "logcounts").
 Default is <code>"data"</code>.</p></dd>
+
+
+<dt id="arg-x-mat">x_mat<a class="anchor" aria-label="anchor" href="#arg-x-mat"></a></dt>
+<dd><p>A <code><a href="https://privefl.github.io/bigstatsr/reference/FBM-class.html" class="external-link">bigstatsr::FBM</a></code> object containing the matrix to normalize
+(typically genes x cells).</p></dd>
+
+
+<dt id="arg-normalization-method">normalization_method<a class="anchor" aria-label="anchor" href="#arg-normalization-method"></a></dt>
+<dd><p>A character string specifying the normalization
+method to use. One of <code>"divide_by_total_counts"</code> (default) or
+<code>"find_residuals"</code>.</p><ul><li><p><code>"divide_by_total_counts"</code> normalizes each cell by its total expression
+count and applies log1p.</p></li>
+<li><p><code>"find_residuals"</code> computes log1p-transformed residuals after regressing
+out total expression.</p></li>
+</ul></dd>
 
 </dl></div>
     <div id="value">
@@ -217,7 +230,9 @@ are also selected by <code>ang_obj</code>.</p></dd>
 <code>ang_obj</code> at the given threshold.</p></dd>
 
 
-</dl></div>
+</dl><p>The input <code>FBM</code> object with normalized values written back in place.
+This function modifies the input <code>x_mat</code> by reference.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>The function combines the <code>geneA</code> and <code>geneB</code> columns, extracts
@@ -274,6 +289,10 @@ of these genes with the variable features of the Seurat object is calculated.
 The result is a summary data frame that includes the number and percentage of
 variable genes overlapping with the anglemania-selected genes, as well as the
 number of genes selected at each threshold.</p></li>
+<li><p><code>normalize_matrix()</code>: normalize matrix
+Normalize a Filebacked Big Matrix (<code>FBM</code>) using either total-count
+scaling or residuals from a linear model. Intended for use with
+single-cell RNA-seq gene expression data.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -349,9 +368,9 @@ number of genes selected at each threshold.</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b1503b333" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20ab1b42ed1c" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b2e5f91a1" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20ab5b40a14c" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
@@ -373,12 +392,12 @@ number of genes selected at each threshold.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpJA61F0/file238b1be99301.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpCUFAZZ/file20ab6bfb4a5a.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpJA61F0/file238b1be99301.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpJA61F0/file238b1be99301.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpCUFAZZ/file20ab6bfb4a5a.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpCUFAZZ/file20ab6bfb4a5a.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -393,12 +412,12 @@ number of genes selected at each threshold.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpJA61F0/file238b5316e1bd.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpCUFAZZ/file20ab1e3da11.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpJA61F0/file238b5316e1bd.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpJA61F0/file238b5316e1bd.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpCUFAZZ/file20ab1e3da11.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpCUFAZZ/file20ab1e3da11.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -413,12 +432,12 @@ number of genes selected at each threshold.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ ncol        : int 300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type        : Named int 8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "names")= chr "double"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpJA61F0/file238b2734939a.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ backingfile : chr "/tmp/RtmpCUFAZZ/file20ab717897d4.bk"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_read_only: logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address     :&lt;externalptr&gt; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ address_rw  :&lt;externalptr&gt; </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpJA61F0/file238b2734939a.bk"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpJA61F0/file238b2734939a.rds"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bk          : chr "/tmp/RtmpCUFAZZ/file20ab717897d4.bk"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rds         : chr "/tmp/RtmpCUFAZZ/file20ab717897d4.rds"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ is_saved    : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_chr    : chr "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ type_size   : int 8</span>
@@ -448,9 +467,9 @@ number of genes selected at each threshold.</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b1d5ef1b" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20ab6fd65dbf" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b4408dfb2" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20abf2fda0" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
@@ -490,9 +509,9 @@ number of genes selected at each threshold.</p></li>
 <span class="r-in"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b7a85d045" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20ab45ae24bf" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b69efda0" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20ab4120f4a6" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
@@ -502,7 +521,76 @@ number of genes selected at each threshold.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting features...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 25 genes for integration."</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">variable_genes_overlap</span><span class="op">(</span><span class="va">seu</span>, <span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in variable_genes_overlap(seu, angl):</span> object 'ang' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 300 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 300 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 300 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 119 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 11 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 2 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 4 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 4 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Selected 1 genes for integration."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   zscore_mean_thresholds zscore_sn_thresholds intersecting_genes perc_var_genes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               0.500000                  0.5                300    1.000000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               1.101441                  0.5                300    1.000000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3               1.702882                  0.5                300    1.000000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4               2.304323                  0.5                119    0.396666667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5               2.905764                  0.5                 11    0.036666667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6               3.507205                  0.5                  2    0.006666667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   number_angl_genes perc_ang_genes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               300              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               300              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3               300              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4               119              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                11              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                 2              1</span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://privefl.github.io/bigstatsr/" class="external-link">bigstatsr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">1000</span>, lambda <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">100</span>, ncol <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://privefl.github.io/bigstatsr/reference/FBM-class.html" class="external-link">as_FBM</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">normalize_matrix</span><span class="op">(</span><span class="va">fbm</span>, normalization_method <span class="op">=</span> <span class="st">"divide_by_total_counts"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]     [,2]     [,3]     [,4]     [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 5.050104 4.789858 5.149273 4.605269 3.107610</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 5.167175 4.104990 4.682746 4.605269 4.680626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 4.363345 4.104990 5.016571 3.703866 4.861401</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 4.917488 4.388541 4.682746 4.384622 4.459799</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 4.764556 5.192548 4.178070 5.071516 5.147147</span>
+<span class="r-in"><span><span class="fu">normalize_matrix</span><span class="op">(</span><span class="va">fbm</span>, normalization_method <span class="op">=</span> <span class="st">"find_residuals"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]        [,2]        [,3]        [,4]          [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.11434410  0.05550312  0.10903721  0.01912041 -0.2880443664</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.09742030 -0.06396060  0.05569234  0.03692842  0.0434047229</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.01356898 -0.05693503  0.09785461 -0.14442728  0.0808357808</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 0.04243604 -0.01456288  0.05508198 -0.00548117 -0.0007333372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 0.04158057  0.08936337 -0.10027542  0.06324354  0.0815543115</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

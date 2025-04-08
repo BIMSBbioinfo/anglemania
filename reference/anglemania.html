@@ -80,7 +80,8 @@ genes based on specified thresholds.</p>
 <span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span>
 <span>  permute_row_or_column <span class="op">=</span> <span class="st">"column"</span>,</span>
 <span>  permutation_function <span class="op">=</span> <span class="st">"sample"</span>,</span>
-<span>  prefilter_threshold <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  prefilter_threshold <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  normalization_method <span class="op">=</span> <span class="st">"divide_by_total_counts"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -115,21 +116,31 @@ Other options include <code>"diem"</code>
 
 
 <dt id="arg-permute-row-or-column">permute_row_or_column<a class="anchor" aria-label="anchor" href="#arg-permute-row-or-column"></a></dt>
-<dd><p>Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is <code>"column"</code></p></dd>
+<dd><p>Character "row" or "column", whether permutations
+should be executed row-wise or column wise. Default is <code>"column"</code></p></dd>
 
 
 <dt id="arg-permutation-function">permutation_function<a class="anchor" aria-label="anchor" href="#arg-permutation-function"></a></dt>
-<dd><p>Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is <code>"sample"</code></p></dd>
+<dd><p>Character "sample" or "permute_nonzero". If
+sample,then sample is used for constructing background distributions. If
+permute_nonzero, then only non-zero values are permuted. Default is
+<code>"sample"</code></p></dd>
 
 
 <dt id="arg-prefilter-threshold">prefilter_threshold<a class="anchor" aria-label="anchor" href="#arg-prefilter-threshold"></a></dt>
-<dd><p>Numeric value specifying the threshold prefiltering genes - speeds up gene selection</p></dd>
+<dd><p>Numeric value specifying the threshold prefiltering
+genes. Speeds up gene selection.</p></dd>
+
+
+<dt id="arg-normalization-method">normalization_method<a class="anchor" aria-label="anchor" href="#arg-normalization-method"></a></dt>
+<dd><p>Character "divide_by_total_counts" or
+"scale_by_total_counts". Default is <code>"divide_by_total_counts"</code></p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An updated <code><a href="anglemania_object-class.html">anglemania_object-class</a></code> with computed statistics and
-selected genes based on the specified thresholds.</p>
+    <p>An updated <code><a href="anglemania_object-class.html">anglemania_object-class</a></code> with computed
+statistics and selected genes based on the specified thresholds.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -174,9 +185,9 @@ across samples using <code><a href="anglemanise_utils.html">get_list_stats</a></
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b76d60668" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20aba9c3bc9" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpJA61F0/file238b405a647b" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpCUFAZZ/file20ab1e9f0392" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=01s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
