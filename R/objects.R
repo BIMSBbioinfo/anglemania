@@ -611,30 +611,30 @@ setGeneric(
 .get_counts <- function(object, seurat_assay = "RNA", cells = NULL) {
   if (checkmate::test_class(object, "Seurat")) {
     if (seurat_assay %in% SeuratObject::Assays(object)) {
-      return(
-        SeuratObject::LayerData(
-          object,
-          assay = seurat_assay,
-          layer = "counts",
-          cells = cells
-        )
+      mat <- SeuratObject::LayerData(
+        object,
+        assay = seurat_assay,
+        layer = "counts",
+        cells = cells
       )
     } else {
       stop("seurat_assay must be an assay present in the Seurat object")
     }
   } else if (checkmate::test_class(object, "SingleCellExperiment")) {
     if (is.null(cells)) {
-      return(
-        SingleCellExperiment::counts(object)
-      )
+      mat <- SingleCellExperiment::counts(object)
     } else {
-      return(
-        SingleCellExperiment::counts(object)[, cells, drop = FALSE]
-      )
+      mat <- SingleCellExperiment::counts(object)[, cells, drop = FALSE]
     }
   } else {
     stop("object must be a Seurat or SingleCellExperiment object")
   }
+  # check if there are any cells with 0 counts
+  if (any(Matrix::colSums(mat) == 0)) {
+    stop("some cells have 0 counts.\nPlease remove those cells before
+     creating an anglemania object.")
+  }
+  return(mat)
 }
 
 #' @rdname create_anglemania_object
@@ -653,6 +653,7 @@ setGeneric(
 #' @importFrom Matrix rowSums
 #' @importFrom pbapply pblapply
 #' @importFrom bigstatsr nb_cores
+#' @import checkmate
 #' @return anglemania_object
 #' @examples 
 #' sce <- sce_example()
@@ -804,6 +805,8 @@ setGeneric(
 #' @param batch_key A character string that names the column in the metadata
 #' that contains the batch information
 #' @param ... Additional arguments passed to .core_create_anglemania_object
+#' @import checkmate
+#' @importFrom Matrix rowSums
 #' @export
 #' @examples
 #' sce <- sce_example()
@@ -848,6 +851,7 @@ setMethod(
 #' @param batch_key A character string that names the column in the metadata
 #' that contains the batch information
 #' @param ... Additional arguments passed to .core_create_anglemania_object
+#' @importFrom Matrix rowSums
 #' @export
 #' @examples
 #' sce <- sce_example()
@@ -892,6 +896,8 @@ setMethod(
 #' @rdname create_anglemania_object
 #' @param object A list of Seurat or SingleCellExperiment objects
 #' @param ... Additional arguments passed to .core_create_anglemania_object
+#' @importFrom Matrix rowSums
+#' @importFrom checkmate assert_list
 #' @export
 #' @examples
 #' sce <- sce_example()
