@@ -554,26 +554,31 @@ replace_with_na = function(v) {
 
 
 # ---------------------------------------------------------------------------
-
-#' Overlap of Variable Genes Across Thresholds
-#'
-#' This function computes the overlap between variable genes identified in a Seurat object and the gene sets selected 
-#' from an "anglemania" analysis object (`ang_obj`) at multiple threshold levels. For each threshold, genes are 
-#' selected from `ang_obj` by applying `select_genes`, and the intersection of these genes with the variable features 
-#' of the Seurat object is calculated. The result is a summary data frame that includes the number and percentage of 
-#' variable genes overlapping with the anglemania-selected genes, as well as the number of genes selected at each 
-#' threshold.
-#'
-#' @param seu A Seurat object. If variable features have not been identified, they will be computed using 
-#'   \code{\link[Seurat]{FindVariableFeatures}}.
-#' @param ang_obj An anglemania analysis object. This is used by `select_genes` and `get_anglemania_genes` to select genes 
-#'   based on the provided thresholds.
-#' @param zscore_mean_thresholds A numeric vector of thresholds used for gene selection from `ang_obj`. Default is \code{NULL}. The thresholds will be chosen uniformly from the range of zscore_mean values.
-#' @param zscore_sn_thresholds A numeric vector of thresholds used for gene selection from `ang_obj`. Default is \code{NULL}. The thresholds will be chosen uniformly from the range of zscore_sds values.
-#' @param length_out An integer that defines the number of values to use as thresholds. Default is \code{6}. 
+#' @describeIn anglemanise_utils Overlap of Variable Genes Across Thresholds.
+#' This function computes the overlap between variable genes identified in a
+#' Seurat object and the gene sets selected from an "anglemania" analysis
+#' object (`ang_obj`) at multiple threshold levels. For each threshold, genes
+#' are selected from `ang_obj` by applying `select_genes`, and the intersection
+#' of these genes with the variable features of the Seurat object is calculated.
+#' The result is a summary data frame that includes the number and percentage of
+#' variable genes overlapping with the anglemania-selected genes, as well as the
+#' number of genes selected at each threshold.
+#' @param seu A Seurat object. If variable features have not been identified,
+#'   they will be computed using \code{\link[Seurat]{FindVariableFeatures}}.
+#' @param angl An anglemania analysis object. This is used by `select_genes`
+#'  and `get_anglemania_genes` to select genes based on the provided thresholds.
+#' @param zscore_mean_thresholds A numeric vector of zscore mean thresholds used
+#'   for gene selection from `ang_obj`. Default is \code{c(0.5, 1:15)}.
+#' @param zscore_sn_thresholds A numeric vector of zscore signal to noise ratio
+#'   thresholds used for gene selection from `ang_obj`. Default is
+#'   \code{c(0.5, 1:15)}.
+#' @param adjust_thresholds Logical. Whether to use adaptive thresholding in
+#'   `select_genes`. Default is FALSE.
 #' @param layer Character. The assay layer in the Seurat object to use when
 #'   calculating variable features (e.g., "counts", "data", or "logcounts").
 #'   Default is \code{"data"}.
+#' @importFrom Seurat FindVariableFeatures
+#' @importFrom SeuratObject VariableFeatures
 #' @return A data frame with the following columns:
 #' \describe{
 #'   \item{threshold}{The threshold value used for gene selection.}
@@ -597,53 +602,60 @@ replace_with_na = function(v) {
 #' head(variable_genes_overlap(seu, angl))
 #' @export
 variable_genes_overlap = function(
-    seu, 
-    ang_obj,
-    zscore_mean_thresholds = NULL,
-    zscore_sn_thresholds   = NULL,
-    adjust_thresholds      = FALSE,
-    layer                  = "data",
-    length_out             = 6
-){
-    # Check if the Seurat object has variable features. If not, compute them.
-    if(length(VariableFeatures(seu)) == 0) {
-        seu = FindVariableFeatures(seu, layer = layer)
-    }
+  seu,
+  angl,
+  zscore_mean_thresholds = NULL,
+  zscore_sn_thresholds = NULL,
+  adjust_thresholds = FALSE,
+  layer = "data",
+  length_out = 6
+) {
+  # Check if the Seurat object has variable features. If not, compute them.
+  if (length(SeuratObject::VariableFeatures(seu)) == 0) {
+    seu <- Seurat::NormalizeData(seu) %>%
+      Seurat::FindVariableFeatures(., layer = layer)
+  }
 
-    if(is.null(zscore_mean_thresholds)){
-      zscore_mean_thresholds = seq(0.5, max(ang@list_stats$mean_zscore[], na.rm = TRUE), length.out = length_out)
-    }
-    if(is.null(zscore_mean_thresholds)){
-      zscore_sn_thresholds = seq(0.5, max(ang@list_stats$zscore_sn_thresholds[], na.rm = TRUE), length.out = length_out)
-    }
+  if (is.null(zscore_mean_thresholds)) {
+    zscore_mean_thresholds <- seq(
+      0.5,
+      max(list_stats(angl)$mean_zscore[], na.rm = TRUE),
+      length.out = length_out
+    )
+  }
+  if (is.null(zscore_sn_thresholds)) {
+    zscore_sn_thresholds <- seq(
+      0.5,
+      max(list_stats(angl)$sn_zscore[], na.rm = TRUE),
+      length.out = length_out
+    )
+  }
 
-    # For each threshold, select genes from ang_obj and extract their names.
-    dparams = expand.grid(zscore_mean_thresholds, zscore_sn_thresholds)
-    colnames(dparams) = c("zscore_mean_thresholds","zscore_sn_thresholds")
-    lg = lapply(1:nrow(dparams), function(i){
-        angl = select_genes(
-            ang_obj,
-            zscore_mean_threshold = dparams$zscore_mean_thresholds[i],
-            zscore_sn_threshold   = dparams$zscore_sn_thresholds[i], 
-            direction = "both",
-            adjust_thresholds = adjust_thresholds
-        )
-        gg = get_anglemania_genes(angl)
-        if(length(gg) < 0)
-          gg = ""
-        return(gg)
-    })
-
-  # NOTE: There seems to be a variable "mseu" that is not defined in the
-  # original code.
-  # Assuming it's meant to be "seu", we replace it accordingly.
+  # For each threshold, select genes from anglemania object and extract their names.
+  dparams <- expand.grid(zscore_mean_thresholds, zscore_sn_thresholds)
+  colnames(dparams) <- c("zscore_mean_thresholds", "zscore_sn_thresholds")
+  lg <- lapply(seq_len(nrow(dparams)), function(i) {
+    angl <- select_genes(
+      angl,
+      zscore_mean_threshold = dparams$zscore_mean_thresholds[i],
+      zscore_sn_threshold = dparams$zscore_sn_thresholds[i],
+      direction = "both",
+      adjust_thresholds = adjust_thresholds
+    )
+    gg <- get_anglemania_genes(angl)
+    if (length(gg) < 0) gg <- ""
+    return(gg)
+  })
 
   # Compute the intersection of anglemania-selected genes with variable
   # features of the Seurat object.
-  lg_int = lapply(lg, function(x) length(intersect(x, SeuratObject::VariableFeatures(seu))))
+  lg_int <- lapply(
+    lg,
+    function(x) length(intersect(x, SeuratObject::VariableFeatures(seu)))
+  )
 
   # Construct a data frame summarizing the intersections and percentages.
-  dg_int = dparams %>%
+  dg_int <- dparams %>%
     data.frame() %>%
     dplyr::mutate(intersecting_genes = unlist(lg_int)) %>%
     dplyr::mutate(
@@ -657,13 +669,42 @@ variable_genes_overlap = function(
 }
 
 # ---------------------------------------------------------------------------
+#' @describeIn anglemanise_utils normalize matrix
+#' Normalize a Filebacked Big Matrix (`FBM`) using either total-count
+#' scaling or residuals from a linear model. Intended for use with
+#' single-cell RNA-seq gene expression data.
+#'
+#' @param x_mat A `bigstatsr::FBM` object containing the matrix to normalize
+#'   (typically genes x cells).
+#' @param normalization_method A character string specifying the normalization
+#'   method to use. One of `"divide_by_total_counts"` (default) or
+#'   `"find_residuals"`. 
+#'   - `"divide_by_total_counts"` normalizes each cell by its total expression
+#'     count and applies log1p.
+#'   - `"find_residuals"` computes log1p-transformed residuals after regressing
+#'     out total expression.
+#'
+#' @return The input `FBM` object with normalized values written back in place. 
+#'   This function modifies the input `x_mat` by reference.
+#'
+#' @importFrom bigstatsr big_apply
+#' @importFrom checkmate assertChoice assertClass
+#' @examples
+#' library(bigstatsr)
+#' set.seed(42)
+#' mat <- matrix(rpois(1000, lambda = 5), nrow = 100, ncol = 10)
+#' fbm <- as_FBM(mat)
+#'
+#' normalize_matrix(fbm, normalization_method = "divide_by_total_counts")[1:5, 1:5]
+#' normalize_matrix(fbm, normalization_method = "find_residuals")[1:5, 1:5]
+#'
+#' @export
 normalize_matrix = function(
   x_mat,
   normalization_method = "divide_by_total_counts"
-
 ){
-
   checkmate::assertChoice(normalization_method, c("divide_by_total_counts", "find_residuals"))
+  checkmate::assertClass(x_mat, "FBM")
 
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- X[, ind, drop = FALSE]
@@ -673,7 +714,7 @@ normalize_matrix = function(
       #   multiply by 10,000 (scaling factor like in Seurat)
       # +1 prevents NaN values when working with partial features
     
-      X.sub <- t(t(X.sub) / (colSums(X.sub)+1) * 10000)
+      X.sub <- t(t(X.sub) / (colSums(X.sub)) * 10000)
       X.res <- log1p(X.sub)
     } else if(normalization_method == "find_residuals"){
       total <- log1p(colSums(X.sub))

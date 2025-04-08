@@ -37,12 +37,18 @@
 #' @param zscore_sn_threshold Numeric value specifying the threshold for the
 #'   signal-to-noise z-score. Default is \code{2.5}.
 #' @param max_n_genes Integer specifying the maximum number of genes to select.
-#' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
-#' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
-#' @param prefilter_threshold Numeric value specifying the threshold prefiltering genes - speeds up gene selection
-#'
-#' @return An updated \code{\link{anglemania_object-class}} with computed statistics and
-#'   selected genes based on the specified thresholds.
+#' @param permute_row_or_column Character "row" or "column", whether permutations
+#'  should be executed row-wise or column wise. Default is \code{"column"}
+#' @param permutation_function Character "sample" or "permute_nonzero". If
+#' sample,then sample is used for constructing background distributions. If
+#' permute_nonzero, then only non-zero values are permuted. Default is
+#' \code{"sample"}
+#' @param prefilter_threshold Numeric value specifying the threshold prefiltering
+#'   genes. Speeds up gene selection.
+#' @param normalization_method Character "divide_by_total_counts" or
+#'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
+#' @return An updated \code{\link{anglemania_object-class}} with computed
+#'   statistics and selected genes based on the specified thresholds.
 #'
 #' @importFrom pbapply pblapply
 #' @importFrom pbapply pboptions

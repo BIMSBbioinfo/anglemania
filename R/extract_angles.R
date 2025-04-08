@@ -56,8 +56,8 @@ extract_angles <- function(
     x_mat,
     method = "cosine"
   ) {
- 
-
+  checkmate::assertChoice(method, c("cosine", "spearman"))
+  checkmate::assertClass(x_mat, "FBM")
   # First transpose the matrix because big_cor calculates the covariance
   # (X^T X)
   x_mat <- bigstatsr::big_transpose(x_mat)

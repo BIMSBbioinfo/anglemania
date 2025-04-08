@@ -11,6 +11,7 @@
 \alias{select_genes}
 \alias{replace_with_na}
 \alias{variable_genes_overlap}
+\alias{normalize_matrix}
 \title{Utility Functions for the anglemania Package}
 \usage{
 sparse_to_fbm(s_mat)
@@ -38,20 +39,23 @@ replace_with_na(v)
 
 variable_genes_overlap(
   seu,
-  ang_obj,
-  zscore_mean_thresholds = c(0.5, 1:15),
-  zscore_sn_thresholds = c(0.5, 1:15),
+  angl,
+  zscore_mean_thresholds = NULL,
+  zscore_sn_thresholds = NULL,
   adjust_thresholds = FALSE,
-  layer = "data"
+  layer = "data",
+  length_out = 6
 )
+
+normalize_matrix(x_mat, normalization_method = "divide_by_total_counts")
 }
 \arguments{
 \item{s_mat}{A sparse matrix.}
 
 \item{corr_matrix}{An \code{\link[bigstatsr]{FBM}} object.}
 
-\item{angl}{An \code{anglemania_object} containing statistical
-matrices such as mean z-scores and SNR z-scores.}
+\item{angl}{An anglemania analysis object. This is used by \code{select_genes}
+and \code{get_anglemania_genes} to select genes based on the provided thresholds.}
 
 \item{dt}{A data frame containing gene pairs, with columns \code{geneA}
 and \code{geneB}.}
@@ -77,9 +81,6 @@ mean z-scores. Default is "both"}
 \item{seu}{A Seurat object. If variable features have not been identified,
 they will be computed using \code{\link[Seurat]{FindVariableFeatures}}.}
 
-\item{ang_obj}{An anglemania analysis object. This is used by \code{select_genes}
-and \code{get_anglemania_genes} to select genes based on the provided thresholds.}
-
 \item{zscore_mean_thresholds}{A numeric vector of zscore mean thresholds used
 for gene selection from \code{ang_obj}. Default is \code{c(0.5, 1:15)}.}
 
@@ -90,6 +91,19 @@ thresholds used for gene selection from \code{ang_obj}. Default is
 \item{layer}{Character. The assay layer in the Seurat object to use when
 calculating variable features (e.g., "counts", "data", or "logcounts").
 Default is \code{"data"}.}
+
+\item{x_mat}{A \code{bigstatsr::FBM} object containing the matrix to normalize
+(typically genes x cells).}
+
+\item{normalization_method}{A character string specifying the normalization
+method to use. One of \code{"divide_by_total_counts"} (default) or
+\code{"find_residuals"}.
+\itemize{
+\item \code{"divide_by_total_counts"} normalizes each cell by its total expression
+count and applies log1p.
+\item \code{"find_residuals"} computes log1p-transformed residuals after regressing
+out total expression.
+}}
 }
 \value{
 An \code{\link[bigstatsr]{FBM}} object from the \pkg{bigstatsr}
@@ -125,6 +139,9 @@ are also selected by \code{ang_obj}.}
 \item{number_angl_genes}{The total number of genes selected by
 \code{ang_obj} at the given threshold.}
 }
+
+The input \code{FBM} object with normalized values written back in place.
+This function modifies the input \code{x_mat} by reference.
 }
 \description{
 A collection of utility functions used within the
@@ -204,6 +221,11 @@ The result is a summary data frame that includes the number and percentage of
 variable genes overlapping with the anglemania-selected genes, as well as the
 number of genes selected at each threshold.
 
+\item \code{normalize_matrix()}: normalize matrix
+Normalize a Filebacked Big Matrix (\code{FBM}) using either total-count
+scaling or residuals from a linear model. Intended for use with
+single-cell RNA-seq gene expression data.
+
 }}
 \examples{
 s_mat <- Matrix::rsparsematrix(nrow = 10, ncol = 5, density = 0.3)
@@ -270,6 +292,14 @@ angl <- create_anglemania_object(
 )
 angl <- anglemania(angl)
 head(variable_genes_overlap(seu, angl))
+library(bigstatsr)
+set.seed(42)
+mat <- matrix(rpois(1000, lambda = 5), nrow = 100, ncol = 10)
+fbm <- as_FBM(mat)
+
+normalize_matrix(fbm, normalization_method = "divide_by_total_counts")[1:5, 1:5]
+normalize_matrix(fbm, normalization_method = "find_residuals")[1:5, 1:5]
+
 }
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}

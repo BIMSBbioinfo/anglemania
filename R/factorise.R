@@ -36,7 +36,8 @@
 #'   permutation. Default is \code{1}.
 #' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
 #' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
-#'
+#' @param normalization_method Character "divide_by_total_counts" or
+#'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the
 #'   z-score-transformed angle matrix.
 #'
