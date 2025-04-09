@@ -1,7 +1,7 @@
 Package: anglemania
 URL: https://bioinformatics.mdc-berlin.de/anglemania, https://github.com/BIMSBbioinfo/anglemania/, http://bioinformatics.mdc-berlin.de/anglemania/
 Title: Feature Extraction for scRNA-seq Dataset Integration
-Version: 0.99.0
+Version: 0.99.1
 Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
 Authors@R: c(
     person("Aaron", "Kollotzek", email = "aaron.kollotzek@mdc-berlin.de", role = c("aut", "cre"),
