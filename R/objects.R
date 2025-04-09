@@ -577,7 +577,7 @@ setGeneric(
 }
 
 #' Internal Helper function to calculate and set weights for anglemania object
-#' @importFrom dplyr select distinct group_by add_count mutate n_groups
+#' @import dplyr
 #' @importFrom bigstatsr nb_cores
 #' @keywords internal
 #' @noRd
@@ -711,6 +711,9 @@ setGeneric(
       "and are separated by batch_key: ",
       batch_key
     )
+    # if no dataset key is provided, make it NA, because the anglemania
+    # object class expects it to be NA or a character
+    dataset_key <- NA_character_
   } else {
     stop(
       "dataset_key needs to be NA/NULL or a character string of length 1 ",
