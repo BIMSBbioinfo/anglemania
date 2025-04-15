@@ -477,34 +477,22 @@ select_genes <- function(
   }
 
   # Adjust thresholds if no genes passed the cutoff
-  if (is.null(filtered_genes_df) && adjust_thresholds) {
+  while (nrow(filtered_genes_df) == 0 && adjust_thresholds) {
     message("No genes passed the cutoff.")
-    quantile95mean <- stats::quantile(
-      abs(list_stats(angl)$mean_zscore[]),
-      0.95,
-      na.rm = TRUE
-    )
-    quantile95sn <- stats::quantile(
-      list_stats(angl)$sn_zscore[],
-      0.95,
-      na.rm = TRUE
-    )
-    if (quantile95mean < zscore_mean_threshold) {
-      zscore_mean_threshold <- quantile95mean
-      message(
-        paste0(
-          "Decreasing zscore_sn_threshold by 0.1: ",
-          zscore_sn_threshold
-        )
+    zscore_sn_threshold <- zscore_sn_threshold - 0.1
+    zscore_mean_threshold <- zscore_mean_threshold - 0.1
+    message(
+      paste0(
+        "Decreasing zscore mean and sn thresholds by 0.1: \n",
+        "zscore_mean_threshold: ", round(zscore_mean_threshold, 2), "\n",
+        "zscore_sn_threshold: ", round(zscore_sn_threshold, 2)
       )
-      filtered_genes_df <- list_stats(angl)$prefiltered %>%
-        dplyr::filter(
-          abs(mean_zscore) >= zscore_mean_threshold &
+    )
+    filtered_genes_df <- list_stats(angl)$prefiltered %>%
+      dplyr::filter(
+        abs(mean_zscore) >= zscore_mean_threshold &
             sn_zscore >= zscore_sn_threshold
         )
-    } else {
-      stop("No genes passed the cutoff.")
-    }
   }
 
   filtered_genes_df$gene_nameA = intersect_genes(angl)[filtered_genes_df[, 1]]
@@ -612,8 +600,12 @@ variable_genes_overlap = function(
 ) {
   # Check if the Seurat object has variable features. If not, compute them.
   if (length(SeuratObject::VariableFeatures(seu)) == 0) {
-    seu <- Seurat::NormalizeData(seu) %>%
-      Seurat::FindVariableFeatures(., layer = layer)
+    seu_list <- Seurat::SplitObject(
+      seu,
+      split.by = batch_key(angl)
+    )
+    hvgs <- lapply(seu_list, function(x) Seurat::NormalizeData(x)) %>%
+      Seurat::SelectIntegrationFeatures()
   }
 
   if (is.null(zscore_mean_thresholds)) {
@@ -651,7 +643,7 @@ variable_genes_overlap = function(
   # features of the Seurat object.
   lg_int <- lapply(
     lg,
-    function(x) length(intersect(x, SeuratObject::VariableFeatures(seu)))
+    function(x) length(intersect(x, hvgs))
   )
 
   # Construct a data frame summarizing the intersections and percentages.
@@ -660,7 +652,7 @@ variable_genes_overlap = function(
     dplyr::mutate(intersecting_genes = unlist(lg_int)) %>%
     dplyr::mutate(
       perc_var_genes = intersecting_genes /
-        length(SeuratObject::VariableFeatures(seu))
+        length(hvgs)
     ) %>%
     dplyr::mutate(number_angl_genes = sapply(lg, length)) %>%
     dplyr::mutate(perc_ang_genes = intersecting_genes / number_angl_genes)
