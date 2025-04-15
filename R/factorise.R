@@ -84,7 +84,7 @@ factorise <- function(
   # Validate input
   checkmate::assertClass(x_mat, "FBM")
   checkmate::assertString(method)
-  checkmate::assertChoice(method, c("cosine", "spearman"))
+  checkmate::assertChoice(method, c("cosine", "spearman","pmf"))
   checkmate::assertString(permute_row_or_column)
   checkmate::assertChoice(permute_row_or_column, c("row", "column"))
   checkmate::assertString(permutation_function)

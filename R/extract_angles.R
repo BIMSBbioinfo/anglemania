@@ -56,11 +56,11 @@ extract_angles <- function(
     x_mat,
     method = "cosine"
   ) {
-  checkmate::assertChoice(method, c("cosine", "spearman"))
+  checkmate::assertChoice(method, c("cosine", "spearman","pmf"))
   checkmate::assertClass(x_mat, "FBM")
-  # First transpose the matrix because big_cor calculates the covariance
-  # (X^T X)
-  x_mat <- bigstatsr::big_transpose(x_mat)
+
+  
+  
 
   # Transform to ranks if method is spearman
   if (method == "spearman") {
@@ -71,14 +71,53 @@ extract_angles <- function(
       NULL
     })
   }
+  if (method == "pmf"){
 
-  # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
-  x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
-  # x_mat <- angl_cor(x_mat, block.size = 1000)
-  # The big_cor function from bigstatsr scales and centers the
-  # count matrix and calculates the covariance (cross product X^T X)
-  diag(x_mat) <- NA
+    # 3) Perform randomized SVD (rank k)
+    x_mat_m = x_mat[]
+    x_mat_scale = scale(t(x_mat_m))
+    n <- nrow(x_mat)
+    k <- k/2
+    rsvd_out <- rsvd(x_mat_scale, k = k)
+    # R_direct <- (1 / (n - 1)) * t(x_mat_scale) %*% x_mat_scale
 
+    # 3) Perform randomized SVD (rank k)
+    # rsvd_out <- bigstatsr::big_randomSVD(
+    #   x_mat,
+    #   fun.scaling = bigstatsr::big_scale(center = TRUE, scale = TRUE) ,
+    #   k = k
+    # )
+    # 4) Approximate correlation from the partial SVD
+    V_approx <- rsvd_out$v
+    D_approx <- rsvd_out$d
+    Sigma2 <- diag(D_approx^2, nrow = k, ncol = k)
+    tmpfile = tempfile()
+    x_mat <- bigstatsr::FBM(
+      nrow = n,
+      ncol = n,
+      backingfile = file.path(tmpfile, digest::digest(tmpfile, length = 10))
+    )
+    bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+      x_mat[, ind] <- (V_approx[ind,] %*% Sigma2 %*% t(V_approx[ind,])) *  (1 / (n - 1))
+      NULL
+    })
+    diag(x_mat) <- NA
+    
+  }
+  if(method == "cosine"){
+    
+    # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
+    # First transpose the matrix because big_cor calculates the covariance
+    # (X^T X)
+    x_mat <- bigstatsr::big_transpose(x_mat)
+    x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
+    # x_mat <- angl_cor(x_mat, block.size = 1000)
+    # The big_cor function from bigstatsr scales and centers the
+    # count matrix and calculates the covariance (cross product X^T X)
+    diag(x_mat) <- NA
+
+  }
+  #
   # replaces NaN with NA values in the matrix
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
