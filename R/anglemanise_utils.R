@@ -589,7 +589,7 @@ replace_with_na = function(v) {
 #' angl <- anglemania(angl)
 #' head(variable_genes_overlap(seu, angl))
 #' @export
-variable_genes_overlap = function(
+variable_genes_overlap <- function(
   seu,
   angl,
   zscore_mean_thresholds = NULL,
@@ -606,6 +606,8 @@ variable_genes_overlap = function(
     )
     hvgs <- lapply(seu_list, function(x) Seurat::NormalizeData(x)) %>%
       Seurat::SelectIntegrationFeatures()
+  } else {
+    hvgs <- SeuratObject::VariableFeatures(seu)
   }
 
   if (is.null(zscore_mean_thresholds)) {
