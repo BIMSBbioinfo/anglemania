@@ -10,6 +10,7 @@ factorise(
   seed = 1,
   permute_row_or_column = "column",
   permutation_function = "sample",
+  normalize_data = TRUE,
   normalization_method = "divide_by_total_counts"
 )
 }
@@ -24,9 +25,16 @@ include \code{"spearman"}}
 \item{seed}{An integer value for setting the seed for reproducibility during
 permutation. Default is \code{1}.}
 
-\item{permute_row_or_column}{Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}}
+\item{permute_row_or_column}{Character "row" or "column", whether permutation
+should be executed row-wise or column wise. Default is \code{"column"}}
 
-\item{permutation_function}{Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}}
+\item{permutation_function}{Character "sample" or "permute_nonzero".
+If sample,then sample is used for constructing background distributions.
+If permute_nonzero, then only non-zero values are permuted.
+Default is \code{"sample"}}
+
+\item{normalize_data}{Logical whether to normalize the matrix. Default is
+\code{TRUE}. If \code{FALSE}, we expect the matrix to be normalized already.}
 
 \item{normalization_method}{Character "divide_by_total_counts" or
 "scale_by_total_counts". Default is \code{"divide_by_total_counts"}}

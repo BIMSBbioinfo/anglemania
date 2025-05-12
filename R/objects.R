@@ -571,8 +571,14 @@ setGeneric(
     return(object[[]])
   } else if (checkmate::test_class(object, "SingleCellExperiment")) {
     return(SingleCellExperiment::colData(object) %>% as.data.frame())
+  } else if (checkmate::test_class(object, "matrix")) {
+    meta <- data.frame(
+      sample = colnames(object)
+    )
+    return(meta)
   } else {
-    stop("object must be a Seurat or SingleCellExperiment object")
+    stop("object must be a Seurat or SingleCellExperiment, or a matrix
+     (gene x sample) object")
   }
 }
 
@@ -627,10 +633,23 @@ setGeneric(
       mat <- SingleCellExperiment::counts(object)[, cells, drop = FALSE]
     }
   } else {
-    stop("object must be a Seurat or SingleCellExperiment object")
+    tryCatch({
+      mat <- as.matrix(object)
+      # change any NAs to 0
+      mat[is.na(mat)] <- 0
+      # check if all elements are numeric
+      if (!all(is.numeric(mat))) {
+        stop("counts must be numeric or NA. Check if any non-numeric
+        values/columns are present in the counts matrix.")
+      }
+    },
+    error = function(e) {
+      stop("object must be a Seurat or SingleCellExperiment object, or a
+      matrix object containing counts.")
+    })
   }
   # check if there are any cells with 0 counts
-  if (any(Matrix::colSums(mat) == 0)) {
+  if (any(Matrix::colSums(mat) == 0, na.rm = TRUE)) {
     stop("some cells have 0 counts.\nPlease remove those cells before
      creating an anglemania object.")
   }
@@ -924,7 +943,7 @@ setMethod(
     seurat_assay = "RNA",
     ...
   ) {
-    checkmate::assert_list(object, types = c("Seurat", "SingleCellExperiment"))
+    checkmate::assert_list(object, types = c("Seurat", "SingleCellExperiment", "matrix"))
 
     if (is.null(names(object))) {
       names(object) <- paste0("batch", seq_along(object))

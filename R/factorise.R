@@ -34,8 +34,14 @@
 #'   include \code{"spearman"}
 #' @param seed An integer value for setting the seed for reproducibility during
 #'   permutation. Default is \code{1}.
-#' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
-#' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
+#' @param permute_row_or_column Character "row" or "column", whether permutation
+#'  should be executed row-wise or column wise. Default is \code{"column"}
+#' @param permutation_function Character "sample" or "permute_nonzero".
+#' If sample,then sample is used for constructing background distributions.
+#' If permute_nonzero, then only non-zero values are permuted.
+#' Default is \code{"sample"}
+#' @param normalize_data Logical whether to normalize the matrix. Default is
+#' \code{TRUE}. If \code{FALSE}, we expect the matrix to be normalized already.
 #' @param normalization_method Character "divide_by_total_counts" or
 #'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the
@@ -79,6 +85,7 @@ factorise <- function(
     seed = 1,
     permute_row_or_column = "column",
     permutation_function = "sample",
+    normalize_data = TRUE,
     normalization_method = "divide_by_total_counts"
   ) {
   # Validate input
@@ -103,7 +110,9 @@ factorise <- function(
   }
 
   # normalizes the matrix before permutation
-  x_mat = normalize_matrix(x_mat, normalization_method = normalization_method)
+  if(normalize_data){
+    x_mat = normalize_matrix(x_mat, normalization_method = normalization_method)
+  }
 
   # default permutation is by columns
   ind_fun = bigstatsr::cols_along(x_mat)

@@ -45,6 +45,8 @@
 #' \code{"sample"}
 #' @param prefilter_threshold Numeric value specifying the threshold prefiltering
 #'   genes. Speeds up gene selection.
+#' @param normalize_data Logical whether to normalize the matrix. Default is
+#' \code{TRUE}. If \code{FALSE}, we expect the matrix to be normalized already.
 #' @param normalization_method Character "divide_by_total_counts" or
 #'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
 #' @return An updated \code{\link{anglemania_object-class}} with computed
@@ -86,6 +88,7 @@ anglemania <- function(
     permute_row_or_column = "column",
     permutation_function = "sample",
     prefilter_threshold = 0.5,
+    normalize_data = TRUE,
     normalization_method = "divide_by_total_counts"
 ) {
   # Validate inputs

@@ -13,6 +13,7 @@ anglemania(
   permute_row_or_column = "column",
   permutation_function = "sample",
   prefilter_threshold = 0.5,
+  normalize_data = TRUE,
   normalization_method = "divide_by_total_counts"
 )
 }
@@ -43,6 +44,9 @@ permute_nonzero, then only non-zero values are permuted. Default is
 
 \item{prefilter_threshold}{Numeric value specifying the threshold prefiltering
 genes. Speeds up gene selection.}
+
+\item{normalize_data}{Logical whether to normalize the matrix. Default is
+\code{TRUE}. If \code{FALSE}, we expect the matrix to be normalized already.}
 
 \item{normalization_method}{Character "divide_by_total_counts" or
 "scale_by_total_counts". Default is \code{"divide_by_total_counts"}}

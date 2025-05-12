@@ -73,20 +73,22 @@ extract_angles <- function(
   }
   if (method == "pmf"){
 
-    # 3) Perform randomized SVD (rank k)
-    x_mat_m = x_mat[]
-    x_mat_scale = scale(t(x_mat_m))
-    n <- nrow(x_mat)
-    k <- k/2
-    rsvd_out <- rsvd(x_mat_scale, k = k)
+    # # 3) Perform randomized SVD (rank k)
+    # x_mat_m <- x_mat[]
+    # x_mat_scale <- scale(t(x_mat_m))
+    n <- nrow(x_mat) # number of genes
+    x_mat <- bigstatsr::big_transpose(x_mat)
+    # # k <- k/2
+    k <- 100
+    # rsvd_out <- rsvd(x_mat_scale, k = k)
     # R_direct <- (1 / (n - 1)) * t(x_mat_scale) %*% x_mat_scale
 
     # 3) Perform randomized SVD (rank k)
-    # rsvd_out <- bigstatsr::big_randomSVD(
-    #   x_mat,
-    #   fun.scaling = bigstatsr::big_scale(center = TRUE, scale = TRUE) ,
-    #   k = k
-    # )
+    rsvd_out <- bigstatsr::big_SVD(
+      x_mat,
+      fun.scaling = bigstatsr::big_scale(center = TRUE, scale = TRUE),
+      k = k
+    )
     # 4) Approximate correlation from the partial SVD
     V_approx <- rsvd_out$v
     D_approx <- rsvd_out$d
@@ -98,9 +100,10 @@ extract_angles <- function(
       backingfile = file.path(tmpfile, digest::digest(tmpfile, length = 10))
     )
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
-      x_mat[, ind] <- (V_approx[ind,] %*% Sigma2 %*% t(V_approx[ind,])) *  (1 / (n - 1))
+      x_mat[, ind] <- (V_approx %*% Sigma2 %*% t(V_approx[ind, ])) * (1 / (n - 1))
       NULL
     })
+    # x_mat <- big_cor_no_warning(V_approx)
     diag(x_mat) <- NA
     
   }
