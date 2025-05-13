@@ -652,6 +652,7 @@ setGeneric(
 #' @importFrom dplyr select distinct group_by add_count mutate n_groups
 #' @importFrom Matrix rowSums
 #' @importFrom pbapply pblapply
+#' @importFrom methods new
 #' @importFrom bigstatsr nb_cores
 #' @import checkmate
 #' @return anglemania_object

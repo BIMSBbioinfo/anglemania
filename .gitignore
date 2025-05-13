@@ -1,22 +1,30 @@
-/tmp
-/tmp_bm
+# Temporary and output folders
 /data
-/results
 /playground
-/snapshots
+/archive
+/guix
+/inst/CITATION
+# RStudio project files
+*.Rproj
 .Rproj.user
-.Rprofile
-prepare*
+anglemania.Rproj
+
+# R-related system files
 .Rhistory
-archive/
-guix/
-.vscode/
-playground/
+.Rprofile
+
+# Documentation and vignette output
+/docs
+/doc/
+/inst/doc
 vignettes/*.html
 vignettes/*_files
-docs
-inst/doc
-/doc/
-/Meta/
-renv.*
-renv
+
+# Compiled objects (C/C++/Fortran)
+*.o
+*.so
+*.dll
+*.a
+
+# macOS system files
+.DS_Store

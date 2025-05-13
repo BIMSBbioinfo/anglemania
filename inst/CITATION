@@ -1,9 +1,0 @@
-citEntry(
-    entry = "Misc",
-    title = "anglemania - Feature Extraction for scRNA-seq Dataset Integration",
-         author = personList( as.person("Aaron Kollotzek" ),
-           as.person("Vedran Frank" ),
-           as.person("Artem Baranovskii" ),
-           as.person("Altuna Akalin" )),
-    year = 2024
-)
