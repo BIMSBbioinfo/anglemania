@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">anglemania</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.3</span>
       </span>
     </div>
 
@@ -98,8 +98,11 @@
 are available in anglemania besides the two main ones:
 <code>create_anglemania_object</code> and <code>anglemania</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioinformatics.mdc-berlin.de/anglemania" class="external-link">anglemania</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioinformatics.mdc-berlin.de/anglemania" class="external-link">anglemania</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: replacing previous import 'S4Arrays::makeNindexFromArrayViewport' by</span></span>
+<span><span class="co">## 'DelayedArray::makeNindexFromArrayViewport' when loading 'SummarizedExperiment'</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: SummarizedExperiment</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: MatrixGenerics</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: matrixStats</span></span></code></pre>
@@ -174,7 +177,7 @@ are available in anglemania besides the two main ones:
 <div class="section level2">
 <h2 id="normal-anglemania-workflow">Normal anglemania workflow<a class="anchor" aria-label="anchor" href="#normal-anglemania-workflow"></a>
 </h2>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"batch"</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="va">batch_key</span><span class="op">)</span></span></code></pre></div>
@@ -184,11 +187,11 @@ are available in anglemania besides the two main ones:
 <pre><code><span><span class="co">## Number of genes in intersected set: 300</span></span></code></pre>
 <pre><code><span><span class="co">## Extracting count matrices...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering each batch to at least 1 cells per gene...</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Computing angles and transforming to z-scores...</span></span></code></pre>
-<pre><code><span><span class="co">## Creating directory "/tmp/Rtmp7xZN0T/file20684d2f60b5" which didn't exist..</span></span></code></pre>
-<pre><code><span><span class="co">## Creating directory "/tmp/Rtmp7xZN0T/file20682ad51725" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/RtmpmFMBzv/file205951491b87" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/RtmpmFMBzv/file205965b521d2" which didn't exist..</span></span></code></pre>
 <pre><code><span><span class="co">## Computing statistics...</span></span></code></pre>
 <pre><code><span><span class="co">## Weighting matrix_list...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
@@ -196,7 +199,7 @@ are available in anglemania besides the two main ones:
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
 <pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 25 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span></span></code></pre></div>
 <pre><code><span><span class="co">## anglemania_object</span></span>
 <span><span class="co">## --------------</span></span>
@@ -248,7 +251,7 @@ ratio (SN, i.e. the mean divided by the standard deviation).</li>
 <div class="section level3">
 <h3 id="factorise">factorise<a class="anchor" aria-label="anchor" href="#factorise"></a>
 </h3>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">barcodes_by_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">[[</span><span class="va">batch_key</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">counts_by_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">barcodes_by_batch</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sce</span><span class="op">[</span>, <span class="va">x</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/anglemanise_utils.html">sparse_to_fbm</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -265,16 +268,16 @@ ratio (SN, i.e. the mean divided by the standard deviation).</li>
 <span><span class="co">##  [8,]    3    3    3    3    5    4</span></span>
 <span><span class="co">##  [9,]    6    4    5    5    3    1</span></span>
 <span><span class="co">## [10,]    6    4    5    2    6    4</span></span></code></pre>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">counts_by_batch</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "FBM"</span></span>
 <span><span class="co">## attr(,"package")</span></span>
 <span><span class="co">## [1] "bigstatsr"</span></span></code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">factorised</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">counts_by_batch</span>, <span class="va">factorise</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Creating directory "/tmp/Rtmp7xZN0T/file20687e44593f" which didn't exist..</span></span></code></pre>
-<pre><code><span><span class="co">## Creating directory "/tmp/Rtmp7xZN0T/file20682c4264d5" which didn't exist..</span></span></code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Creating directory "/tmp/RtmpmFMBzv/file20594d5bf996" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/RtmpmFMBzv/file2059bcffd25" which didn't exist..</span></span></code></pre>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">factorised</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##              [,1]        [,2]        [,3]       [,4]       [,5]        [,6]</span></span>
 <span><span class="co">##  [1,]  0.00000000 -1.74668209 -0.79613304  1.1776966  0.8601212  0.50193905</span></span>
@@ -295,7 +298,7 @@ ratio (SN, i.e. the mean divided by the standard deviation).</li>
 <li>get_list_stats gets called on the anglemania object so we create and
 inspect a anglemania object</li>
 </ul>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"batch"</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_anglemania_object.html">create_anglemania_object</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="va">batch_key</span><span class="op">)</span></span></code></pre></div>
@@ -305,14 +308,14 @@ inspect a anglemania object</li>
 <pre><code><span><span class="co">## Number of genes in intersected set: 300</span></span></code></pre>
 <pre><code><span><span class="co">## Extracting count matrices...</span></span></code></pre>
 <pre><code><span><span class="co">## Filtering each batch to at least 1 cells per gene...</span></span></code></pre>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span> <span class="co"># this slot is empty</span></span></code></pre></div>
 <pre><code><span><span class="co">## list()</span></span></code></pre>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## Computing angles and transforming to z-scores...</span></span></code></pre>
-<pre><code><span><span class="co">## Creating directory "/tmp/Rtmp7xZN0T/file20681b37c15e" which didn't exist..</span></span></code></pre>
-<pre><code><span><span class="co">## Creating directory "/tmp/Rtmp7xZN0T/file20687fb72d74" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/RtmpmFMBzv/file205938c9b555" which didn't exist..</span></span></code></pre>
+<pre><code><span><span class="co">## Creating directory "/tmp/RtmpmFMBzv/file2059d4a8201" which didn't exist..</span></span></code></pre>
 <pre><code><span><span class="co">## Computing statistics...</span></span></code></pre>
 <pre><code><span><span class="co">## Weighting matrix_list...</span></span></code></pre>
 <pre><code><span><span class="co">## Calculating mean...</span></span></code></pre>
@@ -320,13 +323,13 @@ inspect a anglemania object</li>
 <pre><code><span><span class="co">## Filtering features...</span></span></code></pre>
 <pre><code><span><span class="co">## Selecting features...</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "Selected 25 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "mean_zscore" "sds_zscore"  "sn_zscore"   "prefiltered"</span></span></code></pre>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">$</span><span class="va">mean_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##              [,1]       [,2]       [,3]        [,4]        [,5]       [,6]</span></span>
 <span><span class="co">##  [1,]  0.00000000 -1.4773877 -0.6690115  0.80957395  0.21191114  0.3065459</span></span>
@@ -339,7 +342,7 @@ inspect a anglemania object</li>
 <span><span class="co">##  [8,] -0.03868058 -1.0958225 -0.7680151 -0.62207485 -1.42724690 -0.8197054</span></span>
 <span><span class="co">##  [9,]  1.26715940  0.3486664 -0.5030029 -0.76152650 -0.66668260 -0.4825756</span></span>
 <span><span class="co">## [10,]  0.49115807  1.1467226  0.7976727 -0.27013900  0.03028304  0.8112288</span></span></code></pre>
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anglemania_object-methods.html">list_stats</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span><span class="op">$</span><span class="va">sn_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##            [,1]       [,2]      [,3]      [,4]        [,5]      [,6]</span></span>
 <span><span class="co">##  [1,]        NA 3.87928890 3.7213414 1.5550667  0.23116551 1.1093569</span></span>
@@ -363,19 +366,19 @@ zscore_sn_threshold = 2.5</li>
 <li>we can use select_genes to change the thresholds without having to
 run anglemania again</li>
 </ul>
-<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">previous_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span><span class="va">angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemanise_utils.html">select_genes</a></span><span class="op">(</span><span class="va">angl</span>,</span>
 <span>                     zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                     zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Selected 194 genes for integration."</span></span></code></pre>
-<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Inspect the anglemania genes</span></span>
 <span><span class="va">new_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_object-methods.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">angl</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">previous_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 25</span></span></code></pre>
-<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">new_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 194</span></span></code></pre>
 </div>
