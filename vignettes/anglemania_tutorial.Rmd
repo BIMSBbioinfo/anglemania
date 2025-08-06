@@ -1,15 +1,35 @@
 ---
-title: "Running anglemania with SingleCellExperiment"
+title: "anglemania Tutorial"
+author:
+- name: Aaron Kollotzek
+  affiliation:
+  - &MDC Max Delbrück Center for Molecular and Cell Biology, Berlin, Germany
+  - &BIMSB Bioinformatics and Systems Biology, Max Delbrück Center for Molecular and Cell Biology, Berlin, Germany
+  email: aaron.kollotzek@mdc-berlin.de
+- name: Vedran Franke
+  affiliation:
+  - &MDC Max Delbrück Center for Molecular and Cell Biology, Berlin, Germany
+  - &BIMSB Bioinformatics and Systems Biology, Max Delbrück Center for Molecular and Cell Biology, Berlin, Germany
+  email: vedran.franke@mdc-berlin.de
+- name: Artem Baranovskii
+  affiliation:
+  - Helmholtz Munich
+  email: artem.baranowsky@gmail.com
+- name: Altuna Akalin
+  affiliation:
+  - &MDC Max Delbrück Center for Molecular and Cell Biology, Berlin, Germany
+  - &BIMSB Bioinformatics and Systems Biology, Max Delbrück Center for Molecular and Cell Biology, Berlin, Germany
+  email: altuna.akalin@mdc-berlin.de
 date: "`r Sys.Date()`"
 output:
-  html_document:
+  BiocStyle::html_document:
     df_print: "paged"
     toc: true
     toc_depth: 2
     toc_float: true
     theme: simplex
 vignette: >
-  %\VignetteIndexEntry{anglemania tutorial SCE}
+  %\VignetteIndexEntry{anglemania tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,21 +46,25 @@ technical noise between the batches. Those genes are extracted from gene pairs
 that have an invariant and extremely narrow or wide angle between their expression vectors.
 Conventionally, highly-variable genes (HVGs) or sometimes all genes are used
 for integration tasks (https://www.nature.com/articles/s41592-021-01336-8).
-While HVGs are a great and easy way to reduce the noise and
+While HVGs are a great and easy way to reduce the noise ands
 dimensionality of the data, they are not optimal for integration tasks. HVGs are
 sensitive to batch effects because the variance is a function of both the technical
 and biological variance.
 anglemania improves conventional usage of HVGs for integration tasks, 
 especially when the transcriptional difference between cell types or cell states 
-is subtle (showcased here with de.facLoc set to 0.1 (= mild differences between "Groups")).
-The package can be used on top of SingleCellExperiment or Seurat objects.
+is subtle (showcased here with `de.facLoc` and `de.facScale` set to 0.1, which 
+results in mild differences between "Groups").
+The package can be used on top of `r Biocpkg("SingleCellExperiment")` or
+`r CRANpkg("Seurat")` objects.
 
-Under the hood, anglemania works with file-backed big matrices (FBMs) from the bigstatsr package 
-(https://github.com/privefl/bigstatsr/) for fast and memory efficient computation.
+Under the hood, anglemania works with file-backed big matrices (FBMs) from
+the `r CRANpkg("bigstatsr")` package for fast and memory 
+efficient computation.
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
-  library(anglemania)
+  # library(anglemania)
+  devtools::load_all()
   library(dplyr)
   library(Seurat)
   library(splatter)
@@ -49,19 +73,22 @@ suppressPackageStartupMessages({
   library(scran)
   library(bluster)
   library(batchelor)
+  library(UpSetR)
 })
 ```
 
-# Create simulated data with mild batch effects and mild differences between the groups/cell types
+# Simulation
+We simulate a scRNA-seq dataset using Splatter with 4 batches and 3 cell types with subtle differences 
+between cell types and rather big batch effects. 
 ```{r, create simulated data}
 batch.facLoc <- 0.3
 de.facLoc <- 0.1
-nBatches <- 4
-nGroups <- 3
-nGenes <- 5000
+nBatches <- 2
+nGroups <- 2
+nGenes <- 3000
 groupCells <- 300
 
-sce <- splatSimulate(
+sce_raw <- splatSimulate(
   batchCells = rep(groupCells * nGroups, nBatches),
   batch.facLoc = batch.facLoc,
   group.prob = rep(1 / nGroups, nGroups),
@@ -76,14 +103,17 @@ sce <- splatSimulate(
   bcv.common = 0.1,
   seed = 42
 )
-sce
+sce <- sce_raw
 assays(sce)
+
 
 ```
 
-# unintegrated data
-* clusters are driven by batch effects
-```{r}
+# Unintegrated data
+Here we perform a standard workflow on the unintegrated data. 
+When we perform clustering on the unintegrated data and visualize it in a UMAP, 
+we can see that the clusters are driven by batch effects rather than cell types.
+```{r, unintegrated data, fig.cap = "UMAPs of unintegrated data, colored by Batch and Group. The clusters are driven by batch effects.", fig.wide = TRUE, fig.width = 10}
 sce_unintegrated <- sce
 # Normalization.
 sce_unintegrated <- logNormCounts(sce_unintegrated)
@@ -94,7 +124,11 @@ hvg <- getTopHVGs(dec, prop = 0.1)
 
 # PCA.
 set.seed(1234)
-sce_unintegrated <- scater::runPCA(sce_unintegrated, ncomponents = 50, subset_row = hvg)
+sce_unintegrated <- scater::runPCA(
+  sce_unintegrated,
+  ncomponents = 50,
+  subset_row = hvg
+)
 
 # Clustering.
 colLabels(sce_unintegrated) <- clusterCells(sce_unintegrated,
@@ -104,88 +138,104 @@ colLabels(sce_unintegrated) <- clusterCells(sce_unintegrated,
 
 # Visualization.
 sce_unintegrated <- scater::runUMAP(sce_unintegrated, dimred = "PCA")
-plotUMAP(sce_unintegrated, colour_by = "Batch")
-plotUMAP(sce_unintegrated, colour_by = "Group")
+patchwork::wrap_plots(
+  plotUMAP(sce_unintegrated, colour_by = "Batch") +
+    ggtitle("Unintegrated data, colored by Batch"),
+  plotUMAP(sce_unintegrated, colour_by = "Group") +
+    ggtitle("Unintegrated data, colored by Group")
+)
 ```
 
 
 
-# run anglemania
-## create anglemania object
-* We create an anglemania object to have a standardized input to the anglemania function
-  * It can be created from:
-    * An SingleCellExperiment (SCE) object
-    * Seurat object
-    * a list of SCE and/or Seurat objects
-* pre-requisites are that you:
-  * have a column in the metadata (colData for SCE) that specifies the batch/sample a cell belongs to
-  * or if you pass a list of SCE/Seurat objects, just provide this as the input and
-   don't specify a batch key
-```{r, create anglemania object}
+# anglemania
+anglemania works on a `r Biocpkg("SingleCellExperiment")` object.
+  * The function has a few important arguments:
+  * `batch_key`: the column in the metadata of the SingleCellExperiment 
+    object that indicates which batch the cells belong to. This is required to 
+    distinguish between batches, because we compute the angle between gene pairs 
+    for each batch.
+  * `method`: either cosine, spearman or diem
+    * this is the method by which the relationship of the gene pairs is measured. 
+    Default is cosine, which is the cosine similarity between the expression 
+    vectors of the gene pairs.
+  * `zscore_mean_threshold`: We compute a mean of the zscore of the relationship
+    between a gene pair, and then we set a minimal cutoff for the (absolute) 
+    mean zscore. A cutoff of 2 means that the filtered gene pairs have a 
+    relationship, e.g. cosine similarity, that is 2 standard deviations away 
+    from the mean of all cosine similarities from this dataset. 
+    A higher value means a more stringent cutoff.
+  * `zscore_sn_threshold`: The SNR or signal-to-noise ratio measures the 
+    invariance of the relationship of the relationship between the gene pair. 
+    A high SN ratio means that the relationship is constant over multiple batches.
+  * `max_n_genes`: you can specify a maximum number of extracted genes. They are 
+    sorted by decreasing mean zscore after passing the thresholds.
+
+```{r, run anglemania, message = FALSE}
 head(colData(sce))
 batch_key <- "Batch"
-angl <- create_anglemania_object(
+sce <- anglemania(
   sce,
-  batch_key = batch_key
+  batch_key = batch_key,
+  zscore_mean_threshold = 2,
+  zscore_sn_threshold = 2
 )
-angl
 ```
 
-## run anglemania function
-* the anglemania function has five arguments
-  * the input anglemania object
-  * method: either cosine, spearman or diem
-    * this is the method by which the relationship of the gene pairs is measured. Default is cosine, 
-      which is the cosine similarity between the expression vectors of the gene pairs.
-  * zscore_mean_threshold: We compute a mean of the zscore of the relationship between a gene pair,
-    and then we set a minimal cutoff for the (absolute) mean zscore. A cutoff of 2 means that the
-    filtered gene pairs have a relationship, e.g. cosine similarity, that is 2 standard deviations 
-    away from the mean of all cosine similarities from this dataset. A higher value means a more 
-    stringent cutoff.
-  * zscore_sn_threshold: The SN or signal-to-noise ratio measures the invariance of the relationship
-    of the relationship between the gene pair. A high SN ratio means that the relationship is constant
-    over multiple batches.
-  * max_n_genes: you can specify a maximum number of extracted genes. They are sorted by decreasing 
-    mean zscore
-```{r, run anglemania}
-angl <- anglemania(angl,
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2,
-  max_n_genes = 2000 # optionally define a max number of genes.
-)
-# If you think the number of selected genes is too high or low you can adjust the thresholds:
-angl <- select_genes(angl,
-                     zscore_mean_threshold = 2.5,
-                     zscore_sn_threshold = 2.5)
+## extract the anglemania genes from the SCE object
+```{r}
+anglemania_genes <- get_anglemania_genes(sce)
+head(anglemania_genes)
+length(anglemania_genes)
+```
+
+## select_genes 
+once anglemania was run on the SCE, you can adjust the initial zscore
+mean and zscore SNR thresholds by using the `select_genes()` function
+```{r, select genes, message = FALSE}
+# If you think the number of selected genes is 
+# too high or low you can adjust the thresholds:
+sce <- select_genes(sce,
+                    zscore_mean_threshold = 2.5,
+                    zscore_sn_threshold = 2.5)
 # Inspect the anglemania genes
-integration_genes <- get_anglemania_genes(angl)
-head(integration_genes)
-length(integration_genes)
+anglemania_genes <- get_anglemania_genes(sce)
+head(anglemania_genes)
+length(anglemania_genes) # 306 genes are selected with these thresholds
 ```
 
 
 # MNN integration
+The anglemania genes can now be used for downstream integration algorithms such as MNN.
+We compare the integration results using the anglemania genes with the results using 300 
+and the standard 2000 HVGs.
 ## HVGs
-### 320 HVGs
-```{r, echo=FALSE, results="hide"}
-hvg <- sce %>%
+### 300 HVGs
+```{r, MNN_300 HVGs}
+hvg_300 <- sce %>%
   scater::logNormCounts() %>%
   modelGeneVar(block = colData(sce)[[batch_key]]) %>%
-  getTopHVGs(n = 320)
+  getTopHVGs(n = 300)
   
 barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
 sce_list <- lapply(barcodes_by_batch, function(x) sce[, x])
 sce_mnn <- sce %>%
   scater::logNormCounts()
-sce_mnn <- batchelor::fastMNN(sce_mnn, subset.row = hvg, k = 20, batch = factor(colData(sce_mnn)[[batch_key]]), d = 50)
-reducedDim(sce, "MNN_hvg_320") <- reducedDim(sce_mnn, "corrected")
-sce <- scater::runUMAP(sce, dimred = "MNN_hvg_320", name = "umap_MNN_hvg_320")
+sce_mnn <- batchelor::fastMNN(
+  sce_mnn,
+  subset.row = hvg_300,
+  k = 20,
+  batch = factor(colData(sce_mnn)[[batch_key]]),
+  d = 50
+)
+reducedDim(sce, "MNN_hvg_300") <- reducedDim(sce_mnn, "corrected")
+sce <- scater::runUMAP(sce, dimred = "MNN_hvg_300", name = "umap_MNN_hvg_300")
 # k is the number of nearest neighbours to consider when identifying MNNs
 ```
 
 ### 2000 HVGs
-```{r, echo=FALSE, results="hide"}
-hvg <- sce %>%
+```{r, MNN_2000 HVGs}
+hvg_2000 <- sce %>%
   scater::logNormCounts() %>%
   modelGeneVar(block = colData(sce)[[batch_key]]) %>%
   getTopHVGs(n = 2000)
@@ -194,38 +244,238 @@ barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
 sce_list <- lapply(barcodes_by_batch, function(x) sce[, x])
 sce_mnn <- sce %>%
   scater::logNormCounts()
-sce_mnn <- batchelor::fastMNN(sce_mnn, subset.row = hvg, k = 20, batch = factor(colData(sce_mnn)[[batch_key]]), d = 50)
+sce_mnn <- batchelor::fastMNN(
+  sce_mnn,
+  subset.row = hvg_2000,
+  k = 20,
+  batch = factor(colData(sce_mnn)[[batch_key]]),
+  d = 50
+)
 reducedDim(sce, "MNN_hvg_2000") <- reducedDim(sce_mnn, "corrected")
 sce <- scater::runUMAP(sce, dimred = "MNN_hvg_2000", name = "umap_MNN_hvg_2000")
 ```
 
-## anglemania
-```{r, echo=FALSE, results="hide"}
+## anglemania genes
+```{r, MNN anglemania, message = FALSE}
 sce_mnn <- sce %>%
   scater::logNormCounts()
-sce_mnn <- batchelor::fastMNN(sce_mnn, subset.row = integration_genes, k = 20, batch = factor(colData(sce_mnn)[[batch_key]]), d = 50)
+sce_mnn <- batchelor::fastMNN(
+  sce_mnn,
+  subset.row = anglemania_genes,
+  k = 20,
+  batch = factor(colData(sce_mnn)[[batch_key]]),
+  d = 50
+)
 reducedDim(sce, "MNN_anglemania") <- reducedDim(sce_mnn, "corrected")
-sce <- scater::runUMAP(sce, dimred = "MNN_anglemania", name = "umap_MNN_anglemania")
+sce <- scater::runUMAP(
+  sce,
+  dimred = "MNN_anglemania",
+  name = "umap_MNN_anglemania"
+)
 ```
 
 ## Plot
-```{r}
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_anglemania") +
-  ggtitle("MNN integration using anglemania genes, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_anglemania") +
-  ggtitle("MNN integration using anglemania genes, colored by Group")
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_320") +
-  ggtitle("MNN integration using top 320 HVGs, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_320") +
-  ggtitle("MNN integration using top 320 HVGs, colored by Group")
-plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_2000") +
-  ggtitle("MNN integration using top 2000 HVGs, colored by Batch")
-plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_2000") +
-  ggtitle("MNN integration using top 2000 HVGs, colored by Group")
+### UMAP embeddings
+We can see from the UMAPs that anglemania genes yield the best integration
+in terms of clustering by cell type and mixing the batches. The goal of an 
+integration and subsequent clustering should be to have low intra cluster
+variance and high inter cluster variance. This is at least true for most
+downstream scRNA-seq analyses where the goal is to e.g. differentiate between
+cell types or cell states and annotate these.
+```{r, fig.cap = "UMAPs of MNN integrated data. Comparison of UMAP embeddings of integrated data using anglemania genes, top 300 HVGs and top 2000 HVGs.", fig.width = 12, fig.height = 8, fig.wide = TRUE}
+# Use wrap_plots
+patchwork::wrap_plots(
+  plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_anglemania") +
+    ggtitle("MNN integration using anglemania genes, colored by Batch"),
+  plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_anglemania") +
+    ggtitle("MNN integration using anglemania genes, colored by Group"),
+  plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_300") +
+    ggtitle("MNN integration using top 300 HVGs, colored by Batch"),
+  plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_300") +
+    ggtitle("MNN integration using top 300 HVGs, colored by Group"),
+  plotReducedDim(sce, colour_by = "Batch", dimred = "umap_MNN_hvg_2000") +
+    ggtitle("MNN integration using top 2000 HVGs, colored by Batch"),
+  plotReducedDim(sce, colour_by = "Group", dimred = "umap_MNN_hvg_2000") +
+    ggtitle("MNN integration using top 2000 HVGs, colored by Group"),
+    ncol = 2
+)
+```
+
+### Overlap
+```{r, fig.cap = "Overlap of selected genes. Additionally, we check the overlap of the anglemania genes with the HVGs. About 33 of the 306 anglemania genes are also found in the top 300 HVGs, and about 179 of the 306 anglemania genes are also found in the top 2000 HVGs.", fig.width = 10, fig.height = 8, fig.wide = TRUE}
+upsetr_df <- fromList(
+  list(
+    anglemania = anglemania_genes,
+    hvg_300 = hvg_300,
+    hvg_2000 = hvg_2000
+  )
+)
+head(upsetr_df)
+upset(upsetr_df, text.scale = 2.5)
+
+```
+
+# Seurat
+When using Seurat, the easiest approach is to create an SCE from the counts and metadata
+of the Seurat object and then run anglemania on it and optionally save those genes as the
+VariableFeatures of the SeuratObject.
+```{r, message = FALSE}
+se <- CreateSeuratObject(
+  counts = counts(sce_raw),
+  meta.data = as.data.frame(colData(sce_raw))
+)
+se
+anglemania_genes <- se |>
+  as.SingleCellExperiment(assay = "RNA") |>
+  anglemania(
+    batch_key = "Batch",
+    zscore_mean_threshold = 2,
+    zscore_sn_threshold = 2
+  ) |> get_anglemania_genes()
+
 
 ```
 
 
+## Integration
+Now you can also just use the anglemania genes for other integration algorithms
+When finding the integration anchors, by default highly variable genes are used.
+  Using the anchor.features argument, you can specify the genes to use for finding
+  the integration anchors, in our case we are gonna use the anglemania genes.
+```{r}
+# Split by batch
+seurat_list <- SplitObject(se, split.by = "Batch")
+seurat_list <- lapply(seurat_list, NormalizeData)
+```
+
+
+```{r, integration option 1}
+# if the Seurat FindIntegrationAnchors() function does not work,
+# change this to the specified size:
+options(future.globals.maxSize = 4000 * 1024^2)
+
+message("Finding integration anchors...")
+anchors_angl <- FindIntegrationAnchors(
+  object.list = seurat_list,
+  anchor.features = anglemania_genes, # here we use the anglemania genes
+  verbose = FALSE,
+  reduction = "cca"
+)
+message("Integrating samples...")
+
+seurat_integrated_angl <- IntegrateData(
+  anchorset = anchors_angl,
+  verbose = FALSE
+)
+seurat_integrated_angl <- seurat_integrated_angl %>%
+  ScaleData(verbose = FALSE) %>%
+  RunPCA(verbose = FALSE) %>%
+  RunUMAP(dims = 1:30, verbose = FALSE)
+```
+
+
+## Plot
+```{r, fig.cap = "UMAPs of Seurat integrated data. Here we show that we can use the anglemania genes for integration of a Seurat object.", fig.wide = TRUE, fig.width = 10}
+patchwork::wrap_plots(
+  DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Batch") +
+    ggtitle("Seurat integration using anglemania genes, colored by Batch"),
+  DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Group") +
+    ggtitle("Seurat integration using anglemania genes, colored by Group"),
+  ncol = 2
+)
+```
+
+
+
+# Showcase underlying functions
+## Normal anglemania workflow
+```{r, message = FALSE}
+sce_raw <- sce_example()
+sce <- sce_raw
+batch_key <- "batch"
+sce <- anglemania(sce, batch_key = batch_key, verbose = FALSE)
+```
+
+`anglemania` is run on the SCE object and it basically calls three functions:
+* `factorise`: 
+  * creates a permutation of the input matrix whose correlation matrix
+    is used to create a null distribution for each batch.
+  * computes the cosine similarity (or spearman coefficient) between gene
+    expression vector pairs matrix for both the original and permuted matrices
+  * computes the zscore of the relationship between the gene pairs taking 
+    the mean and standard deviation of the null distribution
+  * it does this for every batch in the dataset!
+* `get_list_stats`
+  * computes the mean and standard deviation of the zscores across the 
+    matrices from the different batches. This creates two important matrices:
+    the mean zscore matrix `mean_zscore` and the signal-to-noise ratio matrix
+    `sn_zscore`. These are stored in the metadata of the SCE object.
+* `select_genes`
+  * filters the gene pairs by the `mean_zscore` and `sn_zscore` matrices
+    (SN ratio, i.e. the mean divided by the standard deviation).
+
+## factorise
+```{r, message = FALSE}
+barcodes_by_batch <- split(rownames(colData(sce)), colData(sce)[[batch_key]])
+counts_by_batch <- lapply(barcodes_by_batch, function(x) {
+    counts(sce[, x]) %>% sparse_to_fbm()
+})
+counts_by_batch[[1]][1:10, 1:6]
+# we are working on FBMs (file-backed matrices
+# implemented in the bigstatsr package)
+class(counts_by_batch[[1]])
+
+# factorise produces the correlation matrices transformed to z-scores
+factorised <- lapply(counts_by_batch, factorise)
+factorised[[1]][1:10, 1:6]
+```
+
+## get_list_stats
+The "list stats" are computed by `get_list_stats` and take the z-score transformed
+  correlation matrices from `factorise` as input.
+  The outputs are the mean zscore matrix `mean_zscore` and the 
+  signal-to-noise ratio matrix `sn_zscore`. These are stored in the metadata of
+  the SCE object. 
+
+```{r, message = FALSE}
+matrix_list <- metadata(sce)$anglemania$matrix_list
+weights <- setNames(
+  metadata(sce)$anglemania$weights$weight,
+  metadata(sce)$anglemania$weights$batch
+)
+list_stats <- get_list_stats(
+  matrix_list = matrix_list,
+  weights = weights,
+  verbose = FALSE
+)
+names(list_stats)
+class(list_stats)
+list_stats$mean_zscore[1:10, 1:6]
+list_stats$sn_zscore[1:10, 1:6]
+
+# Or we can access them directly from the SCE object 
+# after running anglemania
+metadata(sce)$anglemania$list_stats$mean_zscore[1:10, 1:6]
+metadata(sce)$anglemania$list_stats$sn_zscore[1:10, 1:6]
+```
+
+## select_genes
+* under the hood, `anglemania` calls `select_genes` on 
+the anglemania object with the default thresholds
+  `zscore_mean_threshold = 2.5`, `zscore_sn_threshold = 2.5`
+* we can use `select_genes` to change the thresholds without having to run anglemania again
+```{r, message = FALSE}
+previous_genes <- get_anglemania_genes(sce)
+sce <- select_genes(sce,
+                     zscore_mean_threshold = 2,
+                     zscore_sn_threshold = 2,
+                     verbose = FALSE)
+# Inspect the anglemania genes
+new_genes <- get_anglemania_genes(sce)
+
+length(previous_genes)
+length(new_genes)
+```
 
 ```{r}
 sessionInfo()
