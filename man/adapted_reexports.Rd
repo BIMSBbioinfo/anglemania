@@ -30,7 +30,8 @@ big_cor_no_warning(
 big_scale_no_warning(center = TRUE, scale = TRUE)
 }
 \arguments{
-\item{m}{An integer specifying the length of the input to split into intervals.}
+\item{m}{An integer specifying the length of the input to split
+into intervals.}
 
 \item{block.size}{An integer specifying the maximum length of each block.}
 
@@ -66,8 +67,8 @@ The self crossproduct of an FBM.
 
 The Pearson correlation matrix from an FBM.
 
-A new function that returns a data.frame with two vectors, \code{center}
-and \code{scale}, both of length \code{ind.col}.
+A new function that returns a data.frame with two vectors,
+\code{center} and \code{scale}, both of length \code{ind.col}.
 }
 \description{
 These are functions that were adapted from the \pkg{bigstatsr}
@@ -79,10 +80,12 @@ variance in scaling).
 \item \code{CutBySize()}: Copied version of the unexported
 \code{bigstatsr:::CutBySize} function.
 
-\item \code{big_crossprodSelf_no_warning()}: Adapted version of \code{bigstatsr::big_crossprodSelf}
+\item \code{big_crossprodSelf_no_warning()}: Adapted version of
+\code{bigstatsr::big_crossprodSelf}
 that suppresses warnings and errors related to zero scaling.
 
-\item \code{big_cor_no_warning()}: Adapted version of \code{bigstatsr::big_cor} that
+\item \code{big_cor_no_warning()}: Adapted version of
+\code{bigstatsr::big_cor} that
 suppresses warnings and errors.
 
 \item \code{big_scale_no_warning()}: Adapted version of \code{bigstatsr::big_scale}
