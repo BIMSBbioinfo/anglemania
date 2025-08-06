@@ -1,8 +1,4 @@
-# load example seurat object
-# pbmc_scmall does not have any "batches" from multiple experiments
-#   but we'll just treat it like the "groups" column are the batches
-se <- SeuratObject::pbmc_small
-se_raw <- se
+sce_raw <- sce_example()
 
 test_that("sparse_to_fbm converts sparse matrix to FBM correctly", {
   # Generate a random sparse matrix using the Matrix package
@@ -35,13 +31,13 @@ test_that("get_dstat computes statistics correctly for an FBM", {
       NA, 0.1, -0.2, -1, 0.1, -0.5, 0.7, -0.3, 0.2, -0.1,
       0.1, NA, -1, 0.1, -0.3, -0.2, 0.5, -0.1, -0.2, 0.3,
       -0.2, -1, NA, 0.2, -0.1, 0.4, -0.3, -0.2, 0.1, -0.5,
-      -1, 0.1, 0.2, NA, 0.3, -0.5, 0.1, -0.2, 0.7, 0.3,
-      0.1, -0.3, -0.1, 0.3, NA, -0.2, -0.5, 0.1, -0.7, 0.2,
-      -0.5, -0.2, 0.4, -0.5, -0.2, NA, 0.3, 0.2, -0.1, 0.4,
-      0.7, 0.5, -0.3, 0.1, -0.5, 0.3, NA, -0.2, -0.1, -0.3,
-      -0.3, -0.1, -0.2, -0.2, 0.1, 0.2, -0.2, NA, 0.5, -0.4,
-      0.2, -0.2, 0.1, 0.7, -0.7, -0.1, -0.1, 0.5, NA, -0.3,
-      -0.1, 0.3, -0.5, 0.3, 0.2, 0.4, -0.3, -0.4, -0.3, NA
+      -1, 0.1, 0.2, NA, 0.3, -0.5, 0.1, -0.2, 0.7, 0.3, 0.1,
+      -0.3, -0.1, 0.3, NA, -0.2, -0.5, 0.1, -0.7, 0.2, -0.5,
+      -0.2, 0.4, -0.5, -0.2, NA, 0.3, 0.2, -0.1, 0.4, 0.7,
+      0.5, -0.3, 0.1, -0.5, 0.3, NA, -0.2, -0.1, -0.3, -0.3,
+      -0.1, -0.2, -0.2, 0.1, 0.2, -0.2, NA, 0.5, -0.4, 0.2,
+      -0.2, 0.1, 0.7, -0.7, -0.1, -0.1, 0.5, NA, -0.3, -0.1,
+      0.3, -0.5, 0.3, 0.2, 0.4, -0.3, -0.4, -0.3, NA
     ),
     nrow = 10,
     ncol = 10,
@@ -85,23 +81,27 @@ test_that("get_dstat throws an error when corr_matrix is not an FBM", {
 })
 
 test_that("big_mat_list_mean computes the weighted mean correctly", {
-  se <- se_raw
-  batch_key <- "groups"
-  angl <- create_anglemania_object(
-    se,
-    batch_key = batch_key
-  )
-  angl <- anglemania(angl)
+  library(S4Vectors)
+  sce <- sce_raw
+  batch_key <- "batch"
+  sce <- anglemania(sce, batch_key = batch_key)
   # Compute the weighted mean using big_mat_list_mean
-  result_fbm <- big_mat_list_mean(angl)
+  weights <- setNames(
+    S4Vectors::metadata(sce)$anglemania$weights$weight,
+    S4Vectors::metadata(sce)$anglemania$weights$anglemania_batch
+  )
+  result_fbm <- big_mat_list_mean(
+    metadata(sce)$anglemania$matrix_list,
+    weights = weights
+  )
 
   # Extract the result as a regular matrix ==> only use a subset
   result_matrix <- result_fbm[1:100, 1:100]
 
   # Manually compute the expected weighted mean ==> only use a subset
-  expected_matrix <- angl@matrix_list$g1[1:100, 1:100] * 0.5 +
-    angl@matrix_list$g2[1:100, 1:100] * 0.5
-
+  expected_matrix <- metadata(sce)$anglemania$matrix_list$batch1[1:100, 1:100] *
+    0.5 +
+    metadata(sce)$anglemania$matrix_list$batch2[1:100, 1:100] * 0.5
 
   # Compare the result with the expected matrix
   expect_equal(result_matrix, expected_matrix)
@@ -124,21 +124,18 @@ when matrices have different dimensions", {
   fbm_list <- list(batch1 = fbm1, batch2 = fbm2)
 
   # Construct the anglemania_object
-  angl <- new(
-    "anglemania_object",
-    weights = weights,
-    matrix_list = fbm_list
-  )
 
   # Expect an error
   expect_error(
-    big_mat_list_mean(angl),
+    big_mat_list_mean(fbm_list, weights = weights),
     "All matrices in the list must have the same dimensions."
   )
 })
 
 
 test_that("select_genes selects genes correctly based on thresholds", {
+  library(SingleCellExperiment)
+  sce <- sce_raw
   # Create minimal matrices for mean_zscore and sn_zscore
   set.seed(123) # For reproducibility
   mean_zscore_matrix <- bigstatsr::FBM(
@@ -147,51 +144,44 @@ test_that("select_genes selects genes correctly based on thresholds", {
     init = rnorm(400, mean = 0, sd = 3)
   )
   sn_zscore_matrix <- bigstatsr::FBM(
-    nrow = 20, 
-    ncol = 20, 
+    nrow = 20,
+    ncol = 20,
     init = rnorm(400, mean = 0, sd = 1)
   )
 
   # Define intersect_genes
   gene_names <- paste0("gene", 1:20)
 
-  # Create an anglemania_object with the required slots
-  test_angl <- new(
-    "anglemania_object",
-    list_stats = list(
-      mean_zscore = mean_zscore_matrix,
-      sn_zscore = sn_zscore_matrix
-    ),
-    intersect_genes = gene_names,
-    integration_genes = list(
-      info = data.frame(),
-      genes = character()
-    )
+  metadata(sce)$anglemania$list_stats <- list(
+    mean_zscore = mean_zscore_matrix,
+    sn_zscore = sn_zscore_matrix
   )
-  test_angl <- prefilter_angl(
-    angl = test_angl,
+  metadata(sce)$anglemania$intersect_genes <- gene_names
+  metadata(sce)$anglemania$prefiltered_df <- prefilter_angl(
+    snr_zscore_matrix = sn_zscore_matrix,
+    mean_zscore_matrix = mean_zscore_matrix,
     zscore_mean_threshold = 1.0,
     zscore_sn_threshold = 1.0
   )
 
   # Call select_genes with thresholds
-  updated_object <- select_genes(
-    angl = test_angl,
+  sce <- select_genes(
+    sce = sce,
     zscore_mean_threshold = 2.0,
     zscore_sn_threshold = 2.0,
     max_n_genes = 3
   )
 
   # Check that the integration_genes slot is updated correctly
-  selected_genes <- updated_object@integration_genes$genes
-  selected_info <- updated_object@integration_genes$info
+  selected_genes <- get_anglemania_genes(sce)
+  selected_info <- get_anglemania_stats_df(sce)
 
   # Expected gene indices (since we have 3 genes, and thresholds are 2.0)
-  # We need to find gene pairs where both mean_zscore 
+  # We need to find gene pairs where both mean_zscore
   #  and sn_zscore exceed thresholds
   # For upper triangular matrix positions
 
-  # Calculate expected indices
+  # Calculate expected indices from the prefiltered_df
   expected_indices <- which(
     upper.tri(sn_zscore_matrix[]) &
       (sn_zscore_matrix[] >= 2.0) &
@@ -201,35 +191,32 @@ test_that("select_genes selects genes correctly based on thresholds", {
 
   # Extract expected gene pairs
   expected_info_df <- data.frame(
-    geneA = expected_indices[, 1],
-    geneB = expected_indices[, 2],
+    geneA = gene_names[expected_indices[, 1]],
+    geneB = gene_names[expected_indices[, 2]],
     sn_zscore = sn_zscore_matrix[expected_indices],
-    mean_zscore = mean_zscore_matrix[expected_indices],
-    gene_nameA = gene_names[expected_indices[, 1]],
-    gene_nameB = gene_names[expected_indices[, 2]]
+    mean_zscore = mean_zscore_matrix[expected_indices]
   )
 
   # Order by absolute zscore
   expected_info_df <- expected_info_df[
     order(abs(expected_info_df$mean_zscore), decreasing = TRUE),
   ]
- 
+  rownames(expected_info_df) <- NULL
+
   # Limit to max_n_genes
-  expected_gene_pairs <- unique(as.vector(rbind(
-    expected_info_df[seq_len(2), ]$geneA,
-    expected_info_df[seq_len(2), ]$geneB
+  expected_selected_genes <- unique(as.vector(rbind(
+    expected_info_df$geneA,
+    expected_info_df$geneB
   )))[1:3]
 
-  # Expected selected genes
-  expected_selected_genes <- unique(c(
-    gene_names[expected_gene_pairs]
-  ))
+  # # Expected selected genes
+  # expected_selected_genes <- unique(c(
+  #   expected_gene_pairs
+  # ))
 
   # Compare the selected genes
   testthat::expect_equal(selected_genes, expected_selected_genes)
 
-  # Compare the info data frame
-rownames(selected_info) <- NULL
-rownames(expected_info_df) <- NULL
-testthat::expect_equal(selected_info, expected_info_df)
+  # Compare the selected info
+  testthat::expect_equal(selected_info, expected_info_df)
 })

@@ -23,15 +23,16 @@ matrix correctly with method 'cosine'", {
 
   # Extract the result as a regular matrix
   result_matrix <- result_fbm[]
-
   # Manually compute the expected result
-
-  # Step 1: Normalize and scale both original and permuted data
-  log_normalized <- Seurat::NormalizeData(mat)
-
-  # Step 2: Permute the matrix column-wise
+  # Step 1: Permute input matrix by column (default in anglemania)
   set.seed(1)
-  permuted_log_normalized <- apply(log_normalized, 2, sample)
+  permuted_mat <- apply(mat, 2, sample)
+
+  # Step 2: Normalize and scale both original and permuted data
+  # Like in Seurat: divide gene counts by the number of total counts per cell,
+  # multiply by 10,000 (default scaling factor)
+  log_normalized <- log1p(t(t(mat) / (colSums(mat)) * 10000))
+  permuted_log_normalized <- log1p(t(t(permuted_mat) / (colSums(permuted_mat)) * 10000))
 
   # Step 3: Compute cosine correlation matrices
   original_correlation <- cor(
@@ -51,7 +52,7 @@ matrix correctly with method 'cosine'", {
   mean_permuted <- Matrix::colMeans(permuted_correlation, na.rm = TRUE)
   sd_permuted <- matrixStats::colSds(permuted_correlation, na.rm = TRUE)
 
-  # Step 7: Transform original correlation matrix into z-scores
+  # Step 5: Transform original correlation matrix into z-scores
   expected_z_scores <- (original_correlation - mean_permuted) / sd_permuted
   diag(expected_z_scores) <- 0
   # Compare the result from factorise with the expected z-score matrix
@@ -84,16 +85,16 @@ matrix correctly with method 'spearman'", {
 
   # Extract the result as a regular matrix
   result_matrix <- result_fbm[]
-
-  # Manually compute the expected result
-
-  # Step 1: Normalize and scale both original and permuted data
-  log_normalized <- Seurat::NormalizeData(mat)
-
-  # Step 2: Permute the matrix column-wise
+    # Manually compute the expected result
+  # Step 1: Permute input matrix by column (default in anglemania)
   set.seed(1)
-  permuted_log_normalized <- apply(log_normalized, 2, sample)
+  permuted_mat <- apply(mat, 2, sample)
 
+  # Step 2: Normalize and scale both original and permuted data
+  # Like in Seurat: divide gene counts by the number of total counts per cell,
+  # multiply by 10,000 (default scaling factor)
+  log_normalized <- log1p(t(t(mat) / (colSums(mat)) * 10000))
+  permuted_log_normalized <- log1p(t(t(permuted_mat) / (colSums(permuted_mat)) * 10000))
   # Step 3: Compute cosine correlation matrices
   original_correlation <- cor(
     t(log_normalized),
