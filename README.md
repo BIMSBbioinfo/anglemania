@@ -29,15 +29,10 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("anglemania")
 ```
 
-For the development version from GitHub:
+For the development version:
 
 ```r
-# Install devtools if you haven't already
-if (!requireNamespace("devtools", quietly = TRUE))
-    install.packages("devtools")
-
-# Install from GitHub
-devtools::install_github("BIMSBbioinfo/anglemania")
+BiocManager::install("anglemania", version="devel")
 ```
 
 
