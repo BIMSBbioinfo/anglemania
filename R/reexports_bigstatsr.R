@@ -10,7 +10,8 @@ NULL
 #' @describeIn adapted_reexports Copied version of the unexported
 #' \code{bigstatsr:::CutBySize} function.
 #' @importFrom bigparallelr split_len
-#' @param m An integer specifying the length of the input to split into intervals.
+#' @param m An integer specifying the length of the input to split
+#' into intervals.
 #' @param block.size An integer specifying the maximum length of each block.
 #' @param nb Number of blocks. Default is \code{ceiling(m / block.size)}.
 #' @return Intervals from the input length.
@@ -23,9 +24,11 @@ CutBySize <- function(m, block.size, nb = ceiling(m / block.size)) {
   bigparallelr::split_len(m, nb_split = nb)
 }
 
-#' @describeIn adapted_reexports Adapted version of \code{bigstatsr::big_crossprodSelf}
+#' @describeIn adapted_reexports Adapted version of
+#' \code{bigstatsr::big_crossprodSelf}
 #' that suppresses warnings and errors related to zero scaling.
-#' @importFrom bigstatsr FBM big_apply rows_along cols_along big_cprodMat block_size
+#' @importFrom bigstatsr FBM big_apply rows_along cols_along
+#' big_cprodMat block_size
 #' @importFrom bigparallelr seq_range
 #' @inheritParams bigstatsr::big_crossprodSelf
 #' @return The self crossproduct of an FBM.
@@ -49,9 +52,9 @@ big_crossprodSelf_no_warning <- function(
   m <- length(ind.col)
   K <- bigstatsr::FBM(m, m, backingfile = backingfile)
 
-  mu    <- numeric(m)
+  mu <- numeric(m)
   delta <- numeric(m)
-  sums  <- numeric(m)
+  sums <- numeric(m)
 
   intervals <- CutBySize(m, block.size)
 
@@ -86,7 +89,8 @@ big_crossprodSelf_no_warning <- function(
   structure(K, center = mu, scale = delta)
 }
 
-#' @describeIn adapted_reexports Adapted version of \code{bigstatsr::big_cor} that
+#' @describeIn adapted_reexports Adapted version of
+#' \code{bigstatsr::big_cor} that
 #' suppresses warnings and errors.
 #' @inheritParams bigstatsr::big_cor
 #' @return The Pearson correlation matrix from an FBM.
@@ -123,8 +127,8 @@ big_cor_no_warning <- function(
 #' @describeIn adapted_reexports Adapted version of \code{bigstatsr::big_scale}
 #' that suppresses warnings and errors.
 #' @inheritParams bigstatsr::big_scale
-#' @return A new function that returns a data.frame with two vectors, \code{center}
-#' and \code{scale}, both of length \code{ind.col}.
+#' @return A new function that returns a data.frame with two vectors,
+#' \code{center} and \code{scale}, both of length \code{ind.col}.
 #' @examples
 #' set.seed(123)
 #' mat <- matrix(rnorm(200), 20, 10)
@@ -144,7 +148,12 @@ big_cor_no_warning <- function(
 #' scaled_mat[1:5, 1:5]
 #' @export
 big_scale_no_warning <- function(center = TRUE, scale = TRUE) {
-  function(X, ind.row = bigstatsr::rows_along(X), ind.col = bigstatsr::cols_along(X), ncores = 1) {
+  function(
+    X,
+    ind.row = bigstatsr::rows_along(X),
+    ind.col = bigstatsr::cols_along(X),
+    ncores = 1
+  ) {
     bigstatsr:::check_args()
 
     m <- length(ind.col)

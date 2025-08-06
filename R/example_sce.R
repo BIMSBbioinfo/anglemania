@@ -2,8 +2,8 @@
 #'
 #' This function generates a SingleCellExperiment object with 2 batches and 2
 #' datasets. The object contains 300 genes and 600 cells. The counts matrix is
-#' generated using the \code{rpois} function with different lambda values for the
-#' two batches.
+#' generated using the \code{rpois} function with different lambda values
+#' for the two batches.
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom stats rpois
@@ -16,15 +16,17 @@
 #' sce <- sce_example()
 #' sce
 #' @export
-sce_example <- function(seed = 42){
+sce_example <- function(seed = 42) {
     # generate example data with two "batches"
     withr::with_seed(seed, {
         counts_mat <- cbind(
-            matrix(rpois(300 * 300, lambda = 5),
+            matrix(
+                rpois(300 * 300, lambda = 5),
                 nrow = 300,
                 dimnames = list(paste0("gene", 1:300), paste0("cell", 1:300))
             ),
-            matrix(rpois(300 * 300, lambda = 3),
+            matrix(
+                rpois(300 * 300, lambda = 3),
                 nrow = 300,
                 dimnames = list(paste0("gene", 1:300), paste0("cell", 301:600))
             )
@@ -32,7 +34,10 @@ sce_example <- function(seed = 42){
     })
     # add metadata
     batch <- rep(c("batch1", "batch2"), each = 300)
-    dataset <- rep(c("dataset1", "dataset2", "dataset1", "dataset2"), each = 150)
+    dataset <- rep(
+        c("dataset1", "dataset2", "dataset1", "dataset2"),
+        each = 150
+    )
     col_data <- S4Vectors::DataFrame(batch = batch, dataset = dataset)
 
     # Create the SingleCellExperiment object

@@ -34,8 +34,13 @@
 #'   include \code{"spearman"}
 #' @param seed An integer value for setting the seed for reproducibility during
 #'   permutation. Default is \code{1}.
-#' @param permute_row_or_column Character "row" or "column", whether permutations should be executed row-wise or column wise. Default is \code{"column"}
-#' @param permutation_function Character "sample" or "permute_nonzero". If sample, then sample is used for constructing background distributions. If permute_nonzero, then only non-zero values are permuted. Default is \code{"sample"}
+#' @param permute_row_or_column Character "row" or "column", whether
+#' permutations should be executed row-wise or column wise.
+#' Default is \code{"column"}
+#' @param permutation_function Character "sample" or "permute_nonzero".
+#' If sample, then sample is used for constructing background distributions.
+#' If permute_nonzero, then only non-zero values are permuted.
+#' Default is \code{"sample"}
 #' @param normalization_method Character "divide_by_total_counts" or
 #'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the
@@ -74,13 +79,13 @@
 #'
 #' @export
 factorise <- function(
-    x_mat,
-    method = "cosine",
-    seed = 1,
-    permute_row_or_column = "column",
-    permutation_function = "sample",
-    normalization_method = "divide_by_total_counts"
-  ) {
+  x_mat,
+  method = "cosine",
+  seed = 1,
+  permute_row_or_column = "column",
+  permutation_function = "sample",
+  normalization_method = "divide_by_total_counts"
+) {
   # Validate input
   checkmate::assertClass(x_mat, "FBM")
   checkmate::assertString(method)
@@ -89,38 +94,36 @@ factorise <- function(
   checkmate::assertChoice(permute_row_or_column, c("row", "column"))
   checkmate::assertString(permutation_function)
   checkmate::assertChoice(permutation_function, c("sample", "permute_nonzero"))
-  tmpfile = tempfile()
+  tmpfile <- tempfile()
   x_mat_perm <- bigstatsr::FBM(
     nrow = nrow(x_mat),
     ncol = ncol(x_mat),
     backingfile = file.path(tmpfile, digest::digest(tmpfile, length = 10))
   )
 
-  if(permutation_function == "sample"){
-    permutation_function = base::sample
-  }else{
-    permutation_function = permute_nonzero
+  if (permutation_function == "sample") {
+    permutation_function <- base::sample
+  } else {
+    permutation_function <- permute_nonzero
+  }
+  # default permutation is by columns, i.e. for each cell
+  # we permute the gene expression values of the genes
+  ind_fun <- bigstatsr::cols_along(x_mat)
+  a_fun <- function(X, ind) {
+    X.sub <- X[, ind, drop = FALSE]
+    X.sub <- apply(X.sub, 2, permutation_function)
+    x_mat_perm[, ind] <- X.sub
+    NULL
   }
 
-  # normalizes the matrix before permutation
-  x_mat = normalize_matrix(x_mat, normalization_method = normalization_method)
-
-  # default permutation is by columns
-  ind_fun = bigstatsr::cols_along(x_mat)
-  a_fun = function(X, ind) {  
-      X.sub <- X[, ind, drop = FALSE]
-      X.sub <- apply(X.sub, 2, permutation_function)
-      x_mat_perm[, ind] <- X.sub
-      NULL
-    }
-
   # permute by rows
-  if(permute_row_or_column == "row"){
-    ind_fun = bigstatsr::rows_along(x_mat)
-    a_fun = function(X, ind){
-      X.sub <- X[ind, ,drop = FALSE]
+  if (permute_row_or_column == "row") {
+    ind_fun <- bigstatsr::rows_along(x_mat)
+    a_fun <- function(X, ind) {
+      X.sub <- X[ind, , drop = FALSE]
       X.sub <- t(apply(X.sub, 1, permutation_function))
       x_mat_perm[ind, ] <- X.sub
+      NULL
     }
   }
   withr::with_seed(seed, {
@@ -134,6 +137,10 @@ factorise <- function(
     )
   })
 
+  # normalizes the matrices
+  x_mat <- normalize_matrix(x_mat, normalization_method = normalization_method)
+  x_mat_perm <- normalize_matrix(x_mat_perm, normalization_method = normalization_method)
+
   # Compute correlation matrix for both original and permuted matrix
   x_mat_corr <- extract_angles(x_mat, method = method)
   x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
@@ -144,9 +151,9 @@ factorise <- function(
     x_mat_corr,
     a.FUN = function(X, ind) {
       zscores <- (X[, ind, drop = FALSE] - dstat$mean[ind]) / dstat$sd[ind]
-      # this is needed because sometimes all the correlation matrices are 0, and then
-      # the mean is zero
-      zscores[is.na(zscores)] = 0
+      # this is needed because sometimes all the correlation matrices
+      # are 0, and then the mean is zero
+      zscores[is.na(zscores)] <- 0
       X[, ind] <- zscores
       NULL
     },
@@ -168,8 +175,104 @@ factorise <- function(
 #' v = c(v, 0, 0, 0)
 #' permute_nonzero(v)
 #' @export
-permute_nonzero = function(v) {
-  ind = v > 0
-  v[ind] = sample(v[ind])
+permute_nonzero <- function(v) {
+  ind <- v > 0
+  v[ind] <- sample(v[ind])
   v
+}
+
+
+#' Calculate cosine angle between genes
+#' @description
+#' Constructs a matrix of gene-gene relationships based on distance
+#' metrics.
+#' @details
+#' The function returns the gene-gene angle matrix as an
+#' \code{\link[bigstatsr]{FBM}} object.
+#'
+#' @param x_mat An \code{\link[bigstatsr]{FBM}} object containing raw gene
+#'   expression data, where rows correspond to genes and columns to samples.
+#'   The data will be normalized and scaled within the function.
+#' @param method A character string specifying the method to compute the
+#'   gene-gene relationships. Options are:
+#'   \itemize{
+#'     \item \code{"cosine"} (default): Computes the cosine angle between
+#'       genes.
+#'     \item \code{"spearman"}: Computes the Spearman rank correlation
+#'       coefficient by rank-transforming the data before computing the
+#'       correlation.
+#'   }
+#'
+#' @return An \code{\link[bigstatsr]{FBM}} object containing the gene-gene
+#'   correlation matrix. The matrix is square with dimensions equal to the
+#'   number of genes and contains the pairwise correlations between genes.
+#'   The diagonal elements are set to \code{NA}.
+#'
+#' @importFrom bigstatsr FBM big_apply big_transpose big_cor
+#' @examples
+#'
+#' mat <- matrix(
+#'  c(
+#'      5, 3, 0, 0,
+#'      0, 0, 0, 3,
+#'      2, 1, 3, 4,
+#'      0, 0, 1, 0,
+#'      1, 2, 1, 2,
+#'      3, 4, 3, 4
+#'    ),
+#'    nrow = 6, # 6 genes
+#'    ncol = 4, # 4 cells
+#'    byrow = TRUE
+#' )
+#'
+#' mat <- bigstatsr::FBM(nrow = nrow(mat), ncol = ncol(mat), init = mat)
+#'
+#' angle_mat <- extract_angles(mat)
+#' angle_mat[]
+#' @seealso
+#' \code{\link[bigstatsr]{big_apply}},
+#' \code{\link[bigstatsr]{big_cor}},
+#' \code{\link[bigstatsr]{FBM}},
+#' \code{\link{factorise}}
+#'
+#' @export
+extract_angles <- function(
+  x_mat,
+  method = "cosine"
+) {
+  checkmate::assertChoice(method, c("cosine", "spearman"))
+  checkmate::assertClass(x_mat, "FBM")
+  # First transpose the matrix because big_cor calculates the covariance
+  # (X^T X)
+  x_mat <- bigstatsr::big_transpose(x_mat)
+
+  # Transform to ranks if method is spearman
+  if (method == "spearman") {
+    bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+      X.sub <- X[, ind, drop = FALSE]
+      X.sub <- apply(X.sub, 2, rank)
+      x_mat[, ind] <- X.sub
+      NULL
+    })
+  }
+
+  # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
+  x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
+  # x_mat <- angl_cor(x_mat, block.size = 1000)
+  # The big_cor function from bigstatsr scales and centers the
+  # count matrix and calculates the covariance (cross product X^T X)
+  diag(x_mat) <- NA
+
+  # replaces NaN with NA values in the matrix
+  bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+    X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
+      xx = x
+      xx[is.nan(xx)] = NA
+      xx
+    })
+    x_mat[, ind] <- X.sub
+    NULL
+  })
+
+  return(x_mat)
 }
