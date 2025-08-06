@@ -1,15 +1,16 @@
 Package: anglemania
-URL: https://bioinformatics.mdc-berlin.de/anglemania, https://github.com/BIMSBbioinfo/anglemania/, http://bioinformatics.mdc-berlin.de/anglemania/
+URL: https://github.com/BIMSBbioinfo/anglemania/
 Title: Feature Extraction for scRNA-seq Dataset Integration
 Version: 0.99.3
-Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks.
+Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It improves conventional usage of highly-variable genes for integration tasks. We leverage gene-gene correlations which are stable across batches to identify invariant and biologically meaningful genes. This way, anglemania selects for genes that are biologically relevant and less affected by batch effects. Currently, its main use is for single-cell RNA-seq dataset integration, but it can be applied for other multi-batch downstream analyses such as NMF. 
 Authors@R: c(
     person("Aaron", "Kollotzek", email = "aaron.kollotzek@mdc-berlin.de", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0009-7142-4015")),
     person("Vedran", "Franke", email = "vedran.franke@mdc-berlin.de", role = c("aut"),
            comment = c(ORCID = "0000-0003-3606-6792")),
     person("Artem", "Baranovskii", email = "artem.baranowsky@gmail.com", role = c("aut")),
-    person("Altuna", "Akalin", email = "altuna.akalin@mdc-berlin.de", role = "aut")
+    person("Altuna", "Akalin", email = "altuna.akalin@mdc-berlin.de", role = "aut"),
+    person("SFB1588", role = "fnd", comment = "Funded by the DFG – Deutsche Forschungsgemeinschaft")
   )
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -22,14 +23,11 @@ Imports:
     methods,
     stats,
     checkmate,
-    Seurat,
-    SeuratObject,
     S4Vectors,
     SingleCellExperiment,
     bigstatsr,
     bigparallelr,
     dplyr,
-    magrittr,
     tidyr,
     pbapply,
     withr,
@@ -39,15 +37,16 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    covr,
-    DT,
-    matrixStats,
     scran,
     scater,
     batchelor,
     bluster,
-    RcppArmadillo
+    RcppArmadillo,
+    UpSetR,
+    BiocStyle,
+    magick
 VignetteBuilder: knitr
 biocViews: SingleCell, BatchEffect, MultipleComparison, FeatureExtraction
 BiocType: Software
 Config/testthat/edition: 3
+BugReports: https://github.com/BIMSBbioinfo/anglemania/issues
