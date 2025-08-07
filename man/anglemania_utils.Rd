@@ -6,6 +6,7 @@
 \alias{replace_with_na}
 \alias{normalize_matrix}
 \alias{get_anglemania_genes}
+\alias{get_anglemania_stats_df}
 \title{Utility Functions for the anglemania Package}
 \usage{
 sparse_to_fbm(s_mat)
@@ -15,10 +16,12 @@ replace_with_na(v)
 normalize_matrix(
   x_mat,
   normalization_method = "divide_by_total_counts",
-  verbose = FALSE
+  verbose = TRUE
 )
 
 get_anglemania_genes(sce)
+
+get_anglemania_stats_df(sce)
 }
 \arguments{
 \item{s_mat}{A sparse matrix.}
@@ -49,7 +52,11 @@ A numeric vector with NaN and Inf values replaced with NA.
 The input \code{FBM} object with normalized values written back in place.
 This function modifies the input \code{x_mat} by reference.
 
-A character vector of gene names that have been selected for integration
+A character vector of gene names that have been selected by the
+anglemania algorithm
+
+A data frame of gene pairs from which the anglemania genes
+were selected
 }
 \description{
 A collection of utility functions used within the
@@ -71,7 +78,11 @@ Normalize a Filebacked Big Matrix (\code{FBM}) using either total-count
 scaling or residuals from a linear model. Intended for use with
 single-cell RNA-seq gene expression data.
 
-\item \code{get_anglemania_genes()}: 
+\item \code{get_anglemania_genes()}: Utility function to extract the genes that
+have been selected by the anglemania algorithm.
+
+\item \code{get_anglemania_stats_df()}: Utility function to extract the stats of the
+gene pairs from which the anglemania genes were selected.
 
 }}
 \examples{
@@ -86,13 +97,24 @@ set.seed(42)
 mat <- matrix(rpois(1000, lambda = 5), nrow = 100, ncol = 10)
 fbm <- as_FBM(mat)
 
-normalize_matrix(fbm, normalization_method = "divide_by_total_counts")[1:5, 1:5]
-normalize_matrix(fbm, normalization_method = "find_residuals")[1:5, 1:5]
+normalize_matrix(
+  fbm,
+  normalization_method = "divide_by_total_counts"
+)[1:5, 1:5]
+normalize_matrix(
+  fbm,
+  normalization_method = "find_residuals"
+)[1:5, 1:5]
 
 sce <- sce_example()
 sce <- anglemania(sce, batch_key = "batch")
 anglemania_genes <- get_anglemania_genes(sce)
 head(anglemania_genes)
 length(anglemania_genes)
+sce <- sce_example()
+sce <- anglemania(sce, batch_key = "batch")
+anglemania_stats_df <- get_anglemania_stats_df(sce)
+head(anglemania_stats_df)
+length(anglemania_stats_df)
 }
 \keyword{internal}

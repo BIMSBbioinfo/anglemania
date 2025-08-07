@@ -295,6 +295,6 @@ select_genes <- function(
 extract_rows_for_unique_genes <- function(dt, max_n_genes) {
     unique_genes <- unique(as.vector(rbind(dt$geneA, dt$geneB)))
     max_genes <- min(max_n_genes, length(unique_genes))
-    unique_genes <- unique_genes[1:max_genes]
+    unique_genes <- unique_genes[seq_len(max_genes)]
     return(unique_genes)
 }

@@ -81,7 +81,7 @@ get_dstat <- function(corr_matrix) {
 big_mat_list_mean <- function(matrix_list, weights, verbose = TRUE) {
   # Check if all matrices in the list have the same dimensions
   if (
-    !all(sapply(
+    !all(vapply(
       matrix_list,
       function(x) {
         identical(dim(matrix_list[[1]]), dim(x))
@@ -159,7 +159,7 @@ big_mat_list_mean <- function(matrix_list, weights, verbose = TRUE) {
 get_list_stats <- function(matrix_list, weights, verbose = TRUE) {
   # Check if all matrices in the list have the same dimensions
   if (
-    !all(sapply(
+    !all(vapply(
       matrix_list,
       function(x) {
         identical(dim(matrix_list[[1]]), dim(x))

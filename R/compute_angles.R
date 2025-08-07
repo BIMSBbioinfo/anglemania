@@ -266,8 +266,8 @@ extract_angles <- function(
   # replaces NaN with NA values in the matrix
   bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
     X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
-      xx = x
-      xx[is.nan(xx)] = NA
+      xx <- x
+      xx[is.nan(xx)] <- NA
       xx
     })
     x_mat[, ind] <- X.sub

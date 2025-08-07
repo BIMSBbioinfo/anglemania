@@ -35,7 +35,6 @@ vignette: >
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# .libPaths(.Library)
 ```
 
 # Introduction
@@ -83,9 +82,9 @@ between cell types and rather big batch effects.
 ```{r, create simulated data}
 batch.facLoc <- 0.3
 de.facLoc <- 0.1
-nBatches <- 2
-nGroups <- 2
-nGenes <- 3000
+nBatches <- 4
+nGroups <- 3
+nGenes <- 5000
 groupCells <- 300
 
 sce_raw <- splatSimulate(
@@ -105,15 +104,13 @@ sce_raw <- splatSimulate(
 )
 sce <- sce_raw
 assays(sce)
-
-
 ```
 
 # Unintegrated data
 Here we perform a standard workflow on the unintegrated data. 
 When we perform clustering on the unintegrated data and visualize it in a UMAP, 
 we can see that the clusters are driven by batch effects rather than cell types.
-```{r, unintegrated data, fig.cap = "UMAPs of unintegrated data, colored by Batch and Group. The clusters are driven by batch effects.", fig.wide = TRUE, fig.width = 10}
+```{r, fig.cap = "UMAPs of unintegrated data, colored by Batch and Group. The clusters are driven by batch effects.", fig.wide = TRUE, fig.width = 10}
 sce_unintegrated <- sce
 # Normalization.
 sce_unintegrated <- logNormCounts(sce_unintegrated)
@@ -310,14 +307,12 @@ upsetr_df <- fromList(
     hvg_2000 = hvg_2000
   )
 )
-head(upsetr_df)
-upset(upsetr_df, text.scale = 2.5)
-
+upset(upsetr_df, text.scale = 2)
 ```
 
 # Seurat
 When using Seurat, the easiest approach is to create an SCE from the counts and metadata
-of the Seurat object and then run anglemania on it and optionally save those genes as the
+of the SeuratObject and then run anglemania on it and optionally save those genes as the
 VariableFeatures of the SeuratObject.
 ```{r, message = FALSE}
 se <- CreateSeuratObject(
@@ -375,7 +370,7 @@ seurat_integrated_angl <- seurat_integrated_angl %>%
 
 
 ## Plot
-```{r, fig.cap = "UMAPs of Seurat integrated data. Here we show that we can use the anglemania genes for integration of a Seurat object.", fig.wide = TRUE, fig.width = 10}
+```{r, fig.cap = "UMAPs of Seurat integrated data. Here we show that we can use the anglemania genes for integration of a SeuratObject.", fig.wide = TRUE, fig.width = 10}
 patchwork::wrap_plots(
   DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Batch") +
     ggtitle("Seurat integration using anglemania genes, colored by Batch"),
@@ -460,8 +455,7 @@ metadata(sce)$anglemania$list_stats$sn_zscore[1:10, 1:6]
 ```
 
 ## select_genes
-* under the hood, `anglemania` calls `select_genes` on 
-the anglemania object with the default thresholds
+* under the hood, `anglemania` calls `select_genes` with the default thresholds
   `zscore_mean_threshold = 2.5`, `zscore_sn_threshold = 2.5`
 * we can use `select_genes` to change the thresholds without having to run anglemania again
 ```{r, message = FALSE}

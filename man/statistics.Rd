@@ -9,9 +9,9 @@
 \usage{
 get_dstat(corr_matrix)
 
-big_mat_list_mean(matrix_list, weights, verbose = FALSE)
+big_mat_list_mean(matrix_list, weights, verbose = TRUE)
 
-get_list_stats(matrix_list, weights, verbose = FALSE)
+get_list_stats(matrix_list, weights, verbose = TRUE)
 }
 \arguments{
 \item{corr_matrix}{An \code{\link[bigstatsr]{FBM}} object.}
@@ -79,7 +79,8 @@ weights <- setNames(
   S4Vectors::metadata(sce)$anglemania$weights$anglemania_batch
 )
 list_stats <- get_list_stats(matrix_list, weights)
-str(list_stats)
+names(list_stats)
+list_stats$mean_zscore[1:5, 1:5]
 }
 \seealso{
 \code{\link[bigstatsr]{big_apply}}, \code{\link[bigstatsr]{FBM}}

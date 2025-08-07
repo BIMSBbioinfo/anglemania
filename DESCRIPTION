@@ -25,6 +25,7 @@ Imports:
     checkmate,
     S4Vectors,
     SingleCellExperiment,
+    SummarizedExperiment,
     bigstatsr,
     bigparallelr,
     dplyr,

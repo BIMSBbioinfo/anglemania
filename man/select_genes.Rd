@@ -11,7 +11,7 @@ prefilter_angl(
   mean_zscore_matrix,
   zscore_mean_threshold = 1,
   zscore_sn_threshold = 1,
-  verbose = FALSE
+  verbose = TRUE
 )
 
 select_genes(
@@ -21,7 +21,7 @@ select_genes(
   max_n_genes = NULL,
   direction = "both",
   adjust_thresholds = TRUE,
-  verbose = FALSE
+  verbose = TRUE
 )
 
 extract_rows_for_unique_genes(dt, max_n_genes)

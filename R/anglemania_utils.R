@@ -88,8 +88,14 @@ replace_with_na <- function(v) {
 #' mat <- matrix(rpois(1000, lambda = 5), nrow = 100, ncol = 10)
 #' fbm <- as_FBM(mat)
 #'
-#' normalize_matrix(fbm, normalization_method = "divide_by_total_counts")[1:5, 1:5]
-#' normalize_matrix(fbm, normalization_method = "find_residuals")[1:5, 1:5]
+#' normalize_matrix(
+#'   fbm,
+#'   normalization_method = "divide_by_total_counts"
+#' )[1:5, 1:5]
+#' normalize_matrix(
+#'   fbm,
+#'   normalization_method = "find_residuals"
+#' )[1:5, 1:5]
 #'
 #' @export
 normalize_matrix <- function(

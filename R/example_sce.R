@@ -23,12 +23,12 @@ sce_example <- function(seed = 42) {
             matrix(
                 rpois(300 * 300, lambda = 5),
                 nrow = 300,
-                dimnames = list(paste0("gene", 1:300), paste0("cell", 1:300))
+                dimnames = list(paste0("gene", seq_len(300)), paste0("cell", seq_len(300)))
             ),
             matrix(
                 rpois(300 * 300, lambda = 3),
                 nrow = 300,
-                dimnames = list(paste0("gene", 1:300), paste0("cell", 301:600))
+                dimnames = list(paste0("gene", seq_len(300)), paste0("cell", seq_len(300)+300))
             )
         )
     })
