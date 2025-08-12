@@ -59,8 +59,7 @@ efficient computation.
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
-    # library(anglemania)
-    devtools::load_all()
+    library(anglemania)
     library(dplyr)
     library(Seurat)
     library(splatter)
