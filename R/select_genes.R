@@ -1,18 +1,18 @@
 # ---------------------------------------------------------------------------
-# Filter and select the anglemania genes from an sce, for which we already
+# Filter and select the anglemania genes from an SCE, for which we already
 # ran the anglemania function
 # ---------------------------------------------------------------------------
 #' @title Select genes
-#' @description Select genes from an anglemania object based on mean z-score
-#' and the signal-to-noise ratio of angles between gene pairs
+#' @description Select genes from a SingleCellExperiment object based on
+#' mean z-score and the signal-to-noise ratio of angles between gene pairs
+#' across batches.
 #' @name select_genes
 #' @keywords internal
 NULL
 
 # ---------------------------------------------------------------------------
-#' @describeIn select_genes Preselect genes from an
-#' \code{anglemania_object}
-#' based on z-score thresholds, to simplify downstream filtering.
+#' @describeIn select_genes Prefilter gene pairs from the mean and SNR z-scores
+#' based on thresholds, to simplify downstream filtering.
 #'
 #' @param snr_zscore_matrix A \code{bigstatsr::FBM} object containing the SNR
 #'   z-scores.
@@ -22,10 +22,9 @@ NULL
 #'   absolute mean z-score. Default is 1.
 #' @param zscore_sn_threshold Numeric value specifying the threshold for the
 #'   SNR z-score. Default is 1.
-#' @return The input \code{anglemania_object} with the
-#'   \code{integration_genes} slot updated to include the selected genes and
-#'   their statistical information.
+#' @return A data frame containing the prefiltered gene pairs.
 #' @examples
+#' library(SingleCellExperiment)
 #' sce <- sce_example()
 #' sce <- anglemania(sce, batch_key = "batch")
 #' snr_zscore_matrix <- metadata(sce)$anglemania$list_stats$sn_zscore
@@ -40,8 +39,6 @@ NULL
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'  \item Checks if the input object is of class
-#' \code{\link{anglemania_object-class}}.
 #'  \item Identifies gene pairs where both the mean z-score and SNR z-score
 #'     exceed the specified thresholds.
 #' }
@@ -68,7 +65,8 @@ prefilter_angl <- function(
     while (nrow(prefiltered_df) == 0) {
         if (zscore_mean_threshold <= 0 || zscore_sn_threshold <= 0) {
             stop(
-                "zscore_mean_threshold and zscore_sn_threshold need to be positive"
+                "zscore_mean_threshold and zscore_sn_threshold ",
+                "need to be positive"
             )
         }
         vmessage(
@@ -89,17 +87,10 @@ prefilter_angl <- function(
 }
 
 # ---------------------------------------------------------------------------
-#' @describeIn select_genes Select genes from an \code{anglemania_object}
-#' based on z-score thresholds for mean and signal-to-noise
-#' ratio (SNR).
-#' Selects genes from an \code{\link{anglemania_object-class}} based on specified
-#' thresholds for the absolute mean z-score and signal-to-noise ratio
-#' (SNR) z-score. It updates the \code{integration_genes} slot of the
-#' \code{anglemania_object} with the selected genes and associated
-#' information.
+#' @describeIn select_genes Select genes from the mean and SNR z-score matrices
+#' stored in the SCE based on thresholds for mean and SNR.
 #'
-#' @param angl An \code{anglemania_object} containing statistical
-#'   matrices such as mean z-scores and SNR z-scores.
+#' @param sce A \code{SingleCellExperiment} object.
 #' @param zscore_mean_threshold Numeric value specifying the threshold for the
 #'   absolute mean z-score. Default is 2.
 #' @param zscore_sn_threshold Numeric value specifying the threshold for the
@@ -120,7 +111,6 @@ prefilter_angl <- function(
 #' @details
 #' The function performs the following steps:
 #' \enumerate{
-#'  \item Checks if the input object is of class \code{\link{anglemania_object-class}}.
 #'  \item If \code{max_n_genes} is not specified, it uses all genes that pass
 #'     the thresholds.
 #'  \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -129,9 +119,6 @@ prefilter_angl <- function(
 #'     99th percentile values of the corresponding statistics and re-selects.
 #'  \item Extracts unique genes from the selected gene pairs using
 #'     \code{\link{extract_rows_for_unique_genes}}.
-#'  \item Updates the \code{integration_genes} slot of the
-#'   \code{anglemania_object}
-#'     with the selected genes and their statistics.
 #' }
 #' @examples
 #' sce <- sce_example()
@@ -155,7 +142,7 @@ prefilter_angl <- function(
 #' head(anglemania_genes)
 #' length(anglemania_genes)
 #' @seealso \code{\link{extract_rows_for_unique_genes}},
-#'   \code{\link{intersect_genes}}, \code{\link{list_stats}}
+#'   \code{\link{get_intersect_genes}}, \code{\link{get_list_stats}}
 #' @export
 select_genes <- function(
     sce,
@@ -173,7 +160,9 @@ select_genes <- function(
     if (!"anglemania" %in% names(S4Vectors::metadata(sce))) {
         stop("please run anglemania first")
     }
-    prefiltered_df <- S4Vectors::metadata(sce)$anglemania$prefiltered_df
+    prefiltered_df <- S4Vectors::metadata(
+        sce
+    )$anglemania$prefiltered_df
     prefiltered_df$geneA <-
         S4Vectors::metadata(sce)$anglemania$intersect_genes[
             prefiltered_df$geneA
@@ -194,7 +183,8 @@ select_genes <- function(
         filtered_genes_df <- subset(
             prefiltered_df,
             sn_zscore >= zscore_sn_threshold &
-                abs(prefiltered_df$mean_zscore) >= zscore_mean_threshold
+                abs(prefiltered_df$mean_zscore) >=
+                    zscore_mean_threshold
         )
     } else if (direction == "positive") {
         filtered_genes_df <- subset(
@@ -246,17 +236,23 @@ select_genes <- function(
 
     # Assign the anglemania genes to the metadata of SCE/SE object
     # and the rowData of SCE/SE object
-    S4Vectors::metadata(sce)$anglemania$anglemania_genes <- anglemania_genes
+    S4Vectors::metadata(
+        sce
+    )$anglemania$anglemania_genes <- anglemania_genes
     SummarizedExperiment::rowData(sce)$anglemania_genes <-
         rownames(sce) %in% anglemania_genes
-    
+
     # update anglemania params slot with the arguments
-    S4Vectors::metadata(sce)$anglemania$params$zscore_mean_threshold <-
+    S4Vectors::metadata(
+        sce
+    )$anglemania$params$zscore_mean_threshold <-
         zscore_mean_threshold
     S4Vectors::metadata(sce)$anglemania$params$zscore_sn_threshold <-
         zscore_sn_threshold
     S4Vectors::metadata(sce)$anglemania$params$direction <- direction
-    S4Vectors::metadata(sce)$anglemania$params$max_n_genes <- max_n_genes
+    S4Vectors::metadata(
+        sce
+    )$anglemania$params$max_n_genes <- max_n_genes
     vmessage(
         verbose,
         "Selected ",

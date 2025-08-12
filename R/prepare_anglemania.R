@@ -55,8 +55,9 @@ check_params <- function(
     ) {
         stop(
             "batch_key needs to be a character string of length 1 ",
-            "corresponding to the column in the metadata of the SingleCellExperiment ",
-            "object that indicates which batch the cells belong to"
+            "corresponding to the column in the metadata of the ",
+            "SingleCellExperiment object that indicates which batch ",
+            "the cells belong to"
         )
     }
     # dataset_key
@@ -64,20 +65,24 @@ check_params <- function(
         if (length(dataset_key) != 1) {
             stop(
                 "dataset_key needs to be a character string of length 1 ",
-                "corresponding to the column in the metadata of the Seurat ",
-                "object that indicates which dataset the cells belong to"
+                "corresponding to the column in the metadata of the ",
+                "SingleCellExperiment object that indicates which dataset ",
+                "the cells belong to"
             )
         } else if (!(dataset_key %in% colnames(colData(sce)))) {
             stop(
-                "dataset_key needs to be a column in the metadata of the Seurat ",
-                "object that indicates which dataset the cells belong to"
+                "dataset_key needs to be a column in the metadata of the ",
+                "SingleCellExperiment object that indicates which dataset ",
+                "the cells belong to"
             )
         }
         message(
             "Using dataset_key: ",
             dataset_key
         )
-    } else if (checkmate::test_scalar_na(dataset_key, null.ok = TRUE)) {
+    } else if (
+        checkmate::test_scalar_na(dataset_key, null.ok = TRUE)
+    ) {
         message(
             "No dataset_key specified.\n",
             "Assuming that all samples belong to the same dataset ",
@@ -89,13 +94,18 @@ check_params <- function(
         dataset_key <- NA_character_
     } else {
         stop(
-            "dataset_key needs to be NA/NULL or a character string of length 1 ",
-            "corresponding to the column in the metadata of the Seurat ",
-            "object that indicates which dataset the cells belong to"
+            "dataset_key needs to be NA/NULL or a character string of ",
+            "length 1 corresponding to the column in the metadata of the ",
+            "SingleCellExperiment object that indicates which dataset ",
+            "the cells belong to"
         )
     }
     # zscore_mean_threshold
-    checkmate::assert_numeric(zscore_mean_threshold, lower = 0, len = 1)
+    checkmate::assert_numeric(
+        zscore_mean_threshold,
+        lower = 0,
+        len = 1
+    )
     # zscore_sn_threshold
     checkmate::assert_numeric(zscore_sn_threshold, lower = 0, len = 1)
     # max_n_genes
@@ -111,9 +121,17 @@ check_params <- function(
         c("cosine", "spearman")
     )
     # min_cells_per_gene
-    checkmate::assert_integerish(min_cells_per_gene, lower = 1, len = 1)
+    checkmate::assert_integerish(
+        min_cells_per_gene,
+        lower = 1,
+        len = 1
+    )
     # min_samples_per_gene
-    checkmate::assert_integerish(min_samples_per_gene, lower = 1, len = 1)
+    checkmate::assert_integerish(
+        min_samples_per_gene,
+        lower = 1,
+        len = 1
+    )
     # allow_missing_features
     checkmate::assert_logical(allow_missing_features, len = 1)
     # permute_row_or_column
@@ -160,8 +178,10 @@ check_params <- function(
 #' Internal Helper function to calculate and set weights for the batches
 #' in a SCE object
 #' @param col_data A data frame containing the metadata of the SCE/SE object
-#' @param batch_key A character string specifying the column name in the metadata that identifies the batch
-#' @param dataset_key A character string specifying the column name in the metadata that identifies the dataset
+#' @param batch_key A character string specifying the column name in the
+#'   metadata that identifies the batch
+#' @param dataset_key A character string specifying the column name in the
+#'   metadata that identifies the dataset
 #' @import dplyr
 #' @importFrom bigstatsr nb_cores
 #' @importFrom checkmate test_string
@@ -184,14 +204,21 @@ check_params <- function(
                 dplyr::all_of(c(dataset_key, batch_key))
             ) |>
             dplyr::distinct() |>
-            dplyr::group_by(dplyr::across(dplyr::all_of(dataset_key))) |>
+            dplyr::group_by(dplyr::across(dplyr::all_of(
+                dataset_key
+            ))) |>
             dplyr::add_count(name = "n_samples") |>
-            dplyr::mutate(weight = 1 / n_samples / dplyr::n_groups(.)) |>
+            dplyr::mutate(
+                weight = 1 / n_samples / dplyr::n_groups(.)
+            ) |>
             dplyr::ungroup() |>
             dplyr::mutate(weight = weight / mean(weight))
     } else {
         data_info <- col_data |>
-            dplyr::select(anglemania_batch, dplyr::all_of(batch_key)) |>
+            dplyr::select(
+                anglemania_batch,
+                dplyr::all_of(batch_key)
+            ) |>
             dplyr::distinct() |>
             dplyr::mutate(weight = 1)
     }
@@ -199,23 +226,20 @@ check_params <- function(
 }
 
 
-#' Add a Unique Batch Key to a Seurat or SingleCellExperiment Object's Metadata
+#' Add a Unique Batch Key to a \code{SingleCellExperiment} Object's Metadata
 #'
 #' This function adds a unique batch identifier to the metadata of a
-#' \code{\link[Seurat]{Seurat}} object by combining specified dataset and batch
+#' \code{SingleCellExperiment} object by combining specified dataset and batch
 #' keys. This is useful for distinguishing samples during integration or
 #' analysis.
 #'
-#' @param object_metadata Metadata of a \code{\link[Seurat]{Seurat}} or SingleCellExperiment object.
+#' @param sce A \code{SingleCellExperiment} object.
 #' @param dataset_key A character string specifying the column name in the
 #'   metadata that identifies the dataset. If \code{NA}, only the
 #'   \code{batch_key} is used.
 #' @param batch_key A character string specifying the column name in the
 #'   metadata that identifies the batch.
-#' @param new_unique_batch_key A character string for the new unique batch key
-#'   to be added to the metadata. Default is \code{"batch"}.
-#'
-#' @return A \code{\link[Seurat]{Seurat}} object with an additional metadata
+#' @return A \code{SingleCellExperiment} object with an additional metadata
 #'   column containing the unique batch key.
 #'
 #' @importFrom tidyr unite
@@ -262,7 +286,9 @@ add_unique_batch_key <- function(
             )
     }
 
-    SummarizedExperiment::colData(sce)$anglemania_batch <- col_data$batch
+    SummarizedExperiment::colData(
+        sce
+    )$anglemania_batch <- col_data$batch
     return(sce)
 }
 
@@ -348,7 +374,10 @@ get_intersect_genes <- function(
             verbose,
             "Using the intersection of filtered genes from all batches..."
         )
-        intersect_genes <- Reduce(intersect, lapply(matrix_list, rownames))
+        intersect_genes <- Reduce(
+            intersect,
+            lapply(matrix_list, rownames)
+        )
     } else {
         vmessage(
             verbose,
@@ -356,7 +385,10 @@ get_intersect_genes <- function(
             min_samples_per_gene,
             " samples..."
         )
-        intersect_genes <- table(unlist(lapply(matrix_list, rownames)))
+        intersect_genes <- table(unlist(lapply(
+            matrix_list,
+            rownames
+        )))
         intersect_genes <- sort(rownames(intersect_genes)[
             intersect_genes >= min_samples_per_gene
         ])

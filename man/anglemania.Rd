@@ -5,7 +5,7 @@
 \alias{check_params}
 \alias{add_unique_batch_key}
 \alias{get_intersect_genes}
-\title{Compute Critical Angles Between Genes Across Samples in an anglemania_object}
+\title{anglemania}
 \usage{
 anglemania(
   sce,
@@ -102,11 +102,6 @@ genes. Speeds up gene selection.}
 \item{verbose}{Logical indicating whether to print messages.}
 
 \item{matrix_list}{A list of \code{bigstatsr::FBM} objects.}
-
-\item{object_metadata}{Metadata of a \code{\link[Seurat]{Seurat}} or SingleCellExperiment object.}
-
-\item{new_unique_batch_key}{A character string for the new unique batch key
-to be added to the metadata. Default is \code{"batch"}.}
 }
 \value{
 An updated \code{SingleCellExperiment} object with computed
@@ -116,37 +111,38 @@ object.
 
 A list of validated parameters
 
-A \code{\link[Seurat]{Seurat}} object with an additional metadata
+A \code{SingleCellExperiment} object with an additional metadata
 column containing the unique batch key.
 
 A character vector of intersected genes.
 }
 \description{
 \code{anglemania} computes critical angles between genes across all samples
-provided in an \code{\link{anglemania_object-class}}. It calculates angles,
+provided in an \code{\link{SingleCellExperiment}}. It calculates angles,
 transforms them to z-scores, computes statistical measures, and selects
-genes based on specified thresholds.
+genes based on specified thresholds. These genes are biologically
+informative and invariant to batch effects.
 
 This function adds a unique batch identifier to the metadata of a
-\code{\link[Seurat]{Seurat}} object by combining specified dataset and batch
+\code{SingleCellExperiment} object by combining specified dataset and batch
 keys. This is useful for distinguishing samples during integration or
 analysis.
 }
 \details{
 This function performs the following steps:
 \enumerate{
-\item Computes angles between genes for each sample in the
-\code{angl} using the specified \code{method}, via
+\item Computes angles between genes for each batch in the
+\code{SingleCellExperiment} using the specified \code{method}, via
 \code{\link{factorise}}.
 \item Transforms the angles to z-scores.
 \item Computes statistical measures (mean z-score, signal-to-noise ratio)
-across samples using \code{\link{get_list_stats}}.
+across batches using \code{\link{get_list_stats}}.
 \item Selects genes based on specified z-score thresholds using
 \code{\link{select_genes}}.
 }
 
 The computed statistics and selected genes are added to the
-\code{angl}, which is returned.
+\code{SingleCellExperiment} object, which is returned.
 }
 \section{Functions}{
 \itemize{

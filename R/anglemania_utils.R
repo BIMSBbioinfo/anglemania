@@ -122,7 +122,9 @@ normalize_matrix <- function(
         } else if (normalization_method == "find_residuals") {
             total <- log1p(colSums(X.sub))
             X.sub <- log1p(X.sub)
-            X.res <- t(apply(X.sub, 1, function(x) residuals(lm(x ~ total))))
+            X.res <- t(apply(X.sub, 1, function(x) {
+                residuals(lm(x ~ total))
+            }))
         }
 
         X[, ind] <- X.res
@@ -169,8 +171,12 @@ get_anglemania_genes <- function(sce) {
 #' length(anglemania_stats_df)
 #' @export
 get_anglemania_stats_df <- function(sce) {
-    zscore_mean_threshold <- metadata(sce)$anglemania$params$zscore_mean_threshold
-    zscore_sn_threshold <- metadata(sce)$anglemania$params$zscore_sn_threshold
+    zscore_mean_threshold <- metadata(
+        sce
+    )$anglemania$params$zscore_mean_threshold
+    zscore_sn_threshold <- metadata(
+        sce
+    )$anglemania$params$zscore_sn_threshold
     direction <- metadata(sce)$anglemania$params$direction
     anglemania_genes <- metadata(sce)$anglemania$anglemania_genes
     prefiltered_df <- metadata(sce)$anglemania$prefiltered_df
@@ -187,7 +193,8 @@ get_anglemania_stats_df <- function(sce) {
         filtered_genes_df <- subset(
             prefiltered_df,
             sn_zscore >= zscore_sn_threshold &
-                abs(prefiltered_df$mean_zscore) >= zscore_mean_threshold
+                abs(prefiltered_df$mean_zscore) >=
+                    zscore_mean_threshold
         )
     } else if (direction == "positive") {
         filtered_genes_df <- subset(
@@ -207,10 +214,9 @@ get_anglemania_stats_df <- function(sce) {
         order(abs(filtered_genes_df$mean_zscore), decreasing = TRUE),
     ]
     filtered_genes_df <- filtered_genes_df |>
-        filter(geneA %in% anglemania_genes | geneB %in% anglemania_genes)
-    
+        filter(
+            geneA %in% anglemania_genes | geneB %in% anglemania_genes
+        )
+
     return(filtered_genes_df)
 }
-
-
-

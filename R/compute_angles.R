@@ -79,88 +79,101 @@
 #'
 #' @export
 factorise <- function(
-  x_mat,
-  method = "cosine",
-  seed = 1,
-  permute_row_or_column = "column",
-  permutation_function = "sample",
-  normalization_method = "divide_by_total_counts"
+    x_mat,
+    method = "cosine",
+    seed = 1,
+    permute_row_or_column = "column",
+    permutation_function = "sample",
+    normalization_method = "divide_by_total_counts"
 ) {
-  # Validate input
-  checkmate::assertClass(x_mat, "FBM")
-  checkmate::assertString(method)
-  checkmate::assertChoice(method, c("cosine", "spearman"))
-  checkmate::assertString(permute_row_or_column)
-  checkmate::assertChoice(permute_row_or_column, c("row", "column"))
-  checkmate::assertString(permutation_function)
-  checkmate::assertChoice(permutation_function, c("sample", "permute_nonzero"))
-  tmpfile <- tempfile()
-  x_mat_perm <- bigstatsr::FBM(
-    nrow = nrow(x_mat),
-    ncol = ncol(x_mat),
-    backingfile = file.path(tmpfile, digest::digest(tmpfile, length = 10))
-  )
-
-  if (permutation_function == "sample") {
-    permutation_function <- base::sample
-  } else {
-    permutation_function <- permute_nonzero
-  }
-  # default permutation is by columns, i.e. for each cell
-  # we permute the gene expression values of the genes
-  ind_fun <- bigstatsr::cols_along(x_mat)
-  a_fun <- function(X, ind) {
-    X.sub <- X[, ind, drop = FALSE]
-    X.sub <- apply(X.sub, 2, permutation_function)
-    x_mat_perm[, ind] <- X.sub
-    NULL
-  }
-
-  # permute by rows
-  if (permute_row_or_column == "row") {
-    ind_fun <- bigstatsr::rows_along(x_mat)
-    a_fun <- function(X, ind) {
-      X.sub <- X[ind, , drop = FALSE]
-      X.sub <- t(apply(X.sub, 1, permutation_function))
-      x_mat_perm[ind, ] <- X.sub
-      NULL
-    }
-  }
-  withr::with_seed(seed, {
-    # Permute matrix
-    bigstatsr::big_apply(
-      x_mat,
-      a.FUN = a_fun,
-      a.combine = "c",
-      ind = ind_fun,
-      block.size = 1000
+    # Validate input
+    checkmate::assertClass(x_mat, "FBM")
+    checkmate::assertString(method)
+    checkmate::assertChoice(method, c("cosine", "spearman"))
+    checkmate::assertString(permute_row_or_column)
+    checkmate::assertChoice(permute_row_or_column, c("row", "column"))
+    checkmate::assertString(permutation_function)
+    checkmate::assertChoice(
+        permutation_function,
+        c("sample", "permute_nonzero")
     )
-  })
+    tmpfile <- tempfile()
+    x_mat_perm <- bigstatsr::FBM(
+        nrow = nrow(x_mat),
+        ncol = ncol(x_mat),
+        backingfile = file.path(
+            tmpfile,
+            digest::digest(tmpfile, length = 10)
+        )
+    )
 
-  # normalizes the matrices
-  x_mat <- normalize_matrix(x_mat, normalization_method = normalization_method)
-  x_mat_perm <- normalize_matrix(x_mat_perm, normalization_method = normalization_method)
+    if (permutation_function == "sample") {
+        permutation_function <- base::sample
+    } else {
+        permutation_function <- permute_nonzero
+    }
+    # default permutation is by columns, i.e. for each cell
+    # we permute the gene expression values of the genes
+    ind_fun <- bigstatsr::cols_along(x_mat)
+    a_fun <- function(X, ind) {
+        X.sub <- X[, ind, drop = FALSE]
+        X.sub <- apply(X.sub, 2, permutation_function)
+        x_mat_perm[, ind] <- X.sub
+        NULL
+    }
 
-  # Compute correlation matrix for both original and permuted matrix
-  x_mat_corr <- extract_angles(x_mat, method = method)
-  x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
+    # permute by rows
+    if (permute_row_or_column == "row") {
+        ind_fun <- bigstatsr::rows_along(x_mat)
+        a_fun <- function(X, ind) {
+            X.sub <- X[ind, , drop = FALSE]
+            X.sub <- t(apply(X.sub, 1, permutation_function))
+            x_mat_perm[ind, ] <- X.sub
+            NULL
+        }
+    }
+    withr::with_seed(seed, {
+        # Permute matrix
+        bigstatsr::big_apply(
+            x_mat,
+            a.FUN = a_fun,
+            a.combine = "c",
+            ind = ind_fun,
+            block.size = 1000
+        )
+    })
 
-  # Transform original correlation matrix into z-scores.
-  dstat <- get_dstat(x_mat_perm_corr)
-  bigstatsr::big_apply(
-    x_mat_corr,
-    a.FUN = function(X, ind) {
-      zscores <- (X[, ind, drop = FALSE] - dstat$mean[ind]) / dstat$sd[ind]
-      # this is needed because sometimes all the correlation matrices
-      # are 0, and then the mean is zero
-      zscores[is.na(zscores)] <- 0
-      X[, ind] <- zscores
-      NULL
-    },
-    a.combine = "c",
-    block.size = 1000
-  )
-  return(x_mat_corr)
+    # normalizes the matrices
+    x_mat <- normalize_matrix(
+        x_mat,
+        normalization_method = normalization_method
+    )
+    x_mat_perm <- normalize_matrix(
+        x_mat_perm,
+        normalization_method = normalization_method
+    )
+
+    # Compute correlation matrix for both original and permuted matrix
+    x_mat_corr <- extract_angles(x_mat, method = method)
+    x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
+
+    # Transform original correlation matrix into z-scores.
+    dstat <- get_dstat(x_mat_perm_corr)
+    bigstatsr::big_apply(
+        x_mat_corr,
+        a.FUN = function(X, ind) {
+            zscores <- (X[, ind, drop = FALSE] - dstat$mean[ind]) /
+                dstat$sd[ind]
+            # this is needed because sometimes all the correlation matrices
+            # are 0, and then the mean is zero
+            zscores[is.na(zscores)] <- 0
+            X[, ind] <- zscores
+            NULL
+        },
+        a.combine = "c",
+        block.size = 1000
+    )
+    return(x_mat_corr)
 }
 
 
@@ -176,9 +189,9 @@ factorise <- function(
 #' permute_nonzero(v)
 #' @export
 permute_nonzero <- function(v) {
-  ind <- v > 0
-  v[ind] <- sample(v[ind])
-  v
+    ind <- v > 0
+    v[ind] <- sample(v[ind])
+    v
 }
 
 
@@ -237,42 +250,42 @@ permute_nonzero <- function(v) {
 #'
 #' @export
 extract_angles <- function(
-  x_mat,
-  method = "cosine"
+    x_mat,
+    method = "cosine"
 ) {
-  checkmate::assertChoice(method, c("cosine", "spearman"))
-  checkmate::assertClass(x_mat, "FBM")
-  # First transpose the matrix because big_cor calculates the covariance
-  # (X^T X)
-  x_mat <- bigstatsr::big_transpose(x_mat)
+    checkmate::assertChoice(method, c("cosine", "spearman"))
+    checkmate::assertClass(x_mat, "FBM")
+    # First transpose the matrix because big_cor calculates the covariance
+    # (X^T X)
+    x_mat <- bigstatsr::big_transpose(x_mat)
 
-  # Transform to ranks if method is spearman
-  if (method == "spearman") {
+    # Transform to ranks if method is spearman
+    if (method == "spearman") {
+        bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
+            X.sub <- X[, ind, drop = FALSE]
+            X.sub <- apply(X.sub, 2, rank)
+            x_mat[, ind] <- X.sub
+            NULL
+        })
+    }
+
+    # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
+    x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
+    # x_mat <- angl_cor(x_mat, block.size = 1000)
+    # The big_cor function from bigstatsr scales and centers the
+    # count matrix and calculates the covariance (cross product X^T X)
+    diag(x_mat) <- NA
+
+    # replaces NaN with NA values in the matrix
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
-      X.sub <- X[, ind, drop = FALSE]
-      X.sub <- apply(X.sub, 2, rank)
-      x_mat[, ind] <- X.sub
-      NULL
+        X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
+            xx <- x
+            xx[is.nan(xx)] <- NA
+            xx
+        })
+        x_mat[, ind] <- X.sub
+        NULL
     })
-  }
 
-  # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
-  x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
-  # x_mat <- angl_cor(x_mat, block.size = 1000)
-  # The big_cor function from bigstatsr scales and centers the
-  # count matrix and calculates the covariance (cross product X^T X)
-  diag(x_mat) <- NA
-
-  # replaces NaN with NA values in the matrix
-  bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
-    X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
-      xx <- x
-      xx[is.nan(xx)] <- NA
-      xx
-    })
-    x_mat[, ind] <- X.sub
-    NULL
-  })
-
-  return(x_mat)
+    return(x_mat)
 }

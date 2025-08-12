@@ -3,6 +3,7 @@
 /archive
 /guix
 /inst/CITATION
+.vscode/
 *.Rproj
 .Rproj.user
 anglemania.Rproj
@@ -18,3 +19,5 @@ vignettes/*_files
 *.dll
 *.a
 .DS_Store
+air.toml
+/Meta/

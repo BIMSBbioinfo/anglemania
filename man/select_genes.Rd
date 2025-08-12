@@ -39,6 +39,8 @@ absolute mean z-score. Default is 2.}
 \item{zscore_sn_threshold}{Numeric value specifying the threshold for the
 SNR z-score. Default is 2.}
 
+\item{sce}{A \code{SingleCellExperiment} object.}
+
 \item{max_n_genes}{An integer specifying the maximum number of unique genes
 to return.}
 
@@ -50,14 +52,9 @@ selected genes do not meet the thresholds. Default is TRUE}
 
 \item{dt}{A data frame containing gene pairs, with columns \code{geneA}
 and \code{geneB}.}
-
-\item{angl}{An \code{anglemania_object} containing statistical
-matrices such as mean z-scores and SNR z-scores.}
 }
 \value{
-The input \code{anglemania_object} with the
-\code{integration_genes} slot updated to include the selected genes and
-their statistical information.
+A data frame containing the prefiltered gene pairs.
 
 The input \code{anglemaniaObject} with the
 \code{integration_genes} slot updated to include the selected genes and
@@ -66,21 +63,19 @@ their statistical information.
 A vector of unique gene identifiers.
 }
 \description{
-Select genes from an anglemania object based on mean z-score
-and the signal-to-noise ratio of angles between gene pairs
+Select genes from a SingleCellExperiment object based on
+mean z-score and the signal-to-noise ratio of angles between gene pairs
+across batches.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item Checks if the input object is of class
-\code{\link{anglemania_object-class}}.
 \item Identifies gene pairs where both the mean z-score and SNR z-score
 exceed the specified thresholds.
 }
 
 The function performs the following steps:
 \enumerate{
-\item Checks if the input object is of class \code{\link{anglemania_object-class}}.
 \item If \code{max_n_genes} is not specified, it uses all genes that pass
 the thresholds.
 \item Identifies gene pairs where both the mean z-score and SNR z-score
@@ -89,9 +84,6 @@ exceed the specified thresholds.
 99th percentile values of the corresponding statistics and re-selects.
 \item Extracts unique genes from the selected gene pairs using
 \code{\link{extract_rows_for_unique_genes}}.
-\item Updates the \code{integration_genes} slot of the
-\code{anglemania_object}
-with the selected genes and their statistics.
 }
 
 The function combines the \code{geneA} and \code{geneB} columns, extracts
@@ -101,24 +93,18 @@ genes are returned.
 }
 \section{Functions}{
 \itemize{
-\item \code{prefilter_angl()}: Preselect genes from an
-\code{anglemania_object}
-based on z-score thresholds, to simplify downstream filtering.
+\item \code{prefilter_angl()}: Prefilter gene pairs from the mean and SNR z-scores
+based on thresholds, to simplify downstream filtering.
 
-\item \code{select_genes()}: Select genes from an \code{anglemania_object}
-based on z-score thresholds for mean and signal-to-noise
-ratio (SNR).
-Selects genes from an \code{\link{anglemania_object-class}} based on specified
-thresholds for the absolute mean z-score and signal-to-noise ratio
-(SNR) z-score. It updates the \code{integration_genes} slot of the
-\code{anglemania_object} with the selected genes and associated
-information.
+\item \code{select_genes()}: Select genes from the mean and SNR z-score matrices
+stored in the SCE based on thresholds for mean and SNR.
 
 \item \code{extract_rows_for_unique_genes()}: Extract unique gene identifiers
 from gene pairs, returning up to a specified maximum number.
 
 }}
 \examples{
+library(SingleCellExperiment)
 sce <- sce_example()
 sce <- anglemania(sce, batch_key = "batch")
 snr_zscore_matrix <- metadata(sce)$anglemania$list_stats$sn_zscore
@@ -162,7 +148,7 @@ print(unique_genes)
 }
 \seealso{
 \code{\link{extract_rows_for_unique_genes}},
-\code{\link{intersect_genes}}, \code{\link{list_stats}}
+\code{\link{get_intersect_genes}}, \code{\link{get_list_stats}}
 
 \code{\link{select_genes}}
 }

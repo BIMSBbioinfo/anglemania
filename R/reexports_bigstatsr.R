@@ -21,7 +21,7 @@ NULL
 #' intervals
 #' @export
 CutBySize <- function(m, block.size, nb = ceiling(m / block.size)) {
-  bigparallelr::split_len(m, nb_split = nb)
+    bigparallelr::split_len(m, nb_split = nb)
 }
 
 #' @describeIn adapted_reexports Adapted version of
@@ -40,53 +40,63 @@ CutBySize <- function(m, block.size, nb = ceiling(m / block.size)) {
 #' all.equal(crossp[], crossp_base)
 #' @export
 big_crossprodSelf_no_warning <- function(
-  X,
-  fun.scaling = big_scale_no_warning(center = FALSE, scale = FALSE),
-  ind.row = bigstatsr::rows_along(X),
-  ind.col = bigstatsr::cols_along(X),
-  block.size = bigstatsr::block_size(nrow(X)),
-  backingfile = tempfile(tmpdir = getOption("FBM.dir"))
+    X,
+    fun.scaling = big_scale_no_warning(center = FALSE, scale = FALSE),
+    ind.row = bigstatsr::rows_along(X),
+    ind.col = bigstatsr::cols_along(X),
+    block.size = bigstatsr::block_size(nrow(X)),
+    backingfile = tempfile(tmpdir = getOption("FBM.dir"))
 ) {
-  bigstatsr:::check_args()
+    bigstatsr:::check_args()
 
-  m <- length(ind.col)
-  K <- bigstatsr::FBM(m, m, backingfile = backingfile)
+    m <- length(ind.col)
+    K <- bigstatsr::FBM(m, m, backingfile = backingfile)
 
-  mu <- numeric(m)
-  delta <- numeric(m)
-  sums <- numeric(m)
+    mu <- numeric(m)
+    delta <- numeric(m)
+    sums <- numeric(m)
 
-  intervals <- CutBySize(m, block.size)
+    intervals <- CutBySize(m, block.size)
 
-  for (j in bigstatsr::rows_along(intervals)) {
-    ind1 <- bigparallelr::seq_range(intervals[j, ])
-    tmp1 <- X[ind.row, ind.col[ind1]]
+    for (j in bigstatsr::rows_along(intervals)) {
+        ind1 <- bigparallelr::seq_range(intervals[j, ])
+        tmp1 <- X[ind.row, ind.col[ind1]]
 
-    ms <- fun.scaling(X, ind.row = ind.row, ind.col = ind.col[ind1])
+        ms <- fun.scaling(
+            X,
+            ind.row = ind.row,
+            ind.col = ind.col[ind1]
+        )
 
-    mu[ind1] <- ms$center
-    delta[ind1] <- ms$scale
-    sums[ind1] <- colSums(tmp1)
+        mu[ind1] <- ms$center
+        delta[ind1] <- ms$scale
+        sums[ind1] <- colSums(tmp1)
 
-    K[ind1, ind1] <- crossprod(tmp1)
+        K[ind1, ind1] <- crossprod(tmp1)
 
-    next_lower <- intervals[j, "upper"] + 1L
-    if (next_lower <= m) {
-      ind2 <- next_lower:m
-      K.part <- bigstatsr::big_cprodMat(
-        X,
-        tmp1,
-        ind.row,
-        ind.col[ind2],
-        block.size = block.size
-      )
-      K[ind2, ind1] <- K.part
-      K[ind1, ind2] <- t(K.part)
+        next_lower <- intervals[j, "upper"] + 1L
+        if (next_lower <= m) {
+            ind2 <- next_lower:m
+            K.part <- bigstatsr::big_cprodMat(
+                X,
+                tmp1,
+                ind.row,
+                ind.col[ind2],
+                block.size = block.size
+            )
+            K[ind2, ind1] <- K.part
+            K[ind1, ind2] <- t(K.part)
+        }
     }
-  }
 
-  scaleK(K, sums = sums, mu = mu, delta = delta, nrow = length(ind.row))
-  structure(K, center = mu, scale = delta)
+    scaleK(
+        K,
+        sums = sums,
+        mu = mu,
+        delta = delta,
+        nrow = length(ind.row)
+    )
+    structure(K, center = mu, scale = delta)
 }
 
 #' @describeIn adapted_reexports Adapted version of
@@ -102,26 +112,30 @@ big_crossprodSelf_no_warning <- function(
 #' all.equal(cor[], cor_base)
 #' @export
 big_cor_no_warning <- function(
-  X,
-  ind.row = bigstatsr::rows_along(X),
-  ind.col = bigstatsr::cols_along(X),
-  block.size = bigstatsr::block_size(nrow(X)),
-  backingfile = tempfile(tmpdir = getOption("FBM.dir"))
-) {
-  cor.scaling <- function(X, ind.row, ind.col) {
-    ms <- big_scale_no_warning(center = TRUE, scale = TRUE)(X, ind.row, ind.col)
-    ms$scale <- ms$scale * sqrt(length(ind.row) - 1)
-    ms
-  }
-
-  big_crossprodSelf_no_warning(
     X,
-    fun.scaling = cor.scaling,
-    ind.row = ind.row,
-    ind.col = ind.col,
-    block.size = block.size,
-    backingfile = backingfile
-  )
+    ind.row = bigstatsr::rows_along(X),
+    ind.col = bigstatsr::cols_along(X),
+    block.size = bigstatsr::block_size(nrow(X)),
+    backingfile = tempfile(tmpdir = getOption("FBM.dir"))
+) {
+    cor.scaling <- function(X, ind.row, ind.col) {
+        ms <- big_scale_no_warning(center = TRUE, scale = TRUE)(
+            X,
+            ind.row,
+            ind.col
+        )
+        ms$scale <- ms$scale * sqrt(length(ind.row) - 1)
+        ms
+    }
+
+    big_crossprodSelf_no_warning(
+        X,
+        fun.scaling = cor.scaling,
+        ind.row = ind.row,
+        ind.col = ind.col,
+        block.size = block.size,
+        backingfile = backingfile
+    )
 }
 
 #' @describeIn adapted_reexports Adapted version of \code{bigstatsr::big_scale}
@@ -148,25 +162,30 @@ big_cor_no_warning <- function(
 #' scaled_mat[1:5, 1:5]
 #' @export
 big_scale_no_warning <- function(center = TRUE, scale = TRUE) {
-  function(
-    X,
-    ind.row = bigstatsr::rows_along(X),
-    ind.col = bigstatsr::cols_along(X),
-    ncores = 1
-  ) {
-    bigstatsr:::check_args()
+    function(
+        X,
+        ind.row = bigstatsr::rows_along(X),
+        ind.col = bigstatsr::cols_along(X),
+        ncores = 1
+    ) {
+        bigstatsr:::check_args()
 
-    m <- length(ind.col)
+        m <- length(ind.col)
 
-    if (center) {
-      stats <- bigstatsr::big_colstats(X, ind.row, ind.col, ncores = ncores)
-      means <- stats$sum / length(ind.row)
-      sds <- if (scale) sqrt(stats$var) else rep(1, m)
-    } else {
-      means <- rep(0, m)
-      sds <- rep(1, m)
+        if (center) {
+            stats <- bigstatsr::big_colstats(
+                X,
+                ind.row,
+                ind.col,
+                ncores = ncores
+            )
+            means <- stats$sum / length(ind.row)
+            sds <- if (scale) sqrt(stats$var) else rep(1, m)
+        } else {
+            means <- rep(0, m)
+            sds <- rep(1, m)
+        }
+
+        data.frame(center = means, scale = sds)
     }
-
-    data.frame(center = means, scale = sds)
-  }
 }

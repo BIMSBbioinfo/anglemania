@@ -28,8 +28,8 @@ A new \code{bigstatsr::FBM} object containing the mean values.
 
 A list containing three matrices: \code{mean_zscore},
 \code{sds_zscore}, and \code{sn_zscore} which are later used to
-filter gene pairs based on the absolute mean z-score and signal-to-noise ratio
-of the angles.
+filter gene pairs based on the absolute mean z-score and signal-to-noise
+ratio of the angles.
 }
 \description{
 A collection of utility functions used within the
@@ -46,7 +46,7 @@ min, and max of a correlation matrix stored as an
 of \code{bigstatsr::FBM} objects.
 
 \item \code{get_list_stats()}: Calculate mean, standard deviation, and SNR
-across a list of FBMs stored in an \code{anglemania_object}.
+across a list of FBMs.
 
 }}
 \examples{
