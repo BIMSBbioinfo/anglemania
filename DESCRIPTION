@@ -1,7 +1,7 @@
 Package: anglemania
 URL: https://github.com/BIMSBbioinfo/anglemania/
 Title: Feature Extraction for scRNA-seq Dataset Integration
-Version: 0.99.3
+Version: 0.99.4
 Description: anglemania extracts genes from multi-batch scRNA-seq experiments for downstream dataset integration. It shows improvement over the conventional usage of highly-variable genes for many integration tasks. We leverage gene-gene correlations that are stable across batches to identify biologically informative genes which are less affected by batch effects. Currently, its main use is for single-cell RNA-seq dataset integration, but it can be applied for other multi-batch downstream analyses such as NMF.
 Authors@R: c(
     person("Aaron", "Kollotzek", email = "aaron.kollotzek@mdc-berlin.de", role = c("aut", "cre"),
