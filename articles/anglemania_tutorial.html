@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">anglemania</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.99.5</span>
       </span>
     </div>
 
@@ -52,6 +52,9 @@
       <a href="../articles/anglemania_tutorial.html">anglemania Tutorial</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -98,7 +101,7 @@ Akalin</h4>
             <address class="author_afil">
       Max Delbrück Center for Molecular Medicine in the Helmholtz
 Association, Berlin, GermanyBerlin Institute for Medical Systems
-Biology, Berlin, Germany<br><h4 data-toc-skip class="date">2025-08-12</h4>
+Biology, Berlin, Germany<br><h4 data-toc-skip class="date">2025-09-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BIMSBbioinfo/anglemania/blob/master/vignettes/anglemania_tutorial.Rmd" class="external-link"><code>vignettes/anglemania_tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>anglemania_tutorial.Rmd</code></div>
@@ -120,16 +123,17 @@ low technical noise between the batches. Those genes are extracted from
 gene pairs that have an invariant and extremely narrow or wide angle
 between their expression vectors. Conventionally, highly-variable genes
 (HVGs) or sometimes all genes are used for integration tasks (<a href="https://www.nature.com/articles/s41592-021-01336-8" class="external-link uri">https://www.nature.com/articles/s41592-021-01336-8</a>).
-While HVGs are a great and easy way to reduce the noise ands
+While HVGs are a great and easy way to reduce the noise and
 dimensionality of the data, we hypothesize that there are better ways to
 select genes specifically for integration tasks. HVGs are sensitive to
 batch effects because the variance is a function of both the technical
 and biological variance. anglemania improves conventional usage of HVGs
 for integration tasks, especially when the transcriptional difference
-between cell types or cell states is subtle (showcased here with
-<code>de.facLoc</code> and <code>de.facScale</code> set to 0.1, which
-results in mild differences between “Groups”). The package can be used
-on top of <em><a href="https://bioconductor.org/packages/3.21/SingleCellExperiment" class="external-link">SingleCellExperiment</a></em>
+between cell types or cell states is subtle (showcased here using
+simulated data generated using <em><a href="https://bioconductor.org/packages/3.21/splatter" class="external-link">splatter</a></em>
+with <code>de.facLoc</code> and <code>de.facScale</code> set to 0.1,
+which results in mild differences between “Groups”). The package can be
+used on top of <em><a href="https://bioconductor.org/packages/3.21/SingleCellExperiment" class="external-link">SingleCellExperiment</a></em>
 or <em><a href="https://CRAN.R-project.org/package=Seurat" class="external-link">Seurat</a></em>
 objects.</p>
 <p>Under the hood, anglemania works with file-backed big matrices (FBMs)
@@ -423,6 +427,28 @@ integrated data using anglemania genes, top 300 HVGs and top 2000 HVGs.
 <span>    <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></span><span class="op">(</span><span class="va">upsetr_df</span>, text.scale <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">UpSetR</span> package.</span></span>
+<span><span class="co">##   Please report the issue to the authors.</span></span>
+<span><span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">UpSetR</span> package.</span></span>
+<span><span class="co">##   Please report the issue to the authors.</span></span>
+<span><span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
+<pre><code><span><span class="co">## Warning: The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">UpSetR</span> package.</span></span>
+<span><span class="co">##   Please report the issue to the authors.</span></span>
+<span><span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
 <div class="figure">
 <img src="anglemania_tutorial_files/figure-html/unnamed-chunk-4-1.png" alt="Overlap of selected genes. Additionally, we check the overlap of the anglemania genes with the HVGs. About 33 of the 306 anglemania genes are also found in the top 300 HVGs, and about 179 of the 306 anglemania genes are also found in the top 2000 HVGs." width="960"><p class="caption">
 Overlap of selected genes. Additionally, we check the overlap of the
@@ -441,19 +467,19 @@ genes are also found in the top 2000 HVGs.
 counts and metadata of the SeuratObject and then run anglemania on it
 and optionally save those genes as the VariableFeatures of the
 SeuratObject.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html" class="external-link">CreateSeuratObject</a></span><span class="op">(</span></span>
 <span>    counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sce_raw</span><span class="op">)</span>,</span>
 <span>    meta.data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce_raw</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Data is of class matrix. Coercing to dgCMatrix.</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">se</span></span></code></pre></div>
 <pre><code><span><span class="co">## An object of class Seurat </span></span>
 <span><span class="co">## 5000 features across 3600 samples within 1 assay </span></span>
 <span><span class="co">## Active assay: RNA (5000 features, 0 variable features)</span></span>
 <span><span class="co">##  1 layer present: counts</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">anglemania_genes</span> <span class="op">&lt;-</span> <span class="va">se</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://satijalab.org/seurat/reference/as.SingleCellExperiment.html" class="external-link">as.SingleCellExperiment</a></span><span class="op">(</span>assay <span class="op">=</span> <span class="st">"RNA"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/anglemania.html">anglemania</a></span><span class="op">(</span></span>
@@ -486,7 +512,7 @@ algorithms When finding the integration anchors, by default highly
 variable genes are used. Using the anchor.features argument, you can
 specify the genes to use for finding the integration anchors, in our
 case we are gonna use the anglemania genes.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Split by batch</span></span>
 <span><span class="va">seurat_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SplitObject.html" class="external-link">SplitObject</a></span><span class="op">(</span><span class="va">se</span>, split.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span></span>
 <span><span class="va">seurat_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">seurat_list</span>, <span class="va">NormalizeData</span><span class="op">)</span></span></code></pre></div>
@@ -494,14 +520,14 @@ case we are gonna use the anglemania genes.</p>
 <span><span class="co">## Normalizing layer: counts</span></span>
 <span><span class="co">## Normalizing layer: counts</span></span>
 <span><span class="co">## Normalizing layer: counts</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># if the Seurat FindIntegrationAnchors() function does not work,</span></span>
 <span><span class="co"># change this to the specified size:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>future.globals.maxSize <span class="op">=</span> <span class="fl">4000</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Finding integration anchors..."</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Finding integration anchors...</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">anchors_angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindIntegrationAnchors.html" class="external-link">FindIntegrationAnchors</a></span><span class="op">(</span></span>
 <span>    object.list <span class="op">=</span> <span class="va">seurat_list</span>,</span>
 <span>    anchor.features <span class="op">=</span> <span class="va">anglemania_genes</span>, <span class="co"># here we use the anglemania genes</span></span>
@@ -515,10 +541,10 @@ case we are gonna use the anglemania genes.</p>
 <span><span class="co">## <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">## <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">## <span style="color: #555555;">generated.</span></span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Integrating samples..."</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Integrating samples...</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">seurat_integrated_angl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/IntegrateData.html" class="external-link">IntegrateData</a></span><span class="op">(</span></span>
 <span>    anchorset <span class="op">=</span> <span class="va">anchors_angl</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -526,7 +552,7 @@ case we are gonna use the anglemania genes.</p>
 <pre><code><span><span class="co">## Warning: Layer counts isn't present in the assay object; returning NULL</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: Layer counts isn't present in the assay object; returning NULL</span></span>
 <span><span class="co">## Warning: Layer counts isn't present in the assay object; returning NULL</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">seurat_integrated_angl</span> <span class="op">&lt;-</span> <span class="va">seurat_integrated_angl</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html" class="external-link">ScaleData</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html" class="external-link">RunPCA</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -538,12 +564,12 @@ case we are gonna use the anglemania genes.</p>
 <div class="section level3">
 <h3 id="plot-1">Plot<a class="anchor" aria-label="anchor" href="#plot-1"></a>
 </h3>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_angl</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Batch"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Seurat integration using anglemania genes, colored by Batch"</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Seurat integration using\nanglemania genes\ncolored by Batch"</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_integrated_angl</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>, group.by <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Seurat integration using anglemania genes, colored by Group"</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Seurat integration using\nanglemania genes\ncolored by Group"</span><span class="op">)</span>,</span>
 <span>    ncol <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -560,7 +586,7 @@ anglemania genes for integration of a SeuratObject.
 <div class="section level3">
 <h3 id="normal-anglemania-workflow">Normal anglemania workflow<a class="anchor" aria-label="anchor" href="#normal-anglemania-workflow"></a>
 </h3>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sce_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="va">sce_raw</span></span>
 <span><span class="va">batch_key</span> <span class="op">&lt;-</span> <span class="st">"batch"</span></span>
@@ -604,7 +630,7 @@ standard deviation).</li>
 <div class="section level3">
 <h3 id="factorise">factorise<a class="anchor" aria-label="anchor" href="#factorise"></a>
 </h3>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">barcodes_by_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/splitAsList.html" class="external-link">split</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">[[</span><span class="va">batch_key</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">counts_by_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">barcodes_by_batch</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sce</span><span class="op">[</span>, <span class="va">x</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/anglemania_utils.html">sparse_to_fbm</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -621,14 +647,14 @@ standard deviation).</li>
 <span><span class="co">##  [8,]    3    3    3    3    5    4</span></span>
 <span><span class="co">##  [9,]    6    4    5    5    3    1</span></span>
 <span><span class="co">## [10,]    6    4    5    2    6    4</span></span></code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># we are working on FBMs (file-backed matrices</span></span>
 <span><span class="co"># implemented in the bigstatsr package)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">counts_by_batch</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "FBM"</span></span>
 <span><span class="co">## attr(,"package")</span></span>
 <span><span class="co">## [1] "bigstatsr"</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># factorise produces the correlation matrices transformed to z-scores</span></span>
 <span><span class="va">factorised</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">counts_by_batch</span>, <span class="va">factorise</span><span class="op">)</span></span>
 <span><span class="va">factorised</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
@@ -653,7 +679,7 @@ as input. The outputs are the mean zscore matrix
 <code>mean_zscore</code> and the signal-to-noise ratio matrix
 <code>sn_zscore</code>. These are stored in the metadata of the SCE
 object.</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">matrix_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">anglemania</span><span class="op">$</span><span class="va">matrix_list</span></span>
 <span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">anglemania</span><span class="op">$</span><span class="va">weights</span><span class="op">$</span><span class="va">weight</span>,</span>
@@ -666,10 +692,10 @@ object.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">list_stats</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "mean_zscore" "sds_zscore"  "sn_zscore"</span></span></code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">list_stats</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">list_stats</span><span class="op">$</span><span class="va">mean_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##              [,1]       [,2]       [,3]        [,4]        [,5]       [,6]</span></span>
 <span><span class="co">##  [1,]  0.00000000 -1.4773877 -0.6690115  0.80957395  0.21191114  0.3065459</span></span>
@@ -682,7 +708,7 @@ object.</p>
 <span><span class="co">##  [8,] -0.03868058 -1.0958225 -0.7680151 -0.62207485 -1.42724690 -0.8197054</span></span>
 <span><span class="co">##  [9,]  1.26715940  0.3486664 -0.5030029 -0.76152650 -0.66668260 -0.4825756</span></span>
 <span><span class="co">## [10,]  0.49115807  1.1467226  0.7976727 -0.27013900  0.03028304  0.8112288</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">list_stats</span><span class="op">$</span><span class="va">sn_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##            [,1]       [,2]      [,3]      [,4]        [,5]      [,6]</span></span>
 <span><span class="co">##  [1,]        NA 3.87928890 3.7213414 1.5550667  0.23116551 1.1093569</span></span>
@@ -695,7 +721,7 @@ object.</p>
 <span><span class="co">##  [8,] 0.1972052 2.70836022 1.0290168 1.1901274  1.60093202 0.7769169</span></span>
 <span><span class="co">##  [9,] 1.1991785 0.85301337 2.6746701 1.1487110  1.87190277 0.9452842</span></span>
 <span><span class="co">## [10,] 0.8240564 0.54672981 0.7297777 0.2970755  0.04424840 2.7762187</span></span></code></pre>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Or we can access them directly from the SCE object</span></span>
 <span><span class="co"># after running anglemania</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">anglemania</span><span class="op">$</span><span class="va">list_stats</span><span class="op">$</span><span class="va">mean_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
@@ -710,7 +736,7 @@ object.</p>
 <span><span class="co">##  [8,] -0.03868058 -1.0958225 -0.7680151 -0.62207485 -1.42724690 -0.8197054</span></span>
 <span><span class="co">##  [9,]  1.26715940  0.3486664 -0.5030029 -0.76152650 -0.66668260 -0.4825756</span></span>
 <span><span class="co">## [10,]  0.49115807  1.1467226  0.7976727 -0.27013900  0.03028304  0.8112288</span></span></code></pre>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">anglemania</span><span class="op">$</span><span class="va">list_stats</span><span class="op">$</span><span class="va">sn_zscore</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##            [,1]       [,2]      [,3]      [,4]        [,5]      [,6]</span></span>
 <span><span class="co">##  [1,]        NA 3.87928890 3.7213414 1.5550667  0.23116551 1.1093569</span></span>
@@ -736,7 +762,7 @@ object.</p>
 <li>we can use <code>select_genes</code> to change the thresholds
 without having to run anglemania again</li>
 </ul>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">previous_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anglemania_utils.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_genes.html">select_genes</a></span><span class="op">(</span></span>
 <span>    <span class="va">sce</span>,</span>
@@ -749,14 +775,14 @@ without having to run anglemania again</li>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">previous_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 25</span></span></code></pre>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">new_genes</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 194</span></span></code></pre>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.2 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -779,25 +805,25 @@ without having to run anglemania again</li>
 <span><span class="co">##  [1] future_1.67.0               UpSetR_1.4.0               </span></span>
 <span><span class="co">##  [3] batchelor_1.24.0            bluster_1.18.0             </span></span>
 <span><span class="co">##  [5] scran_1.36.0                scater_1.36.0              </span></span>
-<span><span class="co">##  [7] ggplot2_3.5.2               scuttle_1.18.0             </span></span>
+<span><span class="co">##  [7] ggplot2_4.0.0               scuttle_1.18.0             </span></span>
 <span><span class="co">##  [9] splatter_1.32.0             SingleCellExperiment_1.30.1</span></span>
 <span><span class="co">## [11] SummarizedExperiment_1.38.1 Biobase_2.68.0             </span></span>
-<span><span class="co">## [13] GenomicRanges_1.60.0        GenomeInfoDb_1.44.1        </span></span>
+<span><span class="co">## [13] GenomicRanges_1.60.0        GenomeInfoDb_1.44.2        </span></span>
 <span><span class="co">## [15] IRanges_2.42.0              S4Vectors_0.46.0           </span></span>
 <span><span class="co">## [17] BiocGenerics_0.54.0         generics_0.1.4             </span></span>
 <span><span class="co">## [19] MatrixGenerics_1.20.0       matrixStats_1.5.0          </span></span>
-<span><span class="co">## [21] Seurat_5.3.0                SeuratObject_5.1.0         </span></span>
+<span><span class="co">## [21] Seurat_5.3.0                SeuratObject_5.2.0         </span></span>
 <span><span class="co">## [23] sp_2.2-0                    dplyr_1.1.4                </span></span>
-<span><span class="co">## [25] anglemania_0.99.4           BiocStyle_2.36.0           </span></span>
+<span><span class="co">## [25] anglemania_0.99.5           BiocStyle_2.36.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##   [1] RcppAnnoy_0.0.22          splines_4.5.1            </span></span>
-<span><span class="co">##   [3] later_1.4.2               tibble_3.3.0             </span></span>
+<span><span class="co">##   [3] later_1.4.4               tibble_3.3.0             </span></span>
 <span><span class="co">##   [5] polyclip_1.10-7           fastDummies_1.7.5        </span></span>
 <span><span class="co">##   [7] lifecycle_1.0.4           edgeR_4.6.3              </span></span>
 <span><span class="co">##   [9] doParallel_1.0.17         globals_0.18.0           </span></span>
 <span><span class="co">##  [11] lattice_0.22-7            MASS_7.3-65              </span></span>
-<span><span class="co">##  [13] backports_1.5.0           magrittr_2.0.3           </span></span>
+<span><span class="co">##  [13] backports_1.5.0           magrittr_2.0.4           </span></span>
 <span><span class="co">##  [15] limma_3.64.3              plotly_4.11.0            </span></span>
 <span><span class="co">##  [17] sass_0.4.10               rmarkdown_2.29           </span></span>
 <span><span class="co">##  [19] jquerylib_0.1.4           yaml_2.3.10              </span></span>
@@ -821,53 +847,54 @@ without having to run anglemania again</li>
 <span><span class="co">##  [55] ScaledMatrix_1.16.0       bigstatsr_1.6.2          </span></span>
 <span><span class="co">##  [57] spatstat.explore_3.5-2    flock_0.7                </span></span>
 <span><span class="co">##  [59] jsonlite_2.0.0            BiocNeighbors_2.2.0      </span></span>
-<span><span class="co">##  [61] progressr_0.15.1          ggridges_0.5.6           </span></span>
+<span><span class="co">##  [61] progressr_0.15.1          ggridges_0.5.7           </span></span>
 <span><span class="co">##  [63] survival_3.8-3            iterators_1.0.14         </span></span>
 <span><span class="co">##  [65] systemfonts_1.2.3         foreach_1.5.2            </span></span>
-<span><span class="co">##  [67] tools_4.5.1               ragg_1.4.0               </span></span>
+<span><span class="co">##  [67] tools_4.5.1               ragg_1.5.0               </span></span>
 <span><span class="co">##  [69] ica_1.0-3                 Rcpp_1.1.0               </span></span>
 <span><span class="co">##  [71] glue_1.8.0                gridExtra_2.3            </span></span>
-<span><span class="co">##  [73] SparseArray_1.8.1         xfun_0.52                </span></span>
+<span><span class="co">##  [73] SparseArray_1.8.1         xfun_0.53                </span></span>
 <span><span class="co">##  [75] withr_3.0.2               BiocManager_1.30.26      </span></span>
 <span><span class="co">##  [77] fastmap_1.2.0             rsvd_1.0.5               </span></span>
 <span><span class="co">##  [79] digest_0.6.37             R6_2.6.1                 </span></span>
-<span><span class="co">##  [81] mime_0.13                 textshaping_1.0.1        </span></span>
+<span><span class="co">##  [81] mime_0.13                 textshaping_1.0.3        </span></span>
 <span><span class="co">##  [83] scattermore_1.2           tensor_1.5.1             </span></span>
-<span><span class="co">##  [85] spatstat.data_3.1-6       tidyr_1.3.1              </span></span>
+<span><span class="co">##  [85] spatstat.data_3.1-8       tidyr_1.3.1              </span></span>
 <span><span class="co">##  [87] data.table_1.17.8         FNN_1.1.4.1              </span></span>
 <span><span class="co">##  [89] httr_1.4.7                htmlwidgets_1.6.4        </span></span>
 <span><span class="co">##  [91] S4Arrays_1.8.1            uwot_0.2.3               </span></span>
 <span><span class="co">##  [93] pkgconfig_2.0.3           gtable_0.3.6             </span></span>
-<span><span class="co">##  [95] lmtest_0.9-40             XVector_0.48.0           </span></span>
-<span><span class="co">##  [97] htmltools_0.5.8.1         dotCall64_1.2            </span></span>
-<span><span class="co">##  [99] bookdown_0.43             scales_1.4.0             </span></span>
-<span><span class="co">## [101] png_0.1-8                 spatstat.univar_3.1-4    </span></span>
-<span><span class="co">## [103] knitr_1.50                reshape2_1.4.4           </span></span>
-<span><span class="co">## [105] checkmate_2.3.2           nlme_3.1-168             </span></span>
-<span><span class="co">## [107] cachem_1.1.0              zoo_1.8-14               </span></span>
-<span><span class="co">## [109] stringr_1.5.1             rmio_0.4.0               </span></span>
-<span><span class="co">## [111] KernSmooth_2.23-26        vipor_0.4.7              </span></span>
-<span><span class="co">## [113] parallel_4.5.1            miniUI_0.1.2             </span></span>
-<span><span class="co">## [115] desc_1.4.3                pillar_1.11.0            </span></span>
-<span><span class="co">## [117] grid_4.5.1                vctrs_0.6.5              </span></span>
-<span><span class="co">## [119] RANN_2.6.2                promises_1.3.3           </span></span>
-<span><span class="co">## [121] BiocSingular_1.24.0       ff_4.5.2                 </span></span>
-<span><span class="co">## [123] beachmat_2.24.0           xtable_1.8-4             </span></span>
-<span><span class="co">## [125] cluster_2.1.8.1           beeswarm_0.4.0           </span></span>
-<span><span class="co">## [127] evaluate_1.0.4            cli_3.6.5                </span></span>
-<span><span class="co">## [129] locfit_1.5-9.12           compiler_4.5.1           </span></span>
-<span><span class="co">## [131] rlang_1.1.6               crayon_1.5.3             </span></span>
-<span><span class="co">## [133] future.apply_1.20.0       labeling_0.4.3           </span></span>
-<span><span class="co">## [135] ps_1.9.1                  ggbeeswarm_0.7.2         </span></span>
-<span><span class="co">## [137] plyr_1.8.9                fs_1.6.6                 </span></span>
-<span><span class="co">## [139] stringi_1.8.7             viridisLite_0.4.2        </span></span>
-<span><span class="co">## [141] deldir_2.0-4              BiocParallel_1.42.1      </span></span>
-<span><span class="co">## [143] lazyeval_0.2.2            spatstat.geom_3.5-0      </span></span>
-<span><span class="co">## [145] Matrix_1.7-3              RcppHNSW_0.6.0           </span></span>
-<span><span class="co">## [147] patchwork_1.3.1           sparseMatrixStats_1.20.0 </span></span>
-<span><span class="co">## [149] statmod_1.5.0             shiny_1.11.1             </span></span>
-<span><span class="co">## [151] ROCR_1.0-11               igraph_2.1.4             </span></span>
-<span><span class="co">## [153] bslib_0.9.0               bit_4.6.0</span></span></code></pre>
+<span><span class="co">##  [95] lmtest_0.9-40             S7_0.2.0                 </span></span>
+<span><span class="co">##  [97] XVector_0.48.0            htmltools_0.5.8.1        </span></span>
+<span><span class="co">##  [99] dotCall64_1.2             bookdown_0.44            </span></span>
+<span><span class="co">## [101] scales_1.4.0              png_0.1-8                </span></span>
+<span><span class="co">## [103] spatstat.univar_3.1-4     knitr_1.50               </span></span>
+<span><span class="co">## [105] reshape2_1.4.4            checkmate_2.3.3          </span></span>
+<span><span class="co">## [107] nlme_3.1-168              cachem_1.1.0             </span></span>
+<span><span class="co">## [109] zoo_1.8-14                stringr_1.5.2            </span></span>
+<span><span class="co">## [111] rmio_0.4.0                KernSmooth_2.23-26       </span></span>
+<span><span class="co">## [113] vipor_0.4.7               parallel_4.5.1           </span></span>
+<span><span class="co">## [115] miniUI_0.1.2              desc_1.4.3               </span></span>
+<span><span class="co">## [117] pillar_1.11.0             grid_4.5.1               </span></span>
+<span><span class="co">## [119] vctrs_0.6.5               RANN_2.6.2               </span></span>
+<span><span class="co">## [121] promises_1.3.3            BiocSingular_1.24.0      </span></span>
+<span><span class="co">## [123] ff_4.5.2                  beachmat_2.24.0          </span></span>
+<span><span class="co">## [125] xtable_1.8-4              cluster_2.1.8.1          </span></span>
+<span><span class="co">## [127] beeswarm_0.4.0            evaluate_1.0.5           </span></span>
+<span><span class="co">## [129] cli_3.6.5                 locfit_1.5-9.12          </span></span>
+<span><span class="co">## [131] compiler_4.5.1            rlang_1.1.6              </span></span>
+<span><span class="co">## [133] crayon_1.5.3              future.apply_1.20.0      </span></span>
+<span><span class="co">## [135] labeling_0.4.3            ps_1.9.1                 </span></span>
+<span><span class="co">## [137] ggbeeswarm_0.7.2          plyr_1.8.9               </span></span>
+<span><span class="co">## [139] fs_1.6.6                  stringi_1.8.7            </span></span>
+<span><span class="co">## [141] viridisLite_0.4.2         deldir_2.0-4             </span></span>
+<span><span class="co">## [143] BiocParallel_1.42.2       lazyeval_0.2.2           </span></span>
+<span><span class="co">## [145] spatstat.geom_3.5-0       Matrix_1.7-3             </span></span>
+<span><span class="co">## [147] RcppHNSW_0.6.0            patchwork_1.3.2          </span></span>
+<span><span class="co">## [149] sparseMatrixStats_1.20.0  statmod_1.5.0            </span></span>
+<span><span class="co">## [151] shiny_1.11.1              ROCR_1.0-11              </span></span>
+<span><span class="co">## [153] igraph_2.1.4              bslib_0.9.0              </span></span>
+<span><span class="co">## [155] bit_4.6.0</span></span></code></pre>
 </div>
 </div>
   </div>
