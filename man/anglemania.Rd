@@ -118,10 +118,11 @@ A character vector of intersected genes.
 }
 \description{
 \code{anglemania} computes critical angles between genes across all samples
-provided in an \code{\link{SingleCellExperiment}}. It calculates angles,
-transforms them to z-scores, computes statistical measures, and selects
-genes based on specified thresholds. These genes are biologically
-informative and invariant to batch effects.
+provided in an
+\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}
+object. It calculates angles, transforms them to z-scores, computes
+statistical measures, and selects genes based on specified thresholds.
+These genes are biologically informative and invariant to batch effects.
 
 This function adds a unique batch identifier to the metadata of a
 \code{SingleCellExperiment} object by combining specified dataset and batch

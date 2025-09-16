@@ -42,14 +42,15 @@ technical noise between the batches. Those genes are extracted from gene pairs
 that have an invariant and extremely narrow or wide angle between their expression vectors.
 Conventionally, highly-variable genes (HVGs) or sometimes all genes are used
 for integration tasks (https://www.nature.com/articles/s41592-021-01336-8).
-While HVGs are a great and easy way to reduce the noise ands
+While HVGs are a great and easy way to reduce the noise and
 dimensionality of the data, we hypothesize that there are better ways to select genes
 specifically for integration tasks. HVGs are sensitive to batch effects because the
 variance is a function of both the technical and biological variance.
 anglemania improves conventional usage of HVGs for integration tasks, 
 especially when the transcriptional difference between cell types or cell states 
-is subtle (showcased here with `de.facLoc` and `de.facScale` set to 0.1, which 
-results in mild differences between "Groups").
+is subtle (showcased here using simulated data generated using `r Biocpkg("splatter")`
+with `de.facLoc` and `de.facScale` set to 0.1, which results in mild differences between 
+"Groups").
 The package can be used on top of `r Biocpkg("SingleCellExperiment")` or
 `r CRANpkg("Seurat")` objects.
 
@@ -369,9 +370,9 @@ seurat_integrated_angl <- seurat_integrated_angl %>%
 ```{r, fig.cap = "UMAPs of Seurat integrated data. Here we show that we can use the anglemania genes for integration of a SeuratObject.", fig.wide = TRUE, fig.width = 10}
 patchwork::wrap_plots(
     DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Batch") +
-        ggtitle("Seurat integration using anglemania genes, colored by Batch"),
+        ggtitle("Seurat integration using\nanglemania genes\ncolored by Batch"),
     DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Group") +
-        ggtitle("Seurat integration using anglemania genes, colored by Group"),
+        ggtitle("Seurat integration using\nanglemania genes\ncolored by Group"),
     ncol = 2
 )
 ```

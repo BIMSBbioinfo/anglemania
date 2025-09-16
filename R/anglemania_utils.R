@@ -81,6 +81,7 @@ replace_with_na <- function(v) {
 #'   This function modifies the input `x_mat` by reference.
 #'
 #' @importFrom bigstatsr big_apply
+#' @importFrom stats lm residuals
 #' @importFrom checkmate assertChoice assertClass
 #' @examples
 #' library(bigstatsr)

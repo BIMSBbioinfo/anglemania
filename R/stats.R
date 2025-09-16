@@ -17,6 +17,7 @@ NULL
 #' @return A list with statistical measures including \code{mean}, \code{sd},
 #'   \code{var}, \code{min}, and \code{max}.
 #' @importFrom bigstatsr big_apply
+#' @importFrom stats setNames
 #' @examples
 #' s_mat <- Matrix::rsparsematrix(nrow = 10, ncol = 5, density = 0.3)
 #' fbm_mat <- sparse_to_fbm(s_mat)

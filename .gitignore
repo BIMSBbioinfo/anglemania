@@ -18,6 +18,5 @@ vignettes/*_files
 *.so
 *.dll
 *.a
-.DS_Store
 air.toml
 /Meta/
