@@ -60,9 +60,11 @@ efficient computation.
 
 ```{r, load libraries}
 suppressPackageStartupMessages({
-    library(anglemania)
+    # library(anglemania)
+    devtools::load_all()
     library(dplyr)
     library(Seurat)
+    options(Seurat.object.assay.version = "v5")
     library(splatter)
     library(SingleCellExperiment)
     library(scater)
@@ -297,7 +299,7 @@ patchwork::wrap_plots(
 ```
 
 ### Overlap
-```{r, fig.cap = "Overlap of selected genes. Additionally, we check the overlap of the anglemania genes with the HVGs. About 33 of the 306 anglemania genes are also found in the top 300 HVGs, and about 179 of the 306 anglemania genes are also found in the top 2000 HVGs.", fig.width = 10, fig.height = 8, fig.wide = TRUE}
+```{r, fig.cap = "Overlap of selected genes. Additionally, we check the overlap of the anglemania genes with the HVGs. About 33 of the 306 anglemania genes are also found in the top 300 HVGs, and about 179 of the 306 anglemania genes are also found in the top 2000 HVGs.", fig.width = 10, fig.height = 8, fig.wide = TRUE, message = FALSE, warning = FALSE}
 upsetr_df <- fromList(
     list(
         anglemania = anglemania_genes,
@@ -309,10 +311,11 @@ upset(upsetr_df, text.scale = 2)
 ```
 
 # Seurat
+Now you can just use the anglemania genes for other integration algorithms.
 When using Seurat, the easiest approach is to create an SCE from the counts and metadata
-of the SeuratObject and then run anglemania on it and optionally save those genes as the
+of the SeuratObject, then run anglemania on it and save those genes as the
 VariableFeatures of the SeuratObject.
-```{r, message = FALSE}
+```{r, message = FALSE, warning = FALSE}
 se <- CreateSeuratObject(
     counts = counts(sce_raw),
     meta.data = as.data.frame(colData(sce_raw))
@@ -330,48 +333,44 @@ anglemania_genes <- se |>
 
 
 ## Integration
-Now you can also just use the anglemania genes for other integration algorithms
-When finding the integration anchors, by default highly variable genes are used.
-Using the anchor.features argument, you can specify the genes to use for finding
-the integration anchors, in our case we are gonna use the anglemania genes.
-```{r}
+In Seurat v5 you split the layers of an assay by batch and then run the normal
+Seurat workflow. To use anglemania genes for integration, you need to assign them 
+to the VariableFeatures slot of the SeuratObject. After that, you integrate the layers 
+using the anglemania genes as the `features` argument.
+```{r, Seurat Integration v5, message = FALSE, warning = FALSE}
 # Split by batch
-seurat_list <- SplitObject(se, split.by = "Batch")
-seurat_list <- lapply(seurat_list, NormalizeData)
-```
+se[["RNA"]] <- split(se[["RNA"]], f = se$Batch)
 
+# Standard preprocessing but use anglemania genes as "VariableFeatures"
+se <- NormalizeData(se, verbose = FALSE)
+VariableFeatures(se) <- anglemania_genes
+se <- se |>
+    ScaleData(verbose = FALSE) |>
+    RunPCA(verbose = FALSE)
 
-```{r, integration option 1}
-# if the Seurat FindIntegrationAnchors() function does not work,
-# change this to the specified size:
-options(future.globals.maxSize = 4000 * 1024^2)
-
-message("Finding integration anchors...")
-anchors_angl <- FindIntegrationAnchors(
-    object.list = seurat_list,
-    anchor.features = anglemania_genes, # here we use the anglemania genes
-    verbose = FALSE,
-    reduction = "cca"
-)
-message("Integrating samples...")
-
-seurat_integrated_angl <- IntegrateData(
-    anchorset = anchors_angl,
+# Integrate
+se <- IntegrateLayers(
+    object = se,
+    method = CCAIntegration,
+    orig.reduction = "pca",
+    new.reduction = "integrated.cca",
+    features = anglemania_genes,
     verbose = FALSE
 )
-seurat_integrated_angl <- seurat_integrated_angl %>%
-    ScaleData(verbose = FALSE) %>%
-    RunPCA(verbose = FALSE) %>%
-    RunUMAP(dims = 1:30, verbose = FALSE)
+se <- RunUMAP(se, dims = 1:30, reduction = "integrated.cca", verbose = FALSE)
+se
 ```
+
+
+
 
 
 ## Plot
 ```{r, fig.cap = "UMAPs of Seurat integrated data. Here we show that we can use the anglemania genes for integration of a SeuratObject.", fig.wide = TRUE, fig.width = 10}
 patchwork::wrap_plots(
-    DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Batch") +
+    DimPlot(se, reduction = "umap", group.by = "Batch") +
         ggtitle("Seurat integration using\nanglemania genes\ncolored by Batch"),
-    DimPlot(seurat_integrated_angl, reduction = "umap", group.by = "Group") +
+    DimPlot(se, reduction = "umap", group.by = "Group") +
         ggtitle("Seurat integration using\nanglemania genes\ncolored by Group"),
     ncol = 2
 )
@@ -471,6 +470,8 @@ length(previous_genes)
 length(new_genes)
 ```
 
+
+# sessionInfo
 ```{r}
 sessionInfo()
 ```
