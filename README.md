@@ -38,7 +38,7 @@ BiocManager::install("anglemania", version="devel")
 
 ## Documentation
 
-Comprehensive documentation is available on our [[anglemania website](https://bioinformatics.mdc-berlin.de/anglemania)]
+Comprehensive documentation is available on our [anglemania website](https://bioinformatics.mdc-berlin.de/anglemania)
 Or visit the [Bioconductor package page](https://bioconductor.org/packages/anglemania).
 
 ## Getting Help
@@ -55,7 +55,7 @@ Artistic License/GPL
 
 If you use **anglemania** in your research, please cite:
 
-> Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin(2024). *anglemania: Feature Extraction for scRNA-seq Dataset Integration. R package version 0.99.0
+> Aaron Kollotzek, Vedran Franke, Artem Baranovskii, Altuna Akalin(2024). *anglemania: Feature Extraction for scRNA-seq Dataset Integration. R package version 0.99.6
 
 
 
