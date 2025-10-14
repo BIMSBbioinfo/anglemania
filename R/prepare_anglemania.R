@@ -9,8 +9,6 @@
 #'   sce,
 #'   batch_key = "batch",
 #'   dataset_key = "dataset",
-#'   zscore_mean_threshold = 2.5,
-#'   zscore_sn_threshold = 2.5,
 #'   max_n_genes = 2000,
 #'   method = "cosine",
 #'   min_cells_per_gene = 1,
@@ -28,8 +26,6 @@ check_params <- function(
     sce,
     batch_key,
     dataset_key,
-    zscore_mean_threshold,
-    zscore_sn_threshold,
     max_n_genes,
     method,
     min_cells_per_gene,
@@ -100,14 +96,6 @@ check_params <- function(
             "the cells belong to"
         )
     }
-    # zscore_mean_threshold
-    checkmate::assert_numeric(
-        zscore_mean_threshold,
-        lower = 0,
-        len = 1
-    )
-    # zscore_sn_threshold
-    checkmate::assert_numeric(zscore_sn_threshold, lower = 0, len = 1)
     # max_n_genes
     checkmate::assert_integerish(
         max_n_genes,
@@ -159,8 +147,6 @@ check_params <- function(
     return(list(
         batch_key = batch_key,
         dataset_key = dataset_key,
-        zscore_mean_threshold = zscore_mean_threshold,
-        zscore_sn_threshold = zscore_sn_threshold,
         max_n_genes = max_n_genes,
         method = method,
         min_cells_per_gene = min_cells_per_gene,

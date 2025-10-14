@@ -9,23 +9,28 @@ using std::size_t;
 // [[Rcpp::export]]
 DataFrame select_genes_cpp(Environment BM_sn,
                            Environment BM_mean,
+                           Environment BM_sd,
                            double zscore_sn_threshold,
                            double zscore_mean_threshold) {
   // Retrieve FBM pointers (using the "address_rw" slot)
   XPtr<FBM_RW> xpBM_sn = BM_sn["address_rw"];
   XPtr<FBM_RW> xpBM_mean = BM_mean["address_rw"];
+  XPtr<FBM_RW> xpBM_sd = BM_sd["address_rw"];
   
-  if (xpBM_sn->matrix_type() != 8 || xpBM_mean->matrix_type() != 8)
+  if (xpBM_sn->matrix_type() != 8 || xpBM_mean->matrix_type() != 8 || xpBM_sd->matrix_type() != 8)
     stop("Only FBMs with double type are supported.");
   
   BMAcc_RW<double> sn_acc(xpBM_sn);
   BMAcc_RW<double> mean_acc(xpBM_mean);
+  BMAcc_RW<double> sd_acc(xpBM_sd);
   
   size_t n = sn_acc.nrow();
   if (sn_acc.ncol() != n)
     stop("The sn_zscore FBM must be square.");
   if (mean_acc.nrow() != n || mean_acc.ncol() != n)
     stop("The mean_zscore FBM must be square and match dimensions with sn_zscore.");
+  if (sd_acc.nrow() != n || sd_acc.ncol() != n)
+    stop("The sd_zscore FBM must be square and match dimensions with sn_zscore.");
   
   // First pass: Count the number of pairs that pass the thresholds
   size_t count = 0;
@@ -46,7 +51,7 @@ DataFrame select_genes_cpp(Environment BM_sn,
   IntegerVector cols(count);
   NumericVector sn_vals(count);
   NumericVector mean_vals(count);
-  
+  NumericVector sd_vals(count);  
   // Second pass: Fill in the vectors
   size_t k = 0;
   for (size_t i = 0; i < n; i++) {
@@ -60,6 +65,7 @@ DataFrame select_genes_cpp(Environment BM_sn,
           cols[k] = j + 1;
           sn_vals[k] = sn_val;
           mean_vals[k] = mean_val;
+          sd_vals[k] = sd_acc(i, j);
           k++;
         }
       }
@@ -71,7 +77,8 @@ DataFrame select_genes_cpp(Environment BM_sn,
     _["geneA"]  = rows,
     _["geneB"]  = cols,
     _["sn_zscore"]   = sn_vals,
-    _["mean_zscore"] = mean_vals
+    _["mean_zscore"] = mean_vals,
+    _["sd_zscore"] = sd_vals
   );
   
   return df;

@@ -11,16 +11,17 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // select_genes_cpp
-DataFrame select_genes_cpp(Environment BM_sn, Environment BM_mean, double zscore_sn_threshold, double zscore_mean_threshold);
-RcppExport SEXP _anglemania_select_genes_cpp(SEXP BM_snSEXP, SEXP BM_meanSEXP, SEXP zscore_sn_thresholdSEXP, SEXP zscore_mean_thresholdSEXP) {
+DataFrame select_genes_cpp(Environment BM_sn, Environment BM_mean, Environment BM_sd, double zscore_sn_threshold, double zscore_mean_threshold);
+RcppExport SEXP _anglemania_select_genes_cpp(SEXP BM_snSEXP, SEXP BM_meanSEXP, SEXP BM_sdSEXP, SEXP zscore_sn_thresholdSEXP, SEXP zscore_mean_thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Environment >::type BM_sn(BM_snSEXP);
     Rcpp::traits::input_parameter< Environment >::type BM_mean(BM_meanSEXP);
+    Rcpp::traits::input_parameter< Environment >::type BM_sd(BM_sdSEXP);
     Rcpp::traits::input_parameter< double >::type zscore_sn_threshold(zscore_sn_thresholdSEXP);
     Rcpp::traits::input_parameter< double >::type zscore_mean_threshold(zscore_mean_thresholdSEXP);
-    rcpp_result_gen = Rcpp::wrap(select_genes_cpp(BM_sn, BM_mean, zscore_sn_threshold, zscore_mean_threshold));
+    rcpp_result_gen = Rcpp::wrap(select_genes_cpp(BM_sn, BM_mean, BM_sd, zscore_sn_threshold, zscore_mean_threshold));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -40,7 +41,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_anglemania_select_genes_cpp", (DL_FUNC) &_anglemania_select_genes_cpp, 4},
+    {"_anglemania_select_genes_cpp", (DL_FUNC) &_anglemania_select_genes_cpp, 5},
     {"_anglemania_scaleK", (DL_FUNC) &_anglemania_scaleK, 5},
     {NULL, NULL, 0}
 };

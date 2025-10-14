@@ -4,11 +4,10 @@
 \alias{select_genes}
 \alias{prefilter_angl}
 \alias{extract_rows_for_unique_genes}
-\title{Select genes}
+\title{Select genes from an anglemania-processed SCE}
 \usage{
 prefilter_angl(
-  snr_zscore_matrix,
-  mean_zscore_matrix,
+  sce,
   zscore_mean_threshold = 1,
   zscore_sn_threshold = 1,
   verbose = TRUE
@@ -16,39 +15,32 @@ prefilter_angl(
 
 select_genes(
   sce,
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2,
-  max_n_genes = NULL,
-  direction = "both",
-  adjust_thresholds = TRUE,
+  max_n_genes = 2000,
+  score_weights = c(0.4, 0.6),
   verbose = TRUE
 )
 
 extract_rows_for_unique_genes(dt, max_n_genes)
 }
 \arguments{
-\item{snr_zscore_matrix}{A \code{bigstatsr::FBM} object containing the SNR
-z-scores.}
-
-\item{mean_zscore_matrix}{A \code{bigstatsr::FBM} object containing the mean
-z-scores.}
+\item{sce}{A \code{SingleCellExperiment} object.}
 
 \item{zscore_mean_threshold}{Numeric value specifying the threshold for the
-absolute mean z-score. Default is 2.}
+absolute mean z-score. Default is 1.}
 
 \item{zscore_sn_threshold}{Numeric value specifying the threshold for the
-SNR z-score. Default is 2.}
+SNR z-score. Default is 1.}
 
-\item{sce}{A \code{SingleCellExperiment} object.}
+\item{verbose}{Logical value indicating whether to print progress messages.
+Default is \code{TRUE}.}
 
 \item{max_n_genes}{An integer specifying the maximum number of unique genes
 to return.}
 
-\item{direction}{whether to select genes with positive, negative or both
-mean z-scores. Default is "both"}
-
-\item{adjust_thresholds}{whether to automatically adjust threholds if the
-selected genes do not meet the thresholds. Default is TRUE}
+\item{score_weights}{A vector of two numeric values specifying the weights
+for the mean z-score and standard deviation of z-score, respectively.
+Default is \code{c(0.4, 0.6)} for a greater emphasis on the standard
+deviation of z-score.}
 
 \item{dt}{A data frame containing gene pairs, with columns \code{geneA}
 and \code{geneB}.}
@@ -56,8 +48,8 @@ and \code{geneB}.}
 \value{
 A data frame containing the prefiltered gene pairs.
 
-The input \code{anglemaniaObject} with the
-\code{integration_genes} slot updated to include the selected genes and
+The input \code{SingleCellExperiment} object with the
+\code{anglemania_genes} slot updated to include the selected genes and
 their statistical information.
 
 A vector of unique gene identifiers.
@@ -74,17 +66,8 @@ The function performs the following steps:
 exceed the specified thresholds.
 }
 
-The function performs the following steps:
-\enumerate{
-\item If \code{max_n_genes} is not specified, it uses all genes that pass
-the thresholds.
-\item Identifies gene pairs where both the mean z-score and SNR z-score
-exceed the specified thresholds.
-\item If no gene pairs meet the criteria, it adjusts the thresholds to the
-99th percentile values of the corresponding statistics and re-selects.
-\item Extracts unique genes from the selected gene pairs using
-\code{\link{extract_rows_for_unique_genes}}.
-}
+Selects the top n genes based on the weighted sum of the ranked mean
+and standard deviation of the z-score of the correlations between gene pairs.
 
 The function combines the \code{geneA} and \code{geneB} columns, extracts
 unique gene names, and returns the first \code{max_n_genes} genes. If
@@ -96,8 +79,8 @@ genes are returned.
 \item \code{prefilter_angl()}: Prefilter gene pairs from the mean and SNR z-scores
 based on thresholds, to simplify downstream filtering.
 
-\item \code{select_genes()}: Select genes from the mean and SNR z-score matrices
-stored in the SCE based on thresholds for mean and SNR.
+\item \code{select_genes()}: Select the top n genes on the weighted sum
+of the ranks of the mean z-score and SNR z-score of the gene pairs.
 
 \item \code{extract_rows_for_unique_genes()}: Extract unique gene identifiers
 from gene pairs, returning up to a specified maximum number.
@@ -107,31 +90,25 @@ from gene pairs, returning up to a specified maximum number.
 library(SingleCellExperiment)
 sce <- sce_example()
 sce <- anglemania(sce, batch_key = "batch")
-snr_zscore_matrix <- metadata(sce)$anglemania$list_stats$sn_zscore
-mean_zscore_matrix <- metadata(sce)$anglemania$list_stats$mean_zscore
 prefiltered_df <- prefilter_angl(
-  snr_zscore_matrix,
-  mean_zscore_matrix,
+  sce,
   zscore_mean_threshold = 1,
   zscore_sn_threshold = 1
 )
 head(prefiltered_df)
 sce <- sce_example()
 sce <- anglemania(
-  sce,
-  batch_key = "batch",
-  zscore_mean_threshold = 2.5,
-  zscore_sn_threshold = 2.5
+    sce,
+    batch_key = "batch",
+    max_n_genes = 20
 )
 anglemania_genes <- get_anglemania_genes(sce)
 # View the selected genes and use for integration
 head(anglemania_genes)
 length(anglemania_genes)
-# Adjust thresholds to 2 and select genes
 sce <- select_genes(
-  sce,
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2
+    sce,
+    max_n_genes = 10
 )
 anglemania_genes <- get_anglemania_genes(sce)
 head(anglemania_genes)

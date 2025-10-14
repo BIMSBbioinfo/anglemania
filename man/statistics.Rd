@@ -75,8 +75,8 @@ sce <- sce_example()
 sce <- anglemania(sce, batch_key = "batch")
 matrix_list <- metadata(sce)$anglemania$matrix_list
 weights <- setNames(
-  S4Vectors::metadata(sce)$anglemania$weights$weight,
-  S4Vectors::metadata(sce)$anglemania$weights$anglemania_batch
+  S4Vectors::metadata(sce)$anglemania$params$dataset_weights$weight,
+  S4Vectors::metadata(sce)$anglemania$params$dataset_weights$anglemania_batch
 )
 list_stats <- get_list_stats(matrix_list, weights)
 names(list_stats)

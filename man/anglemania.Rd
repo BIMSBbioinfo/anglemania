@@ -11,12 +11,10 @@ anglemania(
   sce,
   batch_key,
   dataset_key = NA_character_,
+  max_n_genes = 2000,
   min_cells_per_gene = 1,
   min_samples_per_gene = 2,
   allow_missing_features = FALSE,
-  zscore_mean_threshold = 2.5,
-  zscore_sn_threshold = 2.5,
-  max_n_genes = NULL,
   method = "cosine",
   permute_row_or_column = "column",
   permutation_function = "sample",
@@ -29,8 +27,6 @@ check_params(
   sce,
   batch_key,
   dataset_key,
-  zscore_mean_threshold,
-  zscore_sn_threshold,
   max_n_genes,
   method,
   min_cells_per_gene,
@@ -62,6 +58,8 @@ metadata that identifies the batch.}
 metadata that identifies the dataset. If \code{NA}, only the
 \code{batch_key} is used.}
 
+\item{max_n_genes}{Integer specifying the maximum number of genes to select.}
+
 \item{min_cells_per_gene}{Integer specifying the minimum number of cells per
 gene. Default is \code{1}.}
 
@@ -70,14 +68,6 @@ number of samples per gene.}
 
 \item{allow_missing_features}{Logical indicating whether
 to allow missing features.}
-
-\item{zscore_mean_threshold}{Numeric value specifying the threshold
-for the mean z-score. Default is \code{2.5}.}
-
-\item{zscore_sn_threshold}{Numeric value specifying the threshold for the
-signal-to-noise z-score. Default is \code{2.5}.}
-
-\item{max_n_genes}{Integer specifying the maximum number of genes to select.}
 
 \item{method}{Character string specifying the method to use for calculating
 the relationship between gene pairs. Default is \code{"cosine"}.
@@ -105,7 +95,7 @@ genes. Speeds up gene selection.}
 }
 \value{
 An updated \code{SingleCellExperiment} object with computed
-statistics and selected genes based on the specified thresholds.
+statistics and selected genes.
 The results are stored in the metadata of the \code{SingleCellExperiment}
 object.
 
@@ -121,7 +111,8 @@ A character vector of intersected genes.
 provided in an
 \link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}
 object. It calculates angles, transforms them to z-scores, computes
-statistical measures, and selects genes based on specified thresholds.
+statistical measures, and selects the top genes based on mean and standard
+deviation of z-scores.
 These genes are biologically informative and invariant to batch effects.
 
 This function adds a unique batch identifier to the metadata of a
@@ -138,8 +129,8 @@ This function performs the following steps:
 \item Transforms the angles to z-scores.
 \item Computes statistical measures (mean z-score, signal-to-noise ratio)
 across batches using \code{\link{get_list_stats}}.
-\item Selects genes based on specified z-score thresholds using
-\code{\link{select_genes}}.
+\item Selects the top n genes based on mean and standard deviation of
+z-scores using \code{\link{select_genes}}.
 }
 
 The computed statistics and selected genes are added to the
@@ -164,9 +155,7 @@ sce <- sce_example()
 sce <- anglemania(
   sce,
   batch_key = "batch",
-  method = "cosine",
-  zscore_mean_threshold = 2,
-  zscore_sn_threshold = 2
+  method = "cosine"
 )
 
 # Access the selected genes
@@ -177,8 +166,6 @@ params <- check_params(
   sce,
   batch_key = "batch",
   dataset_key = "dataset",
-  zscore_mean_threshold = 2.5,
-  zscore_sn_threshold = 2.5,
   max_n_genes = 2000,
   method = "cosine",
   min_cells_per_gene = 1,

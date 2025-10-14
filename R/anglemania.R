@@ -11,7 +11,8 @@
 #' provided in an
 #' \link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}
 #' object. It calculates angles, transforms them to z-scores, computes
-#' statistical measures, and selects genes based on specified thresholds.
+#' statistical measures, and selects the top genes based on mean and standard
+#' deviation of z-scores.
 #' These genes are biologically informative and invariant to batch effects.
 #'
 #' @details
@@ -23,8 +24,8 @@
 #'   \item Transforms the angles to z-scores.
 #'   \item Computes statistical measures (mean z-score, signal-to-noise ratio)
 #'     across batches using \code{\link{get_list_stats}}.
-#'   \item Selects genes based on specified z-score thresholds using
-#'     \code{\link{select_genes}}.
+#'   \item Selects the top n genes based on mean and standard deviation of
+#'     z-scores using \code{\link{select_genes}}.
 #' }
 #'
 #' The computed statistics and selected genes are added to the
@@ -38,17 +39,13 @@
 #' the \code{SingleCellExperiment} object that indicates which dataset the cells
 #' belong to. If \code{NA}, then all samples are assumed to belong to the same
 #' dataset and are separated by \code{batch_key}.
+#' @param max_n_genes Integer specifying the maximum number of genes to select.
 #' @param min_cells_per_gene Integer specifying the minimum number of cells per
 #' gene. Default is \code{1}.
 #' @param min_samples_per_gene Integer specifying the minimum number of samples
 #' per gene. Default is \code{2}.
 #' @param allow_missing_features Logical indicating whether to allow missing
 #' features. Default is \code{FALSE}.
-#' @param zscore_mean_threshold Numeric value specifying the threshold
-#'  for the mean z-score. Default is \code{2.5}.
-#' @param zscore_sn_threshold Numeric value specifying the threshold for the
-#'   signal-to-noise z-score. Default is \code{2.5}.
-#' @param max_n_genes Integer specifying the maximum number of genes to select.
 #' @param method Character string specifying the method to use for calculating
 #' the relationship between gene pairs. Default is \code{"cosine"}.
 #' Other options include \code{"spearman"}
@@ -66,7 +63,7 @@
 #'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
 #' @param verbose Logical indicating whether to print progress messages.
 #' @return An updated \code{SingleCellExperiment} object with computed
-#'   statistics and selected genes based on the specified thresholds.
+#'   statistics and selected genes.
 #'   The results are stored in the metadata of the \code{SingleCellExperiment}
 #'   object.
 #'
@@ -89,9 +86,7 @@
 #' sce <- anglemania(
 #'   sce,
 #'   batch_key = "batch",
-#'   method = "cosine",
-#'   zscore_mean_threshold = 2,
-#'   zscore_sn_threshold = 2
+#'   method = "cosine"
 #' )
 #'
 #' # Access the selected genes
@@ -102,12 +97,10 @@ anglemania <- function(
     sce,
     batch_key,
     dataset_key = NA_character_,
+    max_n_genes = 2000,
     min_cells_per_gene = 1,
     min_samples_per_gene = 2,
     allow_missing_features = FALSE,
-    zscore_mean_threshold = 2.5,
-    zscore_sn_threshold = 2.5,
-    max_n_genes = NULL,
     method = "cosine",
     permute_row_or_column = "column",
     permutation_function = "sample",
@@ -120,8 +113,6 @@ anglemania <- function(
         sce = sce,
         batch_key = batch_key,
         dataset_key = dataset_key,
-        zscore_mean_threshold = zscore_mean_threshold,
-        zscore_sn_threshold = zscore_sn_threshold,
         max_n_genes = max_n_genes,
         method = method,
         min_cells_per_gene = min_cells_per_gene,
@@ -151,14 +142,17 @@ anglemania <- function(
         dataset_key = dataset_key,
         batch_key = batch_key
     )
-    S4Vectors::metadata(sce)$anglemania$weights <- .set_weights(
+    S4Vectors::metadata(
+        sce
+    )$anglemania$params$dataset_weights <- .set_weights(
         col_data = SummarizedExperiment::colData(sce),
         batch_key = batch_key,
         dataset_key = dataset_key
     )
-    weights <- setNames(
-        S4Vectors::metadata(sce)$anglemania$weights$weight,
-        S4Vectors::metadata(sce)$anglemania$weights$anglemania_batch
+    params <- S4Vectors::metadata(sce)$anglemania$params
+    dataset_weights <- setNames(
+        params$dataset_weights$weight,
+        params$dataset_weights$anglemania_batch
     )
     # split cells/barcodes by batch
     barcodes_by_batch <- split(
@@ -232,21 +226,14 @@ anglemania <- function(
     vmessage(verbose, "Computing statistics...")
     S4Vectors::metadata(sce)$anglemania$list_stats <- get_list_stats(
         matrix_list = S4Vectors::metadata(sce)$anglemania$matrix_list,
-        weights = weights,
+        weights = dataset_weights,
         verbose = verbose
     )
     invisible(gc())
 
     vmessage(verbose, "Pre-filtering features...")
-    S4Vectors::metadata(
-        sce
-    )$anglemania$prefiltered_df <- prefilter_angl(
-        snr_zscore_matrix = S4Vectors::metadata(
-            sce
-        )$anglemania$list_stats$sn_zscore,
-        mean_zscore_matrix = S4Vectors::metadata(
-            sce
-        )$anglemania$list_stats$mean_zscore,
+    sce <- prefilter_angl(
+        sce,
         zscore_mean_threshold = prefilter_threshold,
         zscore_sn_threshold = prefilter_threshold,
         verbose = verbose
@@ -255,8 +242,6 @@ anglemania <- function(
     vmessage(verbose, "Extracting filtered features...")
     sce <- select_genes(
         sce,
-        zscore_mean_threshold = zscore_mean_threshold,
-        zscore_sn_threshold = zscore_sn_threshold,
         max_n_genes = max_n_genes,
         verbose = verbose
     )

@@ -2,7 +2,7 @@ sce_raw <- sce_example()
 test_that("anglemania works correctly with method cosine", {
     library(S4Vectors)
     sce <- sce_raw
-    sce <- anglemania(sce, batch_key = "batch")
+    sce <- anglemania(sce, batch_key = "batch", max_n_genes = 20)
 
     # check that list_stats is not empty
     expect_true(length(metadata(sce)$anglemania$list_stats) > 0)

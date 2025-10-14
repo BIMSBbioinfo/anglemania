@@ -59,8 +59,7 @@
     Code
       get_anglemania_genes(sce)
     Output
-       [1] "gene43"  "gene207" "gene119" "gene130" "gene25"  "gene209" "gene69" 
-       [8] "gene184" "gene63"  "gene71"  "gene172" "gene40"  "gene105" "gene88" 
-      [15] "gene159" "gene14"  "gene155" "gene66"  "gene122" "gene157" "gene193"
-      [22] "gene58"  "gene240" "gene150" "gene286"
+       [1] "gene270" "gene294" "gene66"  "gene122" "gene18"  "gene161" "gene26" 
+       [8] "gene276" "gene15"  "gene111" "gene74"  "gene280" "gene150" "gene286"
+      [15] "gene31"  "gene251" "gene85"  "gene200" "gene6"   "gene184"
 

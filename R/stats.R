@@ -125,9 +125,9 @@ big_mat_list_mean <- function(matrix_list, weights, verbose = TRUE) {
                 wrap_mean(X.sub, batch)
             })
             # this sums up the z-scores across samples
-            m_sum <- Reduce("+", lapply(lmats, '[[', 1))
+            m_sum <- Reduce("+", lapply(lmats, "[[", 1))
             # this gets the number of samples in which the feature was present
-            m_n <- Reduce("+", lapply(lmats, '[[', 2))
+            m_n <- Reduce("+", lapply(lmats, "[[", 2))
             # Divide by zero shouldn't happen because the features have
             # already been filtered properly
             X[, ind] <- m_sum / m_n # Already weighted, no need to divide
@@ -158,8 +158,8 @@ big_mat_list_mean <- function(matrix_list, weights, verbose = TRUE) {
 #' sce <- anglemania(sce, batch_key = "batch")
 #' matrix_list <- metadata(sce)$anglemania$matrix_list
 #' weights <- setNames(
-#'   S4Vectors::metadata(sce)$anglemania$weights$weight,
-#'   S4Vectors::metadata(sce)$anglemania$weights$anglemania_batch
+#'   S4Vectors::metadata(sce)$anglemania$params$dataset_weights$weight,
+#'   S4Vectors::metadata(sce)$anglemania$params$dataset_weights$anglemania_batch
 #' )
 #' list_stats <- get_list_stats(matrix_list, weights)
 #' names(list_stats)

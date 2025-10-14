@@ -172,52 +172,11 @@ get_anglemania_genes <- function(sce) {
 #' length(anglemania_stats_df)
 #' @export
 get_anglemania_stats_df <- function(sce) {
-    zscore_mean_threshold <- metadata(
-        sce
-    )$anglemania$params$zscore_mean_threshold
-    zscore_sn_threshold <- metadata(
-        sce
-    )$anglemania$params$zscore_sn_threshold
-    direction <- metadata(sce)$anglemania$params$direction
-    anglemania_genes <- metadata(sce)$anglemania$anglemania_genes
-    prefiltered_df <- metadata(sce)$anglemania$prefiltered_df
-    prefiltered_df$geneA <-
-        S4Vectors::metadata(sce)$anglemania$intersect_genes[
-            prefiltered_df$geneA
-        ]
-    prefiltered_df$geneB <-
-        S4Vectors::metadata(sce)$anglemania$intersect_genes[
-            prefiltered_df$geneB
-        ]
-    # Selects the direction of conserved genes
-    if (direction == "both") {
-        filtered_genes_df <- subset(
-            prefiltered_df,
-            sn_zscore >= zscore_sn_threshold &
-                abs(prefiltered_df$mean_zscore) >=
-                    zscore_mean_threshold
-        )
-    } else if (direction == "positive") {
-        filtered_genes_df <- subset(
-            prefiltered_df,
-            sn_zscore >= zscore_sn_threshold &
-                prefiltered_df$mean_zscore >= zscore_mean_threshold
-        )
-    } else if (direction == "negative") {
-        filtered_genes_df <- subset(
-            prefiltered_df,
-            sn_zscore >= zscore_sn_threshold &
-                prefiltered_df$mean_zscore <= zscore_mean_threshold
-        )
-    }
+    prefiltered_df <- S4Vectors::metadata(sce)$anglemania$prefiltered_df
     # Order data frame
-    filtered_genes_df <- filtered_genes_df[
-        order(abs(filtered_genes_df$mean_zscore), decreasing = TRUE),
+    filtered_genes_df <- prefiltered_df[
+        order(abs(prefiltered_df$rank), decreasing = TRUE),
     ]
-    filtered_genes_df <- filtered_genes_df |>
-        filter(
-            geneA %in% anglemania_genes | geneB %in% anglemania_genes
-        )
 
     return(filtered_genes_df)
 }
