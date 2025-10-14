@@ -3,7 +3,8 @@
 provided in an
 SingleCellExperiment
 object. It calculates angles, transforms them to z-scores, computes
-statistical measures, and selects genes based on specified thresholds.
+statistical measures, and selects the top genes based on mean and standard
+deviation of z-scores.
 These genes are biologically informative and invariant to batch effects.
 This function adds a unique batch identifier to the metadata of a
 SingleCellExperiment object by combining specified dataset and batch
@@ -72,7 +73,8 @@ analysis."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/m
 provided in an
 <a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a>
 object. It calculates angles, transforms them to z-scores, computes
-statistical measures, and selects genes based on specified thresholds.
+statistical measures, and selects the top genes based on mean and standard
+deviation of z-scores.
 These genes are biologically informative and invariant to batch effects.</p>
 <p>This function adds a unique batch identifier to the metadata of a
 <code>SingleCellExperiment</code> object by combining specified dataset and batch
@@ -85,12 +87,10 @@ analysis.</p>
 <span>  <span class="va">sce</span>,</span>
 <span>  <span class="va">batch_key</span>,</span>
 <span>  dataset_key <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  min_samples_per_gene <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  allow_missing_features <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>  max_n_genes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span>
 <span>  permute_row_or_column <span class="op">=</span> <span class="st">"column"</span>,</span>
 <span>  permutation_function <span class="op">=</span> <span class="st">"sample"</span>,</span>
@@ -103,8 +103,6 @@ analysis.</p>
 <span>  <span class="va">sce</span>,</span>
 <span>  <span class="va">batch_key</span>,</span>
 <span>  <span class="va">dataset_key</span>,</span>
-<span>  <span class="va">zscore_mean_threshold</span>,</span>
-<span>  <span class="va">zscore_sn_threshold</span>,</span>
 <span>  <span class="va">max_n_genes</span>,</span>
 <span>  <span class="va">method</span>,</span>
 <span>  <span class="va">min_cells_per_gene</span>,</span>
@@ -146,6 +144,10 @@ metadata that identifies the dataset. If <code>NA</code>, only the
 <code>batch_key</code> is used.</p></dd>
 
 
+<dt id="arg-max-n-genes">max_n_genes<a class="anchor" aria-label="anchor" href="#arg-max-n-genes"></a></dt>
+<dd><p>Integer specifying the maximum number of genes to select.</p></dd>
+
+
 <dt id="arg-min-cells-per-gene">min_cells_per_gene<a class="anchor" aria-label="anchor" href="#arg-min-cells-per-gene"></a></dt>
 <dd><p>Integer specifying the minimum number of cells per
 gene. Default is <code>1</code>.</p></dd>
@@ -159,20 +161,6 @@ number of samples per gene.</p></dd>
 <dt id="arg-allow-missing-features">allow_missing_features<a class="anchor" aria-label="anchor" href="#arg-allow-missing-features"></a></dt>
 <dd><p>Logical indicating whether
 to allow missing features.</p></dd>
-
-
-<dt id="arg-zscore-mean-threshold">zscore_mean_threshold<a class="anchor" aria-label="anchor" href="#arg-zscore-mean-threshold"></a></dt>
-<dd><p>Numeric value specifying the threshold
-for the mean z-score. Default is <code>2.5</code>.</p></dd>
-
-
-<dt id="arg-zscore-sn-threshold">zscore_sn_threshold<a class="anchor" aria-label="anchor" href="#arg-zscore-sn-threshold"></a></dt>
-<dd><p>Numeric value specifying the threshold for the
-signal-to-noise z-score. Default is <code>2.5</code>.</p></dd>
-
-
-<dt id="arg-max-n-genes">max_n_genes<a class="anchor" aria-label="anchor" href="#arg-max-n-genes"></a></dt>
-<dd><p>Integer specifying the maximum number of genes to select.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -216,7 +204,7 @@ genes. Speeds up gene selection.</p></dd>
     <div id="value">
     <h2>Value</h2>
     <p>An updated <code>SingleCellExperiment</code> object with computed
-statistics and selected genes based on the specified thresholds.
+statistics and selected genes.
 The results are stored in the metadata of the <code>SingleCellExperiment</code>
 object.</p>
 <p>A list of validated parameters</p>
@@ -232,8 +220,8 @@ column containing the unique batch key.</p>
 <li><p>Transforms the angles to z-scores.</p></li>
 <li><p>Computes statistical measures (mean z-score, signal-to-noise ratio)
 across batches using <code><a href="statistics.html">get_list_stats</a></code>.</p></li>
-<li><p>Selects genes based on specified z-score thresholds using
-<code><a href="select_genes.html">select_genes</a></code>.</p></li>
+<li><p>Selects the top n genes based on mean and standard deviation of
+z-scores using <code><a href="select_genes.html">select_genes</a></code>.</p></li>
 </ol><p>The computed statistics and selected genes are added to the
 <code>SingleCellExperiment</code> object, which is returned.</p>
     </div>
@@ -264,9 +252,7 @@ that a feature does not have to be present in every single batch.</p></li>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">anglemania</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">sce</span>,</span></span>
 <span class="r-in"><span>  batch_key <span class="op">=</span> <span class="st">"batch"</span>,</span></span>
-<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span></span>
-<span class="r-in"><span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cosine"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Assuming that all samples belong to the same dataset and are separated by batch_key: batch</span>
@@ -279,30 +265,29 @@ that a feature does not have to be present in every single batch.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/Rtmp8yZUhq/file1fcc6ff45914" which didn't exist..</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/Rtmp8yZUhq/file1fcc76d1ded5" which didn't exist..</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpqekGwf/file2fd648dc5e3c" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=01s, remaining~01s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpqekGwf/file2fd6445076e1" which didn't exist..</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=01s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating mean...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Pre-filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting filtered features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Selected 194 genes for integration.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2000 is larger than the number of intersected genes.Setting max_n_genes to 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Selected 300 genes for integration.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access the selected genes</span></span></span>
 <span class="r-in"><span><span class="va">selected_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania_utils.html">get_anglemania_genes</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">selected_genes</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "gene43"  "gene207" "gene119" "gene130" "gene25"  "gene209" "gene82" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "gene114" "gene53"  "gene113"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "gene270" "gene294" "gene66"  "gene122" "gene18"  "gene161" "gene26" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "gene276" "gene15"  "gene111"</span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">check_params</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">sce</span>,</span></span>
 <span class="r-in"><span>  batch_key <span class="op">=</span> <span class="st">"batch"</span>,</span></span>
 <span class="r-in"><span>  dataset_key <span class="op">=</span> <span class="st">"dataset"</span>,</span></span>
-<span class="r-in"><span>  zscore_mean_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span></span>
-<span class="r-in"><span>  zscore_sn_threshold <span class="op">=</span> <span class="fl">2.5</span>,</span></span>
 <span class="r-in"><span>  max_n_genes <span class="op">=</span> <span class="fl">2000</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"cosine"</span>,</span></span>
 <span class="r-in"><span>  min_cells_per_gene <span class="op">=</span> <span class="fl">1</span>,</span></span>

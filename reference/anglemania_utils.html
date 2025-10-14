@@ -193,9 +193,9 @@ gene pairs from which the anglemania genes were selected.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/Rtmp8yZUhq/file1fcc54756172" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpqekGwf/file2fd6a8dc90f" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/Rtmp8yZUhq/file1fcc6ddb75f2" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpqekGwf/file2fd6690342f3" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
@@ -203,12 +203,13 @@ gene pairs from which the anglemania genes were selected.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Pre-filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting filtered features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Selected 25 genes for integration.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2000 is larger than the number of intersected genes.Setting max_n_genes to 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Selected 300 genes for integration.</span>
 <span class="r-in"><span><span class="va">anglemania_genes</span> <span class="op">&lt;-</span> <span class="fu">get_anglemania_genes</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">anglemania_genes</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "gene43"  "gene207" "gene119" "gene130" "gene25"  "gene209"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "gene270" "gene294" "gene66"  "gene122" "gene18"  "gene161"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">anglemania_genes</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 300</span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="sce_example.html">sce_example</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="anglemania.html">anglemania</a></span><span class="op">(</span><span class="va">sce</span>, batch_key <span class="op">=</span> <span class="st">"batch"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> No dataset_key specified.</span>
@@ -222,9 +223,9 @@ gene pairs from which the anglemania genes were selected.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s     |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing angles and transforming to z-scores...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                  | 0 % elapsed=00s   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/Rtmp8yZUhq/file1fcc1fc0e1e7" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpqekGwf/file2fd634c99a0b" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |=========================                         | 50% elapsed=00s, remaining~00s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/Rtmp8yZUhq/file1fcc6d5126da" which didn't exist..</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating directory "/tmp/RtmpqekGwf/file2fd6353d0a10" which didn't exist..</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   |==================================================| 100% elapsed=00s, remaining~00s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing statistics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Weighting matrix_list...</span>
@@ -232,18 +233,19 @@ gene pairs from which the anglemania genes were selected.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating sds...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Pre-filtering features...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting filtered features...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Selected 25 genes for integration.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 2000 is larger than the number of intersected genes.Setting max_n_genes to 300</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Selected 300 genes for integration.</span>
 <span class="r-in"><span><span class="va">anglemania_stats_df</span> <span class="op">&lt;-</span> <span class="fu">get_anglemania_stats_df</span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">anglemania_stats_df</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     geneA   geneB sn_zscore mean_zscore</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  gene43 gene207 61.159210    3.345794</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 gene119 gene130  6.350243    3.014981</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  gene25 gene209  3.352897    2.983193</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  gene69 gene184  2.621413    2.858989</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  gene43  gene63  3.107353    2.735689</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  gene71 gene172  2.876975    2.691607</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         geneA   geneB sn_zscore mean_zscore sd_zscore  rank</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9468   gene88 gene284 0.5005326  -0.5307601  1.060391 18986</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12460 gene126 gene132 0.5008629  -0.5407590  1.079655 18985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12932 gene132 gene160 0.5019395   0.5093796  1.014823 18984</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13290 gene137 gene235 0.5021455   0.5057122  1.007103 18983</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10046  gene95 gene242 0.5027604   0.5283980  1.050994 18982</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11525 gene113 gene223 0.5009884  -0.5695345  1.136822 18981</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">anglemania_stats_df</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
 </code></pre></div>
     </div>
   </div>
