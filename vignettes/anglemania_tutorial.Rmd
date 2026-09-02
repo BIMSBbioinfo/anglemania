@@ -279,7 +279,7 @@ for (i in seq_along(btch)) {
 
     clusters <- create_microclusters_sparse(
         counts(sim_demo)[, cells],
-        n_clusters = 15, n_pcs = 20, min_cells = 15, verbose = FALSE
+        n_pcs = 20, min_cells = 15, verbose = FALSE
     )
     w <- compute_simpsons_weights(clusters$assignments, min_cluster_size = 10)
 
@@ -352,27 +352,41 @@ scoring against the simulator's ground-truth DE genes
 Both simulations have unequal, batch-specific cell type proportions, and both
 have thousands of cells per batch.
 
-## A note on `simpsons_n_clusters`
+## Cluster granularity: leave `simpsons_n_clusters` alone
 
-This argument does not currently do what its name suggests. It sets the Leiden
-resolution to `max(1, simpsons_n_clusters / 20)`, so **every value from 2 to 20
-maps to resolution 1 and gives identical clustering**; above 20 the resolution
-changes, but `igraph::cluster_leiden(objective_function = "modularity")`
-responds to it weakly and non-monotonically. In practice the clustering resolves
-whole cell types rather than finer sub-structures.
+By default (`simpsons_n_clusters = NULL`) the clustering is whatever Leiden
+finds at resolution 1, which on these data resolves whole cell types -- a
+handful of clusters, not dozens. That is deliberate, and it is the setting all
+the benchmark numbers above were produced with.
 
-The correction still works -- the benchmark results above were produced at the
-default -- but it works by equalising cell types, not by building
-microclusters, and tuning this argument will not change that. You can check what
-you actually get:
+Supplying an integer instead searches for the Leiden resolution giving roughly
+that many clusters. It works -- but it makes results substantially worse. On
+SCIB Sim2:
+
+| Clustering | DE precision |
+|---|---|
+| **`NULL`** (natural communities, 4 clusters) | **0.983** |
+| no correction at all | 0.903 |
+| `simpsons_n_clusters = 15` | 0.812 |
+| `simpsons_n_clusters = 30` | 0.800 |
+| `simpsons_n_clusters = 60` | 0.857 |
+
+Forcing genuine microclusters is worse than not correcting at all. The reason is
+that the correction works by giving each *cell type* equal weight regardless of
+how many cells the batch happens to contain. Split those cell types into finer
+groups and you remove the between-cell-type variation that carries the
+gene-gene correlation signal, leaving the weighted correlation dominated by
+noise.
+
+The name is therefore somewhat misleading: this is cell-type reweighting, not
+microclustering. You can check what you actually get:
 
 ```{r, inspect clustering, message = FALSE}
 b1 <- colnames(sim_demo)[sim_demo$Batch == "Batch1"]
 cl <- create_microclusters_sparse(
-    counts(sim_demo)[, b1], n_clusters = 15, n_pcs = 20,
-    min_cells = 15, verbose = FALSE
+    counts(sim_demo)[, b1], n_pcs = 20, min_cells = 15, verbose = FALSE
 )
-c(requested = 15, obtained = cl$n_clusters)
+cl$n_clusters
 ```
 
 `simpsons_min_cells` (default `30`) sets the size below which a cluster is

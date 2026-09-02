@@ -667,3 +667,46 @@ test_that("prepare_simpsons with binary PCA + density weights runs", {
     expect_true(length(result$weights_per_batch$batch1) == 200)
     expect_true(all(result$weights_per_batch$batch1 > 0))
 })
+
+test_that("leiden_at_target tracks the requested cluster count", {
+    skip_if_not_installed("bluster")
+    skip_if_not_installed("igraph")
+
+    withr::with_seed(42, {
+        # three well-separated blobs in 10 dimensions, 900 cells
+        coords <- rbind(
+            matrix(rnorm(300 * 10, mean = 0), ncol = 10),
+            matrix(rnorm(300 * 10, mean = 6), ncol = 10),
+            matrix(rnorm(300 * 10, mean = 12), ncol = 10)
+        )
+        g <- bluster::makeSNNGraph(coords, k = 10)
+
+        few <- leiden_at_target(g, 3)
+        many <- leiden_at_target(g, 40)
+    })
+
+    # The point of the search: asking for more clusters must actually yield
+    # more. The old max(1, n/20) formula made every target <= 20 identical.
+    expect_gt(length(unique(many)), length(unique(few)))
+    expect_length(few, nrow(coords))
+    expect_length(many, nrow(coords))
+
+    # Natural structure is recovered when that is what was asked for
+    expect_equal(length(unique(few)), 3)
+})
+
+test_that("create_microclusters_sparse responds to n_clusters", {
+    skip_if_not_installed("bluster")
+    skip_if_not_installed("igraph")
+
+    sce <- sce_example()
+    mat <- SingleCellExperiment::counts(sce)
+
+    coarse <- create_microclusters_sparse(mat, n_clusters = 3, min_cells = 10,
+                                          verbose = FALSE)
+    fine <- create_microclusters_sparse(mat, n_clusters = 25, min_cells = 10,
+                                        verbose = FALSE)
+
+    expect_gt(fine$n_clusters, coarse$n_clusters)
+    expect_true(all(fine$sizes >= 10))
+})

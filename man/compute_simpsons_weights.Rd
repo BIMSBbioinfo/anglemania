@@ -23,7 +23,7 @@ Cells in clusters smaller than \code{min_cluster_size} get weight 0.
 \examples{
 sce <- sce_example()
 mat <- SingleCellExperiment::counts(sce)
-clusters <- create_microclusters_sparse(mat, n_clusters = 15, min_cells = 20)
+clusters <- create_microclusters_sparse(mat, min_cells = 20)
 w <- compute_simpsons_weights(clusters$assignments, min_cluster_size = 10)
 head(w)
 

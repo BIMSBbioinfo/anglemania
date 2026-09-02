@@ -22,7 +22,7 @@ anglemania(
   normalization_method = "divide_by_total_counts",
   verbose = TRUE,
   use_simpsons = FALSE,
-  simpsons_n_clusters = 15,
+  simpsons_n_clusters = NULL,
   simpsons_n_pcs = 20,
   simpsons_min_cells = 30,
   simpsons_min_cluster_size = 20,
@@ -51,7 +51,7 @@ check_params(
   normalization_method,
   verbose,
   use_simpsons = FALSE,
-  simpsons_n_clusters = 15,
+  simpsons_n_clusters = NULL,
   simpsons_n_pcs = 20,
   simpsons_min_cells = 30,
   simpsons_min_cluster_size = 20,
@@ -124,16 +124,18 @@ each batch and gene-gene correlations are computed with per-cell weights
 regardless of size. This removes correlation signal that is driven purely by
 differing cell type proportions across batches. Default is \code{FALSE}.}
 
-\item{simpsons_n_clusters}{Integer nominally specifying the target number
-of microclusters per batch. \strong{This argument currently has no effect
-for values of 20 or below.} It sets the Leiden resolution to
-\code{max(1, simpsons_n_clusters / 20)}, so every value from 2 to 20 maps to
-resolution 1 and yields identical clustering; above 20 the resolution changes
-but \code{igraph::cluster_leiden(objective_function = "modularity")}
-responds to it only weakly and non-monotonically. In practice the clustering
-resolves whole cell types rather than finer microclusters. The published
-benchmarks were produced at the default and are unaffected, but do not
-expect to tune this. Default is \code{15}.}
+\item{simpsons_n_clusters}{Target number of clusters per batch, or
+\code{NULL} (the default) to use the natural community structure Leiden
+finds at resolution 1. \strong{\code{NULL} is strongly recommended.} On the
+SCIB Sim2 benchmark it gives DE precision 0.983, against 0.903 for no
+correction at all, while forcing finer clusterings is markedly worse -- 0.812
+at 15 clusters, 0.800 at 30, 0.857 at 60. The correction works by giving each
+cell type equal weight; splitting cell types into finer microclusters removes
+the very variation that carries the gene-gene correlation signal. When an
+integer is supplied, the resolution achieving roughly that many clusters is
+found by bisection, since the resolution needed depends on the dataset and
+its size. The realised count is approximate and can be read back from
+\code{metadata(sce)$anglemania$simpsons_data$clusters_per_batch}.}
 
 \item{simpsons_n_pcs}{Integer specifying the number of principal components
 used for the microclustering embedding. Default is \code{20}.}

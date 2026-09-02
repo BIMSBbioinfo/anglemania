@@ -6,7 +6,7 @@
 \usage{
 create_microclusters_sparse(
   expr_mat,
-  n_clusters = 15,
+  n_clusters = NULL,
   n_pcs = 20,
   min_cells = 30,
   use_binary_pca = FALSE,
@@ -16,10 +16,12 @@ create_microclusters_sparse(
 \arguments{
 \item{expr_mat}{Sparse matrix (genes x cells), raw counts.}
 
-\item{n_clusters}{Nominal target number of microclusters. Sets the Leiden
-resolution to \code{max(1, n_clusters / 20)}; because of the floor, all
-values <= 20 give resolution 1 and identical clustering. Default
-\code{15}.}
+\item{n_clusters}{Target number of microclusters, or \code{NULL} (default)
+to use the natural community structure found by Leiden at resolution 1.
+When an integer is given, the resolution achieving roughly that many
+clusters is found by bisection (see \code{leiden_at_target}) and the
+realised count is returned in \code{n_clusters} of the result. \code{NULL}
+performs substantially better on the benchmarks -- see the vignette.}
 
 \item{n_pcs}{Number of principal components. Default \code{20}.}
 
@@ -47,7 +49,7 @@ clusters are merged into their nearest larger neighbor.
 \examples{
 sce <- sce_example()
 mat <- SingleCellExperiment::counts(sce)
-clusters <- create_microclusters_sparse(mat, n_clusters = 15, min_cells = 20)
+clusters <- create_microclusters_sparse(mat, min_cells = 20)
 clusters$n_clusters
 table(clusters$assignments)
 

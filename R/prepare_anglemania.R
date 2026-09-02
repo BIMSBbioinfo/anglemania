@@ -37,7 +37,7 @@ check_params <- function(
     normalization_method,
     verbose,
     use_simpsons = FALSE,
-    simpsons_n_clusters = 15,
+    simpsons_n_clusters = NULL,
     simpsons_n_pcs = 20,
     simpsons_min_cells = 30,
     simpsons_min_cluster_size = 20,
@@ -161,7 +161,7 @@ check_params <- function(
     checkmate::assert_logical(use_simpsons, len = 1)
     if (use_simpsons) {
         checkmate::assert_integerish(
-            simpsons_n_clusters, lower = 2, len = 1
+            simpsons_n_clusters, lower = 2, len = 1, null.ok = TRUE
         )
         checkmate::assert_integerish(
             simpsons_n_pcs, lower = 1, len = 1

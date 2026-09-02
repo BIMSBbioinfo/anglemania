@@ -13,6 +13,87 @@
 # PART A: Microclustering and cluster-reweighted correlations
 # =============================================================================
 
+#' Run Leiden at the resolution that yields a target number of clusters
+#'
+#' The resolution needed for a given cluster count depends on the graph -- on
+#' one 3000-cell SNN graph modularity resolution 1 gives 3 clusters and
+#' resolution 10 gives 204, while on a 355-cell graph resolution 15 still gives
+#' only 7. A fixed resolution, or a fixed formula mapping a requested count to a
+#' resolution, therefore cannot deliver a requested number of clusters. This
+#' bisects on resolution instead.
+#'
+#' The achieved count is approximate. Cluster count steps rather than varies
+#' continuously with resolution, so some targets are unreachable -- modularity
+#' can jump from a handful of clusters straight to dozens. The CPM objective was
+#' tried and tracked targets worse. Always read the realised count back from the
+#' \code{n_clusters} element of \code{create_microclusters_sparse()}'s return
+#' value; the small-cluster merge governed by \code{min_cells} can also reduce
+#' it further.
+#'
+#' Cluster count is monotone non-decreasing in resolution, so bisection is
+#' well-defined. The search stops on an exact hit, when the bracket collapses,
+#' or after \code{max_iter} steps, and then returns the clustering whose count
+#' was closest to \code{target}.
+#'
+#' @param graph An \pkg{igraph} graph, typically from
+#'   \code{bluster::makeSNNGraph}.
+#' @param target Target number of clusters.
+#' @param lower,upper Initial resolution bracket. \code{upper} is doubled (up
+#'   to 10 times) if it does not already overshoot \code{target}.
+#' @param max_iter Maximum bisection steps. Default \code{30}.
+#' @return Integer vector of cluster assignments, one per node.
+#'
+#' @keywords internal
+#' @noRd
+leiden_at_target <- function(graph, target, lower = 0.01, upper = 10,
+                             max_iter = 30) {
+    n_at <- function(res) {
+        cl <- igraph::cluster_leiden(
+            graph,
+            objective_function = "modularity",
+            resolution = res
+        )
+        as.integer(igraph::membership(cl))
+    }
+
+    best <- n_at(lower)
+    best_gap <- abs(length(unique(best)) - target)
+    if (best_gap == 0) {
+        return(best)
+    }
+
+    # Grow the upper bound until it overshoots the target
+    for (i in seq_len(10)) {
+        m <- n_at(upper)
+        k <- length(unique(m))
+        if (abs(k - target) < best_gap) {
+            best <- m
+            best_gap <- abs(k - target)
+        }
+        if (k >= target) break
+        upper <- upper * 2
+    }
+
+    for (i in seq_len(max_iter)) {
+        if (best_gap == 0 || (upper - lower) < 1e-4) break
+        mid <- (lower + upper) / 2
+        m <- n_at(mid)
+        k <- length(unique(m))
+        if (abs(k - target) < best_gap) {
+            best <- m
+            best_gap <- abs(k - target)
+        }
+        if (k < target) {
+            lower <- mid
+        } else {
+            upper <- mid
+        }
+    }
+
+    best
+}
+
+
 #' Create microclusters from a sparse expression matrix
 #'
 #' Performs PCA on log-normalized expression, builds an SNN graph on the
@@ -20,10 +101,12 @@
 #' clusters are merged into their nearest larger neighbor.
 #'
 #' @param expr_mat Sparse matrix (genes x cells), raw counts.
-#' @param n_clusters Nominal target number of microclusters. Sets the Leiden
-#'   resolution to \code{max(1, n_clusters / 20)}; because of the floor, all
-#'   values <= 20 give resolution 1 and identical clustering. Default
-#'   \code{15}.
+#' @param n_clusters Target number of microclusters, or \code{NULL} (default)
+#'   to use the natural community structure found by Leiden at resolution 1.
+#'   When an integer is given, the resolution achieving roughly that many
+#'   clusters is found by bisection (see \code{leiden_at_target}) and the
+#'   realised count is returned in \code{n_clusters} of the result. \code{NULL}
+#'   performs substantially better on the benchmarks -- see the vignette.
 #' @param n_pcs Number of principal components. Default \code{20}.
 #' @param min_cells Minimum cells per microcluster; smaller clusters
 #'   are merged. Default \code{30}.
@@ -43,14 +126,14 @@
 #' @examples
 #' sce <- sce_example()
 #' mat <- SingleCellExperiment::counts(sce)
-#' clusters <- create_microclusters_sparse(mat, n_clusters = 15, min_cells = 20)
+#' clusters <- create_microclusters_sparse(mat, min_cells = 20)
 #' clusters$n_clusters
 #' table(clusters$assignments)
 #'
 #' @export
 create_microclusters_sparse <- function(
     expr_mat,
-    n_clusters = 15,
+    n_clusters = NULL,
     n_pcs = 20,
     min_cells = 30,
     use_binary_pca = FALSE,
@@ -159,14 +242,22 @@ create_microclusters_sparse <- function(
     }
     rownames(pca_coords) <- colnames(expr_mat)
 
-    # Leiden clustering on SNN graph from PCA
+    # Leiden clustering on SNN graph from PCA. The resolution that yields a
+    # given number of clusters depends on the dataset and its size, so it is
+    # searched for rather than derived from a fixed formula.
     snn_graph <- bluster::makeSNNGraph(pca_coords, k = min(10, n_cells - 1))
-    leiden_res <- igraph::cluster_leiden(
-        snn_graph,
-        objective_function = "modularity",
-        resolution = max(1, n_clusters / 20)
-    )
-    assignments <- as.integer(igraph::membership(leiden_res))
+    if (is.null(n_clusters)) {
+        # Natural community structure at resolution 1. On the benchmarks this
+        # resolves whole cell types and is the best-performing setting.
+        leiden_res <- igraph::cluster_leiden(
+            snn_graph,
+            objective_function = "modularity",
+            resolution = 1
+        )
+        assignments <- as.integer(igraph::membership(leiden_res))
+    } else {
+        assignments <- leiden_at_target(snn_graph, n_clusters)
+    }
     names(assignments) <- colnames(expr_mat)
 
     # Iteratively merge small clusters into nearest neighbor until all >= min_cells
@@ -235,7 +326,7 @@ create_microclusters_sparse <- function(
 #' @examples
 #' sce <- sce_example()
 #' mat <- SingleCellExperiment::counts(sce)
-#' clusters <- create_microclusters_sparse(mat, n_clusters = 15, min_cells = 20)
+#' clusters <- create_microclusters_sparse(mat, min_cells = 20)
 #' w <- compute_simpsons_weights(clusters$assignments, min_cluster_size = 10)
 #' head(w)
 #'
@@ -656,7 +747,8 @@ compare_local_correlations <- function(local_cor_list, weights) {
 #' weights. Called from \code{anglemania()} before FBM conversion.
 #'
 #' @param matrix_list Named list of sparse matrices (genes x cells).
-#' @param n_clusters Target microclusters per batch.
+#' @param n_clusters Target microclusters per batch, or NULL for the
+#'   natural community structure (default).
 #' @param n_pcs PCs for clustering.
 #' @param min_cells Min cells per cluster.
 #' @param min_cluster_size Min cluster size for weight inclusion.
@@ -676,7 +768,7 @@ compare_local_correlations <- function(local_cor_list, weights) {
 #' @noRd
 prepare_simpsons <- function(
     matrix_list,
-    n_clusters = 15,
+    n_clusters = NULL,
     n_pcs = 20,
     min_cells = 30,
     min_cluster_size = 20,
