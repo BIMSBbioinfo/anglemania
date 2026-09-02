@@ -150,7 +150,7 @@ The function has a few important arguments:
 object that indicates which batch the cells belong to. This is required to 
 distinguish between batches, because we compute the angle between gene pairs 
 for each batch.
-- `method`: either cosine, spearman or diem
+- `method`: either cosine or spearman
     - this is the method by which the relationship of the gene pairs is measured. 
 Default is cosine, which is the cosine similarity between the expression 
 vectors of the gene pairs.
@@ -194,6 +194,139 @@ anglemania_genes <- get_anglemania_genes(sce)
 head(anglemania_genes)
 length(anglemania_genes)
 ```
+
+
+# Simpson's paradox correction
+
+anglemania ranks gene pairs by how *consistent* their correlation is across
+batches. That works well when every batch contains the same mixture of cell
+types, but real datasets rarely do. A gene pair that is correlated only within
+T cells will show a correlation proportional to each batch's T cell fraction --
+so a pair with a perfectly stable biological relationship looks unstable, and a
+pair with no within-cell-type relationship at all can look stable simply because
+two batches happen to share a composition. This is Simpson's paradox: the
+aggregate correlation is driven by the mixture, not by the biology.
+
+The correction, enabled with `use_simpsons = TRUE`, groups cells into
+microclusters within each batch (PCA, then an SNN graph, then Leiden) and
+computes the gene-gene correlations with per-cell weights `1 / |cluster|`. Every
+microcluster then contributes equally to the estimate regardless of how many
+cells it holds, which removes the composition term.
+
+The simulated data used above has balanced composition by construction, so it
+cannot show the effect. We first make the batches unbalanced -- each batch is
+dominated by a different cell type -- and then compare gene selection with and
+without the correction.
+
+```{r, simpsons unbalanced data}
+set.seed(1)
+batches <- unique(as.character(sce_raw$Batch))
+groups <- unique(as.character(sce_raw$Group))
+
+# Each batch keeps all cells of one dominant group and 30% of the others
+keep <- unlist(lapply(seq_along(batches), function(i) {
+    dominant <- groups[(i - 1) %% length(groups) + 1]
+    in_batch <- which(as.character(sce_raw$Batch) == batches[i])
+    is_dominant <- as.character(sce_raw$Group)[in_batch] == dominant
+    c(
+        in_batch[is_dominant],
+        sample(in_batch[!is_dominant], round(0.3 * sum(!is_dominant)))
+    )
+}))
+
+sce_unbalanced <- sce_raw[, keep]
+table(sce_unbalanced$Batch, sce_unbalanced$Group)
+```
+
+Each batch is now dominated by a different cell type. Running anglemania with
+and without the correction:
+
+```{r, run simpsons, message = FALSE}
+sce_plain <- anglemania(
+    sce_unbalanced,
+    batch_key = "Batch",
+    max_n_genes = 2000
+)
+
+sce_simpsons <- anglemania(
+    sce_unbalanced,
+    batch_key = "Batch",
+    max_n_genes = 2000,
+    use_simpsons = TRUE
+)
+
+genes_plain <- get_anglemania_genes(sce_plain)
+genes_simpsons <- get_anglemania_genes(sce_simpsons)
+
+length(intersect(genes_plain, genes_simpsons))
+```
+
+The two gene sets overlap substantially but not completely -- the difference is
+the set of genes whose apparent cross-batch stability came from the composition
+rather than from the biology. On the SCIB benchmark suite the correction raises
+DE gene precision to 0.937-0.983 from a baseline of 0.899-0.901.
+
+## Choosing the number of microclusters
+
+`simpsons_n_clusters` is the parameter worth tuning. It sets the Leiden
+resolution to `max(1, simpsons_n_clusters / 20)`. Sweeps across 5-50 clusters
+show that 10-20 is optimal: too few and the microclusters are still internally
+heterogeneous, so the composition confound survives; too many and each cluster
+holds too few cells for a stable correlation estimate. The default is `15`.
+
+`simpsons_min_cells` (default `30`) sets the size below which a microcluster is
+merged into its nearest neighbour, and `simpsons_min_cluster_size` (default
+`20`) the size below which its cells are dropped from the correlation estimate
+entirely. Both matter most for small batches.
+
+## Count splitting on real data
+
+The pipeline above uses the same counts to build the microclusters and to
+estimate the correlations within them. That is double-dipping, and on real data
+it makes the correction overshoot -- in our PBMC benchmark plain Simpson's
+scored ARI 0.180 against a baseline of 0.195. Count splitting
+([Neufeld et al.](https://arxiv.org/abs/2307.12985)) fixes this by drawing two
+independent Poisson folds from the counts, clustering on the first and
+correlating on the second:
+
+```{r, count splitting, eval = FALSE}
+sce_simpsons_cs <- anglemania(
+    sce_unbalanced,
+    batch_key = "Batch",
+    max_n_genes = 2000,
+    use_simpsons = TRUE,
+    simpsons_use_count_split = TRUE,
+    simpsons_count_split_prop = 0.5
+)
+```
+
+On the same PBMC benchmark this recovers the win, reaching ARI 0.205. **If you
+are running on real data rather than simulations, turn this on.** It requires
+the `countsplit` package.
+
+## Options that are available but not recommended
+
+Two alternatives to the default weighting scheme are exposed as parameters
+because they were benchmarked, but neither improved on the default and both
+default to `FALSE`:
+
+- `simpsons_use_binary_pca` builds the clustering embedding from the binarised
+detection matrix rather than from expression. Cost: 0.4-0.8% DE precision.
+- `simpsons_use_density_weights` replaces the discrete cluster-inverse weights
+with continuous kNN density weights. Cost: 3-7% DE precision.
+
+Plain Leiden microclusters with cluster-inverse weights remains the best
+configuration.
+
+## Using the Simpson's score in gene ranking
+
+Setting `simpsons_weight_in_ranking` above `0` adds a third criterion to
+`select_genes()`, alongside the mean and standard deviation of the z-scores. It
+scores each gene pair on how strong and how consistent its *within-microcluster*
+correlations are across datasets, and the two base weights are rescaled to sum
+to `1 - simpsons_weight_in_ranking`. This triggers a post-hoc pass over every
+prefiltered gene pair in every microcluster, which is considerably more
+expensive than the correction itself, so it is off by default.
 
 
 # MNN integration
