@@ -223,7 +223,7 @@ without the weights. That cross-batch spread is exactly what anglemania's
 standard-deviation criterion penalises.
 
 ```{r, simpsons mechanism, message = FALSE}
-sim_demo <- splatSimulate(
+sim_full <- splatSimulate(
     batchCells = rep(1000 * 3, 4),
     batch.facLoc = 0.3, batch.facScale = 0.1,
     group.prob = rep(1 / 3, 3),
@@ -235,18 +235,18 @@ sim_demo <- splatSimulate(
 # Batches with a decreasing share of Group1
 set.seed(1)
 share <- c(0.70, 0.50, 0.30, 0.15)
-grps <- unique(as.character(sim_demo$Group))
-btch <- unique(as.character(sim_demo$Batch))
+grps <- unique(as.character(sim_full$Group))
+btch <- unique(as.character(sim_full$Batch))
 keep <- unlist(lapply(seq_along(btch), function(i) {
-    in_b <- which(as.character(sim_demo$Batch) == btch[i])
-    g <- as.character(sim_demo$Group)[in_b]
+    in_b <- which(as.character(sim_full$Batch) == btch[i])
+    g <- as.character(sim_full$Group)[in_b]
     c(
         sample(in_b[g == grps[1]], round(share[i] * 1000)),
         sample(in_b[g == grps[2]], round((1 - share[i]) * 500)),
         sample(in_b[g == grps[3]], round((1 - share[i]) * 500))
     )
 }))
-sim_demo <- scater::logNormCounts(sim_demo[, keep])
+sim_demo <- scater::logNormCounts(sim_full[, keep])
 table(sim_demo$Batch, sim_demo$Group)
 ```
 
@@ -307,6 +307,159 @@ group instead of 1000 makes it vanish into noise (weighted SD 0.056 against
 `1 / |cluster|`, so a cluster holding few cells is promoted to full weight
 while still being a noisy estimate. Batches with small or highly skewed
 populations can therefore come out worse rather than better.
+
+## How the correction behaves as imbalance grows
+
+The demonstration above used one fixed level of imbalance. The more useful
+question is how the correction behaves as batches become progressively more
+disproportionate. We sweep that directly, holding the number of cells per batch
+**fixed at 900** so that only the proportions change -- otherwise increasing
+imbalance would also mean shrinking the data, and the two effects could not be
+told apart.
+
+At a dominant share of 1/3 the three cell types are balanced and there is no
+confound to remove; at 0.9 each batch is almost a pure population.
+
+```{r, imbalance sweep, message = FALSE}
+sim_all <- scater::logNormCounts(sim_full)
+cells_per_batch <- 900
+
+sweep_res <- do.call(rbind, lapply(c(1 / 3, 0.5, 0.7, 0.9), function(d) {
+    set.seed(1)
+    unw <- wtd <- matrix(NA_real_, nrow(pairs), length(btch))
+    smallest <- Inf
+
+    for (i in seq_along(btch)) {
+        in_b <- which(as.character(sim_all$Batch) == btch[i])
+        g <- as.character(sim_all$Group)[in_b]
+        dom <- grps[(i - 1) %% length(grps) + 1]
+        oth <- setdiff(grps, dom)
+
+        idx <- c(
+            sample(in_b[g == dom], round(d * cells_per_batch)),
+            sample(in_b[g == oth[1]], round((1 - d) * cells_per_batch / 2)),
+            sample(in_b[g == oth[2]], round((1 - d) * cells_per_batch / 2))
+        )
+        cells <- colnames(sim_all)[idx]
+        expr <- as.matrix(logcounts(sim_all)[de_genes_g1, cells])
+
+        clusters <- create_microclusters_sparse(
+            counts(sim_all)[, cells], n_pcs = 20, min_cells = 15,
+            verbose = FALSE
+        )
+        w <- compute_simpsons_weights(clusters$assignments,
+                                      min_cluster_size = 10)
+        smallest <- min(smallest, min(as.numeric(clusters$sizes)))
+
+        cu <- cor(t(expr))
+        cw <- wcor(expr, w[cells])
+        unw[, i] <- cu[cbind(pairs[, 1], pairs[, 2])]
+        wtd[, i] <- cw[cbind(pairs[, 1], pairs[, 2])]
+    }
+
+    data.frame(
+        dominant_share = round(d, 2),
+        unweighted_sd = mean(apply(unw, 1, sd)),
+        weighted_sd = mean(apply(wtd, 1, sd)),
+        smallest_cluster = smallest
+    )
+}))
+
+sweep_res$change_pct <- round(
+    100 * (sweep_res$weighted_sd - sweep_res$unweighted_sd) /
+        sweep_res$unweighted_sd, 1
+)
+sweep_res
+```
+
+The behaviour is not monotone, and it is not uniformly reliable either:
+
+| Dominant share | Unweighted SD | Weighted SD | Change | Smallest cluster |
+|---|---|---|---|---|
+| 0.33 (balanced) | 0.0334 | 0.0334 | −0.1% | 296 |
+| 0.50 | 0.0388 | 0.0357 | **−8.1%** | 223 |
+| 0.70 | 0.0429 | 0.0392 | −8.6% | 132 |
+| 0.90 | 0.0380 | 0.0478 | **+25.8%** | 45 |
+
+Repeating the sweep under three sampling seeds shows which of these rows can be
+trusted. Reading the change column for seeds 1, 2 and 3:
+
+| Dominant share | seed 1 | seed 2 | seed 3 | verdict |
+|---|---|---|---|---|
+| 0.33 | −0.1% | 0.0% | 0.0% | no effect, completely reproducible |
+| 0.50 | −8.1% | −11.7% | −7.8% | consistent help |
+| 0.70 | −8.6% | **+8.9%** | −0.8% | **unstable -- the sign flips** |
+| 0.90 | +25.8% | +33.9% | +32.2% | consistent harm |
+
+Four things to take from this:
+
+**Balanced batches: the correction does nothing.** To three decimal places, and
+identically under every seed. That is the right behaviour -- there is no
+composition confound to remove. It also means switching the correction on costs
+nothing but compute when your batches happen to be well matched.
+
+**Moderate imbalance is where it works.** Around a 0.5 dominant share it
+reliably cuts cross-batch spread by roughly 8-12%. Note the unweighted spread
+climbing from 0.0334 to 0.0388 as the confound appears: that increase is exactly
+the artefact anglemania would otherwise mistake for unstable biology.
+
+**Strong imbalance is a coin flip.** At a 0.7 dominant share the result swings
+between −8.6% and +8.9% depending only on which cells were sampled. The last
+column explains why: the smallest cluster in that setting ranged from 82 to 132
+cells across seeds, and whether the run helps or hurts tracks whether the
+clustering happened to produce a small cluster. Do not rely on the correction
+here without checking it on your own data.
+
+**Extreme imbalance actively hurts**, by 26-34%. At a 0.9 dominant share the
+minority clusters hold about 45 cells, and cluster-inverse weighting promotes
+those 45 cells to the same total influence as the several hundred cells of the
+dominant type. The estimate ends up dominated by the noisiest part of the data.
+
+### The same sweep end to end
+
+The comparison above isolates the correlation step. Running the full gene
+selection pipeline over the same kind of sweep -- SCIB Sim2 generative
+parameters, 4 batches, 4 cell types, **5000 cells per batch throughout**, only
+the proportions changing -- and scoring the 1000 selected genes against the
+simulator's true DE genes:
+
+| Dominant share | Minority share | Minority cells per batch | Baseline | Simpson's | Gain |
+|---|---|---|---|---|---|
+| 0.25 (balanced) | 0.25 | 1250 | 1.000 | 1.000 | +0.000 |
+| 0.40 | 0.20 | 1000 | 0.990 | 1.000 | +0.010 |
+| 0.55 | 0.15 | 750 | 0.948 | 0.993 | +0.045 |
+| 0.70 | 0.10 | 500 | 0.901 | 0.934 | +0.033 |
+| 0.85 | 0.05 | 250 | 0.836 | 0.897 | **+0.061** |
+
+Two things stand out. First, the **baseline** degrades steadily with imbalance,
+1.000 down to 0.836 -- confirming that composition confounding, and nothing
+else, is what costs anglemania precision on these data. When the batches are
+balanced anglemania is perfect. Second, the correction helps at every level and
+never hurts, with the gain broadly growing as the confound does.
+
+That looks like it contradicts the +25.8% harm at a 0.9 dominant share above,
+and the difference is the point. Here each batch holds 5000 cells, so even a 5%
+minority is 250 cells -- ample. In the correlation sweep each batch held 900
+cells, so a 10% minority was around 45 cells, and the weighting promoted those
+45 noisy cells to full influence.
+
+So the two sweeps do not disagree; they vary different things. Skew in
+*proportion* is what the correction fixes, and it fixes more of it the worse the
+skew gets. Skew that drives the minority *count* down towards a few dozen cells
+is what breaks it.
+
+The rule of thumb is that the correction needs minority populations that are
+*small in proportion but not small in number*. The proportion is what it
+corrects; the absolute count is what determines whether the corrected estimate
+is any good. Check the realised cluster sizes before trusting it on a badly
+skewed dataset:
+
+```{r, check cluster sizes, eval = FALSE}
+clusters <- create_microclusters_sparse(counts(sce)[, batch_cells],
+                                        verbose = FALSE)
+sort(clusters$sizes)
+```
+
 
 ## Using the correction
 
