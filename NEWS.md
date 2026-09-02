@@ -1,9 +1,9 @@
 # anglemania 0.99.7
 
 * Added Simpson's paradox correction, enabled with `anglemania(use_simpsons = TRUE)`.
-Cells are grouped into microclusters within each batch (PCA + SNN graph + Leiden) and
+Cells are grouped into clusters within each batch (PCA + SNN graph + Leiden) and
 gene-gene correlations are computed with per-cell weights `1 / |cluster|`, so every
-microcluster contributes equally regardless of size. This removes correlation signal
+cluster contributes equally regardless of size. This removes correlation signal
 driven purely by differing cell type proportions across batches. On SCIB simulations
 DE precision rises to 0.937-0.983 from a baseline of 0.899-0.901.
 
@@ -14,8 +14,21 @@ where uncorrected Simpson's weighting tends to overcorrect. Requires the `counts
 package.
 
 * Added `simpsons_weight_in_ranking`, an optional third criterion in `select_genes()`
-that scores gene pairs on how consistent their within-microcluster correlations are
+that scores gene pairs on how consistent their within-cluster correlations are
 across datasets.
+
+* Exported `create_microclusters_sparse()` and `compute_simpsons_weights()` so the
+clustering and the per-cell weights can be inspected directly.
+
+* Known limitation: `simpsons_n_clusters` does not control clustering granularity.
+It sets the Leiden resolution to `max(1, simpsons_n_clusters / 20)`, so every value
+from 2 to 20 gives resolution 1 and identical clustering, and above 20
+`igraph::cluster_leiden(objective_function = "modularity")` responds only weakly.
+The clustering resolves whole cell types rather than finer sub-structures. The
+benchmark results above were produced at the default and are unaffected, but the
+argument cannot currently be tuned. The correction also needs enough cells per
+cluster: cluster-inverse weights promote small clusters to full weight while they
+remain noisy, so batches with small or highly skewed populations can come out worse.
 
 * Fixed `permute_nonzero()` erroring on vectors with fewer than two non-zero entries.
 

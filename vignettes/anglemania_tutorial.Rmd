@@ -207,84 +207,185 @@ pair with no within-cell-type relationship at all can look stable simply because
 two batches happen to share a composition. This is Simpson's paradox: the
 aggregate correlation is driven by the mixture, not by the biology.
 
-The correction, enabled with `use_simpsons = TRUE`, groups cells into
-microclusters within each batch (PCA, then an SNN graph, then Leiden) and
-computes the gene-gene correlations with per-cell weights `1 / |cluster|`. Every
-microcluster then contributes equally to the estimate regardless of how many
-cells it holds, which removes the composition term.
+The correction, enabled with `use_simpsons = TRUE`, groups cells into clusters
+within each batch (PCA, then an SNN graph, then Leiden) and computes the
+gene-gene correlations with per-cell weights `1 / |cluster|`. Every cluster
+then contributes equally to the estimate regardless of how many cells it holds,
+which removes the composition term.
 
-The simulated data used above has balanced composition by construction, so it
-cannot show the effect. We first make the batches unbalanced -- each batch is
-dominated by a different cell type -- and then compare gene selection with and
-without the correction.
+## Seeing the confound directly
 
-```{r, simpsons unbalanced data}
+Before using the correction it is worth watching it work on the quantity it is
+meant to fix. We simulate four batches whose share of one cell type falls from
+70% to 15%, take the genes most strongly up-regulated in that cell type, and
+measure how much each pair's correlation moves across batches -- with and
+without the weights. That cross-batch spread is exactly what anglemania's
+standard-deviation criterion penalises.
+
+```{r, simpsons mechanism, message = FALSE}
+sim_demo <- splatSimulate(
+    batchCells = rep(1000 * 3, 4),
+    batch.facLoc = 0.3, batch.facScale = 0.1,
+    group.prob = rep(1 / 3, 3),
+    nGenes = 5000, method = "groups", verbose = FALSE,
+    out.prob = 0.001, de.prob = 0.1,
+    de.facLoc = 0.3, de.facScale = 0.1, bcv.common = 0.1, seed = 42
+)
+
+# Batches with a decreasing share of Group1
 set.seed(1)
-batches <- unique(as.character(sce_raw$Batch))
-groups <- unique(as.character(sce_raw$Group))
-
-# Each batch keeps all cells of one dominant group and 30% of the others
-keep <- unlist(lapply(seq_along(batches), function(i) {
-    dominant <- groups[(i - 1) %% length(groups) + 1]
-    in_batch <- which(as.character(sce_raw$Batch) == batches[i])
-    is_dominant <- as.character(sce_raw$Group)[in_batch] == dominant
+share <- c(0.70, 0.50, 0.30, 0.15)
+grps <- unique(as.character(sim_demo$Group))
+btch <- unique(as.character(sim_demo$Batch))
+keep <- unlist(lapply(seq_along(btch), function(i) {
+    in_b <- which(as.character(sim_demo$Batch) == btch[i])
+    g <- as.character(sim_demo$Group)[in_b]
     c(
-        in_batch[is_dominant],
-        sample(in_batch[!is_dominant], round(0.3 * sum(!is_dominant)))
+        sample(in_b[g == grps[1]], round(share[i] * 1000)),
+        sample(in_b[g == grps[2]], round((1 - share[i]) * 500)),
+        sample(in_b[g == grps[3]], round((1 - share[i]) * 500))
     )
 }))
-
-sce_unbalanced <- sce_raw[, keep]
-table(sce_unbalanced$Batch, sce_unbalanced$Group)
+sim_demo <- scater::logNormCounts(sim_demo[, keep])
+table(sim_demo$Batch, sim_demo$Group)
 ```
 
-Each batch is now dominated by a different cell type. Running anglemania with
-and without the correction:
+Weighted Pearson correlation, the quantity `use_simpsons = TRUE` substitutes for
+the ordinary one:
+
+```{r, weighted correlation helper}
+wcor <- function(mat, w) {
+    w <- w / sum(w)
+    centred <- mat - as.numeric(mat %*% w)
+    covm <- (centred * rep(w, each = nrow(mat))) %*% t(centred)
+    sds <- sqrt(diag(covm))
+    covm / outer(sds, sds)
+}
+```
+
+For each batch we cluster, derive the weights, and record every pair's
+correlation both ways:
+
+```{r, compare stability, message = FALSE}
+de_genes_g1 <- rownames(sim_demo)[
+    order(rowData(sim_demo)$DEFacGroup1, decreasing = TRUE)[1:40]
+]
+pairs <- t(combn(length(de_genes_g1), 2))
+unw <- wtd <- matrix(NA_real_, nrow(pairs), length(btch))
+
+for (i in seq_along(btch)) {
+    cells <- colnames(sim_demo)[sim_demo$Batch == btch[i]]
+    expr <- as.matrix(logcounts(sim_demo)[de_genes_g1, cells])
+
+    clusters <- create_microclusters_sparse(
+        counts(sim_demo)[, cells],
+        n_clusters = 15, n_pcs = 20, min_cells = 15, verbose = FALSE
+    )
+    w <- compute_simpsons_weights(clusters$assignments, min_cluster_size = 10)
+
+    cu <- cor(t(expr))
+    cw <- wcor(expr, w[cells])
+    unw[, i] <- cu[cbind(pairs[, 1], pairs[, 2])]
+    wtd[, i] <- cw[cbind(pairs[, 1], pairs[, 2])]
+}
+
+data.frame(
+    correlation = c("unweighted", "cluster-weighted"),
+    mean_cross_batch_sd = c(mean(apply(unw, 1, sd)), mean(apply(wtd, 1, sd)))
+)
+```
+
+The cluster-weighted correlations move roughly 17% less across batches
+(mean SD 0.035 against 0.042). These are gene pairs whose biology is identical
+in every batch; all that changed is the cell type mixture, and the weighting
+absorbs most of that. Since anglemania rewards low cross-batch spread, pairs
+like these rank higher once the confound is removed.
+
+**This effect needs cells.** Repeating the same comparison at 300 cells per
+group instead of 1000 makes it vanish into noise (weighted SD 0.056 against
+0.054 -- marginally *worse*). Each cluster's contribution is rescaled to
+`1 / |cluster|`, so a cluster holding few cells is promoted to full weight
+while still being a noisy estimate. Batches with small or highly skewed
+populations can therefore come out worse rather than better.
+
+## Using the correction
 
 ```{r, run simpsons, message = FALSE}
+sce_unbalanced <- sim_demo
+
 sce_plain <- anglemania(
     sce_unbalanced,
     batch_key = "Batch",
-    max_n_genes = 2000
+    max_n_genes = 2000,
+    min_cells_per_gene = 10
 )
 
 sce_simpsons <- anglemania(
     sce_unbalanced,
     batch_key = "Batch",
     max_n_genes = 2000,
+    min_cells_per_gene = 10,
     use_simpsons = TRUE
 )
 
-genes_plain <- get_anglemania_genes(sce_plain)
-genes_simpsons <- get_anglemania_genes(sce_simpsons)
-
-length(intersect(genes_plain, genes_simpsons))
+length(intersect(
+    get_anglemania_genes(sce_plain),
+    get_anglemania_genes(sce_simpsons)
+))
 ```
 
-The two gene sets overlap substantially but not completely -- the difference is
-the set of genes whose apparent cross-batch stability came from the composition
-rather than from the biology. On the SCIB benchmark suite the correction raises
-DE gene precision to 0.937-0.983 from a baseline of 0.899-0.901.
+The two gene sets overlap substantially but not completely. This simulation is
+too small to separate the two on DE-gene recovery -- for that, see the
+benchmark below.
 
-## Choosing the number of microclusters
+## Benchmark results
 
-`simpsons_n_clusters` is the parameter worth tuning. It sets the Leiden
-resolution to `max(1, simpsons_n_clusters / 20)`. Sweeps across 5-50 clusters
-show that 10-20 is optimal: too few and the microclusters are still internally
-heterogeneous, so the composition confound survives; too many and each cluster
-holds too few cells for a stable correlation estimate. The default is `15`.
+On the two SCIB integration-benchmark simulations, selecting 1000 genes and
+scoring against the simulator's ground-truth DE genes
+(`Scripts/Reports/test_scib_simulations.Rmd`):
 
-`simpsons_min_cells` (default `30`) sets the size below which a microcluster is
+| Simulation | Baseline (permutation) | Simpson's | HVG |
+|---|---|---|---|
+| Sim1 (6 batches, 7 types) | 0.899 | **0.937** | 0.792 |
+| Sim2 (4 batches, 4 types) | 0.901 | **0.983** | 0.696 |
+
+Both simulations have unequal, batch-specific cell type proportions, and both
+have thousands of cells per batch.
+
+## A note on `simpsons_n_clusters`
+
+This argument does not currently do what its name suggests. It sets the Leiden
+resolution to `max(1, simpsons_n_clusters / 20)`, so **every value from 2 to 20
+maps to resolution 1 and gives identical clustering**; above 20 the resolution
+changes, but `igraph::cluster_leiden(objective_function = "modularity")`
+responds to it weakly and non-monotonically. In practice the clustering resolves
+whole cell types rather than finer sub-structures.
+
+The correction still works -- the benchmark results above were produced at the
+default -- but it works by equalising cell types, not by building
+microclusters, and tuning this argument will not change that. You can check what
+you actually get:
+
+```{r, inspect clustering, message = FALSE}
+b1 <- colnames(sim_demo)[sim_demo$Batch == "Batch1"]
+cl <- create_microclusters_sparse(
+    counts(sim_demo)[, b1], n_clusters = 15, n_pcs = 20,
+    min_cells = 15, verbose = FALSE
+)
+c(requested = 15, obtained = cl$n_clusters)
+```
+
+`simpsons_min_cells` (default `30`) sets the size below which a cluster is
 merged into its nearest neighbour, and `simpsons_min_cluster_size` (default
-`20`) the size below which its cells are dropped from the correlation estimate
-entirely. Both matter most for small batches.
+`20`) the size below which its cells are dropped from the correlation estimate.
+Given the note above about small clusters, these are the arguments that matter.
 
 ## Count splitting on real data
 
-The pipeline above uses the same counts to build the microclusters and to
-estimate the correlations within them. That is double-dipping, and on real data
-it makes the correction overshoot -- in our PBMC benchmark plain Simpson's
-scored ARI 0.180 against a baseline of 0.195. Count splitting
+The pipeline above uses the same counts to build the clusters and to estimate
+the correlations within them. That is double-dipping, and on real data it makes
+the correction overshoot -- in the PBMC benchmark plain Simpson's scored ARI
+0.180 against a baseline of 0.195. Count splitting
 ([Neufeld et al.](https://arxiv.org/abs/2307.12985)) fixes this by drawing two
 independent Poisson folds from the counts, clustering on the first and
 correlating on the second:
@@ -307,26 +408,27 @@ the `countsplit` package.
 ## Options that are available but not recommended
 
 Two alternatives to the default weighting scheme are exposed as parameters
-because they were benchmarked, but neither improved on the default and both
-default to `FALSE`:
+because they were benchmarked, but neither improved on it. DE precision on the
+SCIB simulations, against 0.937 (Sim1) and 0.983 (Sim2) for the default:
 
-- `simpsons_use_binary_pca` builds the clustering embedding from the binarised
-detection matrix rather than from expression. Cost: 0.4-0.8% DE precision.
-- `simpsons_use_density_weights` replaces the discrete cluster-inverse weights
-with continuous kNN density weights. Cost: 3-7% DE precision.
+| Option | Sim1 | Sim2 |
+|---|---|---|
+| `simpsons_use_binary_pca` | 0.929 | 0.979 |
+| `simpsons_use_density_weights` | 0.905 | 0.917 |
+| both together | 0.902 | 0.899 |
 
-Plain Leiden microclusters with cluster-inverse weights remains the best
-configuration.
+Plain Leiden clusters with cluster-inverse weights remains the best
+configuration, and both options default to `FALSE`.
 
 ## Using the Simpson's score in gene ranking
 
 Setting `simpsons_weight_in_ranking` above `0` adds a third criterion to
 `select_genes()`, alongside the mean and standard deviation of the z-scores. It
-scores each gene pair on how strong and how consistent its *within-microcluster*
+scores each gene pair on how strong and how consistent its *within-cluster*
 correlations are across datasets, and the two base weights are rescaled to sum
 to `1 - simpsons_weight_in_ranking`. This triggers a post-hoc pass over every
-prefiltered gene pair in every microcluster, which is considerably more
-expensive than the correction itself, so it is off by default.
+prefiltered gene pair in every cluster, which is considerably more expensive
+than the correction itself, so it is off by default.
 
 
 # MNN integration

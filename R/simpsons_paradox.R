@@ -20,8 +20,10 @@
 #' clusters are merged into their nearest larger neighbor.
 #'
 #' @param expr_mat Sparse matrix (genes x cells), raw counts.
-#' @param n_clusters Target number of microclusters; sets the Leiden
-#'   resolution to \code{max(1, n_clusters / 20)}. Default \code{15}.
+#' @param n_clusters Nominal target number of microclusters. Sets the Leiden
+#'   resolution to \code{max(1, n_clusters / 20)}; because of the floor, all
+#'   values <= 20 give resolution 1 and identical clustering. Default
+#'   \code{15}.
 #' @param n_pcs Number of principal components. Default \code{20}.
 #' @param min_cells Minimum cells per microcluster; smaller clusters
 #'   are merged. Default \code{30}.
@@ -38,8 +40,14 @@
 #' @importFrom Matrix colSums rowMeans
 #' @importFrom stats prcomp median var
 #'
-#' @keywords internal
-#' @noRd
+#' @examples
+#' sce <- sce_example()
+#' mat <- SingleCellExperiment::counts(sce)
+#' clusters <- create_microclusters_sparse(mat, n_clusters = 15, min_cells = 20)
+#' clusters$n_clusters
+#' table(clusters$assignments)
+#'
+#' @export
 create_microclusters_sparse <- function(
     expr_mat,
     n_clusters = 15,
@@ -224,8 +232,14 @@ create_microclusters_sparse <- function(
 #'   Default \code{20}.
 #' @return Named numeric vector of per-cell weights.
 #'
-#' @keywords internal
-#' @noRd
+#' @examples
+#' sce <- sce_example()
+#' mat <- SingleCellExperiment::counts(sce)
+#' clusters <- create_microclusters_sparse(mat, n_clusters = 15, min_cells = 20)
+#' w <- compute_simpsons_weights(clusters$assignments, min_cluster_size = 10)
+#' head(w)
+#'
+#' @export
 compute_simpsons_weights <- function(assignments, min_cluster_size = 20) {
     cluster_sizes <- table(assignments)
 

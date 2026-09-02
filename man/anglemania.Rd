@@ -124,10 +124,16 @@ each batch and gene-gene correlations are computed with per-cell weights
 regardless of size. This removes correlation signal that is driven purely by
 differing cell type proportions across batches. Default is \code{FALSE}.}
 
-\item{simpsons_n_clusters}{Integer specifying the target number of
-microclusters per batch. Controls the Leiden resolution, which is set to
-\code{max(1, simpsons_n_clusters / 20)}. Benchmarks show 10-20 is optimal;
-outside that range performance degrades. Default is \code{15}.}
+\item{simpsons_n_clusters}{Integer nominally specifying the target number
+of microclusters per batch. \strong{This argument currently has no effect
+for values of 20 or below.} It sets the Leiden resolution to
+\code{max(1, simpsons_n_clusters / 20)}, so every value from 2 to 20 maps to
+resolution 1 and yields identical clustering; above 20 the resolution changes
+but \code{igraph::cluster_leiden(objective_function = "modularity")}
+responds to it only weakly and non-monotonically. In practice the clustering
+resolves whole cell types rather than finer microclusters. The published
+benchmarks were produced at the default and are unaffected, but do not
+expect to tune this. Default is \code{15}.}
 
 \item{simpsons_n_pcs}{Integer specifying the number of principal components
 used for the microclustering embedding. Default is \code{20}.}
