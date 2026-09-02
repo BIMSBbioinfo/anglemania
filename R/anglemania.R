@@ -18,6 +18,9 @@
 #' @details
 #' This function performs the following steps:
 #' \enumerate{
+#'   \item Optionally, when \code{use_simpsons = TRUE}, groups cells into
+#'     microclusters within each batch and derives per-cell weights so that
+#'     each microcluster contributes equally to the correlation estimate.
 #'   \item Computes angles between genes for each batch in the
 #'     \code{SingleCellExperiment} using the specified \code{method}, via
 #'     \code{\link{factorise}}.
@@ -62,6 +65,60 @@
 #' @param normalization_method Character "divide_by_total_counts" or
 #'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
 #' @param verbose Logical indicating whether to print progress messages.
+#' @param use_simpsons Logical indicating whether to apply Simpson's paradox
+#' correction. When \code{TRUE}, cells are grouped into microclusters within
+#' each batch and gene-gene correlations are computed with per-cell weights
+#' \code{1 / |cluster|}, so that each microcluster contributes equally
+#' regardless of size. This removes correlation signal that is driven purely by
+#' differing cell type proportions across batches. Default is \code{FALSE}.
+#' @param simpsons_n_clusters Integer specifying the target number of
+#' microclusters per batch. Controls the Leiden resolution, which is set to
+#' \code{max(1, simpsons_n_clusters / 20)}. Benchmarks show 10-20 is optimal;
+#' outside that range performance degrades. Default is \code{15}.
+#' @param simpsons_n_pcs Integer specifying the number of principal components
+#' used for the microclustering embedding. Default is \code{20}.
+#' @param simpsons_min_cells Integer specifying the minimum number of cells a
+#' microcluster may contain. Clusters below this size are iteratively merged
+#' into their nearest neighbour. Default is \code{30}.
+#' @param simpsons_min_cluster_size Integer specifying the minimum cluster size
+#' for a cell to receive a non-zero weight. Cells in smaller clusters are
+#' excluded from the correlation estimate. Default is \code{20}.
+#' @param simpsons_min_cells_cor Integer specifying the minimum number of cells
+#' a microcluster must contain to contribute a within-cluster correlation
+#' during the post-hoc analysis. Only used when
+#' \code{simpsons_weight_in_ranking > 0}. Default is \code{20}.
+#' @param simpsons_top_quantile Numeric in \code{[0, 1]} specifying the
+#' quantile of within-cluster correlations used to summarise a gene pair's
+#' peak local correlation. Only used when
+#' \code{simpsons_weight_in_ranking > 0}. Default is \code{0.95}.
+#' @param simpsons_weight_in_ranking Numeric in \code{[0, 1]} specifying how
+#' much weight the Simpson's preservation score receives as a third criterion
+#' in \code{\link{select_genes}}, alongside mean z-score and z-score standard
+#' deviation. The two base criteria are rescaled to sum to
+#' \code{1 - simpsons_weight_in_ranking}. Setting this above \code{0} triggers
+#' the post-hoc local correlation analysis, which is computationally
+#' expensive. Default is \code{0} (disabled).
+#' @param simpsons_use_binary_pca Logical indicating whether to build the
+#' clustering embedding from the binarised detection matrix rather than from
+#' normalized expression. Benchmarks show this costs 0.4-0.8\% DE precision;
+#' retained as an option but not recommended. Default is \code{FALSE}.
+#' @param simpsons_use_density_weights Logical indicating whether to replace
+#' the discrete cluster-inverse weights with continuous kNN density-based
+#' weights. Benchmarks show this costs 3-7\% DE precision; retained as an
+#' option but not recommended. Default is \code{FALSE}.
+#' @param simpsons_density_k Integer specifying the number of nearest
+#' neighbours for density estimation. Only used when
+#' \code{simpsons_use_density_weights = TRUE}. Default is \code{30}.
+#' @param simpsons_use_count_split Logical indicating whether to use count
+#' splitting (Neufeld et al., \url{https://arxiv.org/abs/2307.12985}) so that
+#' clustering and correlation estimation use independent Poisson folds of the
+#' counts. This avoids double-dipping and is recommended on real data, where
+#' uncorrected Simpson's weighting tends to overcorrect. Requires the
+#' \pkg{countsplit} package. Default is \code{FALSE}.
+#' @param simpsons_count_split_prop Numeric in \code{[0.1, 0.9]} specifying the
+#' proportion of counts allocated to the first fold (used for PCA and
+#' clustering); the remainder is used for correlations. Only used when
+#' \code{simpsons_use_count_split = TRUE}. Default is \code{0.5}.
 #' @return An updated \code{SingleCellExperiment} object with computed
 #'   statistics and selected genes.
 #'   The results are stored in the metadata of the \code{SingleCellExperiment}
@@ -106,7 +163,20 @@ anglemania <- function(
     permutation_function = "sample",
     prefilter_threshold = 0.5,
     normalization_method = "divide_by_total_counts",
-    verbose = TRUE
+    verbose = TRUE,
+    use_simpsons = FALSE,
+    simpsons_n_clusters = 15,
+    simpsons_n_pcs = 20,
+    simpsons_min_cells = 30,
+    simpsons_min_cluster_size = 20,
+    simpsons_min_cells_cor = 20,
+    simpsons_top_quantile = 0.95,
+    simpsons_weight_in_ranking = 0.0,
+    simpsons_use_binary_pca = FALSE,
+    simpsons_use_density_weights = FALSE,
+    simpsons_density_k = 30,
+    simpsons_use_count_split = FALSE,
+    simpsons_count_split_prop = 0.5
 ) {
     # Check parameters
     S4Vectors::metadata(sce)$anglemania$params <- check_params(
@@ -122,7 +192,20 @@ anglemania <- function(
         permutation_function = permutation_function,
         prefilter_threshold = prefilter_threshold,
         normalization_method = normalization_method,
-        verbose = verbose
+        verbose = verbose,
+        use_simpsons = use_simpsons,
+        simpsons_n_clusters = simpsons_n_clusters,
+        simpsons_n_pcs = simpsons_n_pcs,
+        simpsons_min_cells = simpsons_min_cells,
+        simpsons_min_cluster_size = simpsons_min_cluster_size,
+        simpsons_min_cells_cor = simpsons_min_cells_cor,
+        simpsons_top_quantile = simpsons_top_quantile,
+        simpsons_weight_in_ranking = simpsons_weight_in_ranking,
+        simpsons_use_binary_pca = simpsons_use_binary_pca,
+        simpsons_use_density_weights = simpsons_use_density_weights,
+        simpsons_density_k = simpsons_density_k,
+        simpsons_use_count_split = simpsons_use_count_split,
+        simpsons_count_split_prop = simpsons_count_split_prop
     )
     {
         # Process inputs
@@ -192,6 +275,40 @@ anglemania <- function(
         min_samples_per_gene = min_samples_per_gene,
         verbose = verbose
     )
+    # Simpson's paradox correction: microcluster before FBM conversion
+    simpsons_data <- NULL
+    original_matrices <- NULL
+    if (use_simpsons) {
+        vmessage(verbose, "Preparing Simpson's correction...")
+        simpsons_data <- prepare_simpsons(
+            matrix_list = S4Vectors::metadata(sce)$anglemania$matrix_list,
+            n_clusters = simpsons_n_clusters,
+            n_pcs = simpsons_n_pcs,
+            min_cells = simpsons_min_cells,
+            min_cluster_size = simpsons_min_cluster_size,
+            use_binary_pca = simpsons_use_binary_pca,
+            use_density_weights = simpsons_use_density_weights,
+            density_k = simpsons_density_k,
+            use_count_split = simpsons_use_count_split,
+            count_split_prop = simpsons_count_split_prop,
+            verbose = verbose
+        )
+        S4Vectors::metadata(sce)$anglemania$simpsons_data <- simpsons_data
+
+        # If count splitting, replace correlation matrices with fold 2
+        if (simpsons_use_count_split &&
+            !is.null(simpsons_data$cor_matrices)) {
+            S4Vectors::metadata(sce)$anglemania$matrix_list <-
+                simpsons_data$cor_matrices
+        }
+        # Keep original sparse matrices for posthoc local correlations
+        if (simpsons_weight_in_ranking > 0) {
+            original_matrices <- S4Vectors::metadata(
+                sce
+            )$anglemania$matrix_list
+        }
+    }
+
     #
     S4Vectors::metadata(
         sce
@@ -207,18 +324,26 @@ anglemania <- function(
     if (verbose) {
         message("Computing angles and transforming to z-scores...")
     }
+    fbm_list <- S4Vectors::metadata(sce)$anglemania$matrix_list
+    batch_names <- names(fbm_list)
     S4Vectors::metadata(
         sce
     )$anglemania$matrix_list <- pbapply::pblapply(
-        S4Vectors::metadata(sce)$anglemania$matrix_list,
-        function(x) {
+        stats::setNames(batch_names, batch_names),
+        function(bn) {
+            w <- if (use_simpsons) {
+                simpsons_data$weights_per_batch[[bn]]
+            } else {
+                NULL
+            }
             factorise(
-                x_mat = x,
+                x_mat = fbm_list[[bn]],
                 method = method,
                 seed = 1,
                 permute_row_or_column = permute_row_or_column,
                 permutation_function = permutation_function,
-                normalization_method = normalization_method
+                normalization_method = normalization_method,
+                cell_weights = w
             )
         }
     )
@@ -238,6 +363,18 @@ anglemania <- function(
         zscore_sn_threshold = prefilter_threshold,
         verbose = verbose
     )
+
+    # Post-hoc Simpson's local correlation analysis
+    if (use_simpsons && simpsons_weight_in_ranking > 0) {
+        vmessage(verbose, "Computing Simpson's local correlations...")
+        sce <- posthoc_simpsons(
+            sce = sce,
+            original_matrices = original_matrices,
+            min_cells_cor = simpsons_min_cells_cor,
+            top_quantile = simpsons_top_quantile,
+            verbose = verbose
+        )
+    }
 
     vmessage(verbose, "Extracting filtered features...")
     sce <- select_genes(

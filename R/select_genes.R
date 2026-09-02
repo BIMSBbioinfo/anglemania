@@ -168,20 +168,52 @@ select_genes <- function(
             null.ok = FALSE
         )
     }
+    # Check for Simpson's score integration
+    simpsons_w <- S4Vectors::metadata(
+        sce
+    )$anglemania$params$simpsons_weight_in_ranking
+    has_simpsons <- !is.null(simpsons_w) && simpsons_w > 0 &&
+        "simpsons_score" %in% colnames(prefiltered_df)
+
     if (isTRUE(check_weights)) {
-        prefiltered_df$rank <- prefiltered_df |>
-            dplyr::mutate(
-                rank_mean_zscore = rank(
-                    -abs(mean_zscore),
-                    ties.method = "min"
-                ),
-                rank_sd_zscore = rank(sd_zscore, ties.method = "min"),
-                rank = rank(
-                    rank_mean_zscore * score_weights[1] +
-                        rank_sd_zscore * score_weights[2]
-                )
-            ) |>
-            dplyr::pull(rank)
+        if (has_simpsons) {
+            # Rescale base weights to (1 - simpsons_w) total
+            adj_factor <- 1 - simpsons_w
+            adj_w1 <- score_weights[1] * adj_factor
+            adj_w2 <- score_weights[2] * adj_factor
+            # Replace NA simpsons_score with worst rank
+            ss <- prefiltered_df$simpsons_score
+            ss[is.na(ss)] <- 0
+            prefiltered_df$rank <- prefiltered_df |>
+                dplyr::mutate(
+                    rank_mean_zscore = rank(
+                        -abs(mean_zscore),
+                        ties.method = "min"
+                    ),
+                    rank_sd_zscore = rank(sd_zscore, ties.method = "min"),
+                    rank_simpsons = rank(-ss, ties.method = "min"),
+                    rank = rank(
+                        rank_mean_zscore * adj_w1 +
+                            rank_sd_zscore * adj_w2 +
+                            rank_simpsons * simpsons_w
+                    )
+                ) |>
+                dplyr::pull(rank)
+        } else {
+            prefiltered_df$rank <- prefiltered_df |>
+                dplyr::mutate(
+                    rank_mean_zscore = rank(
+                        -abs(mean_zscore),
+                        ties.method = "min"
+                    ),
+                    rank_sd_zscore = rank(sd_zscore, ties.method = "min"),
+                    rank = rank(
+                        rank_mean_zscore * score_weights[1] +
+                            rank_sd_zscore * score_weights[2]
+                    )
+                ) |>
+                dplyr::pull(rank)
+        }
     } else {
         stop(check_weights) # if weights are set incorrectly, it prints
         # the error message

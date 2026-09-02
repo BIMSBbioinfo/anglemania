@@ -8,8 +8,7 @@ extract_angles(x_mat, method = "cosine")
 }
 \arguments{
 \item{x_mat}{An \code{\link[bigstatsr]{FBM}} object containing raw gene
-expression data, where rows correspond to genes and columns to samples.
-The data will be normalized and scaled within the function.}
+expression data, where rows correspond to genes and columns to samples.}
 
 \item{method}{A character string specifying the method to compute the
 gene-gene relationships. Options are:

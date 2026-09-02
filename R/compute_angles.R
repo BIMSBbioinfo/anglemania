@@ -3,8 +3,9 @@
 #' @description
 #' `factorise` computes the angle matrix of the input gene expression
 #' matrix using the specified method, performs permutation to create a null
-#' distribution, and transforms the correlations into z-scores. This function
-#' is optimized for large datasets using the \pkg{bigstatsr} package.
+#' distribution, and transforms the correlations into z-scores. When
+#' Simpson's correction weights are provided, cluster-reweighted correlations
+#' are used instead of standard correlations.
 #'
 #' @details
 #' The function performs the following steps:
@@ -12,37 +13,32 @@
 #'   \item **Permutation**: The input matrix is permuted column-wise to disrupt
 #'     existing angles, creating a null distribution.
 #'   \item **Angle Computation**: Computes the angle matrix for both the
-#'     original and permuted matrices using \code{\link{extract_angles}}.
-#'   \item **Method-Specific Processing**:
-#'   \itemize{
-#'     \item For other methods (\code{"cosine"}, \code{"spearman"}),
-#'       statistical measures are computed from the permuted data.
-#'   }
+#'     original and permuted matrices using \code{\link{extract_angles}}
+#'     (or \code{weighted_cor_fbm()} when Simpson's weights are provided).
 #'   \item **Statistical Measures**: Calculates mean, variance, and standard
-#'     deviation using \code{\link{get_dstat}}.
+#'     deviation of the permuted null using \code{\link{get_dstat}}.
 #'   \item **Z-Score Transformation**: Transforms the original angle matrix into
-#'     z-scores.
+#'     z-scores relative to the permuted null.
 #' }
-#' This process allows for the identification of invariant gene-gene
-#' relationships by comparing them to a null distribution derived from the
-#' permuted data.
 #'
 #' @param x_mat A \code{\link[bigstatsr]{FBM}} object representing the
-#'   normalized and scaled gene expression matrix.
+#'   gene expression matrix (genes x cells).
 #' @param method A character string specifying the method for calculating the
-#'   relationship between gene pairs. Default is \code{"cosine"}. Other options
-#'   include \code{"spearman"}
+#'   relationship between gene pairs. Default is \code{"cosine"}. Other option
+#'   is \code{"spearman"}.
 #' @param seed An integer value for setting the seed for reproducibility during
 #'   permutation. Default is \code{1}.
 #' @param permute_row_or_column Character "row" or "column", whether
-#' permutations should be executed row-wise or column wise.
-#' Default is \code{"column"}
+#'   permutations should be executed row-wise or column wise.
+#'   Default is \code{"column"}.
 #' @param permutation_function Character "sample" or "permute_nonzero".
-#' If sample, then sample is used for constructing background distributions.
-#' If permute_nonzero, then only non-zero values are permuted.
-#' Default is \code{"sample"}
+#'   Default is \code{"sample"}.
 #' @param normalization_method Character "divide_by_total_counts" or
-#'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}
+#'   "scale_by_total_counts". Default is \code{"divide_by_total_counts"}.
+#' @param cell_weights Optional numeric vector of per-cell weights from
+#'   Simpson's correction. When provided, \code{weighted_cor_fbm()}
+#'   is used instead of \code{\link{extract_angles}} for both original and
+#'   permuted matrices.
 #' @return An \code{\link[bigstatsr]{FBM}} object containing the
 #'   z-score-transformed angle matrix.
 #'
@@ -84,7 +80,8 @@ factorise <- function(
     seed = 1,
     permute_row_or_column = "column",
     permutation_function = "sample",
-    normalization_method = "divide_by_total_counts"
+    normalization_method = "divide_by_total_counts",
+    cell_weights = NULL
 ) {
     # Validate input
     checkmate::assertClass(x_mat, "FBM")
@@ -97,6 +94,8 @@ factorise <- function(
         permutation_function,
         c("sample", "permute_nonzero")
     )
+
+    # Create permuted FBM
     tmpfile <- tempfile()
     x_mat_perm <- bigstatsr::FBM(
         nrow = nrow(x_mat),
@@ -112,7 +111,8 @@ factorise <- function(
     } else {
         permutation_function <- permute_nonzero
     }
-    # default permutation is by columns, i.e. for each cell
+
+    # Default permutation is by columns, i.e. for each cell
     # we permute the gene expression values of the genes
     ind_fun <- bigstatsr::cols_along(x_mat)
     a_fun <- function(X, ind) {
@@ -122,7 +122,7 @@ factorise <- function(
         NULL
     }
 
-    # permute by rows
+    # Permute by rows
     if (permute_row_or_column == "row") {
         ind_fun <- bigstatsr::rows_along(x_mat)
         a_fun <- function(X, ind) {
@@ -132,8 +132,8 @@ factorise <- function(
             NULL
         }
     }
+
     withr::with_seed(seed, {
-        # Permute matrix
         bigstatsr::big_apply(
             x_mat,
             a.FUN = a_fun,
@@ -143,29 +143,33 @@ factorise <- function(
         )
     })
 
-    # normalizes the matrices
-    x_mat <- normalize_matrix(
-        x_mat,
-        normalization_method = normalization_method
-    )
-    x_mat_perm <- normalize_matrix(
-        x_mat_perm,
-        normalization_method = normalization_method
-    )
+    # Normalize both matrices
+    x_mat <- normalize_matrix(x_mat, normalization_method)
+    x_mat_perm <- normalize_matrix(x_mat_perm, normalization_method)
 
-    # Compute correlation matrix for both original and permuted matrix
-    x_mat_corr <- extract_angles(x_mat, method = method)
-    x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
+    # Compute correlation matrices
+    if (!is.null(cell_weights)) {
+        # Simpson's correction: use cluster-reweighted correlations
+        if (method == "spearman") {
+            warning(
+                "Spearman not supported with Simpson's correction; ",
+                "using weighted Pearson"
+            )
+        }
+        x_mat_corr <- weighted_cor_fbm(x_mat, cell_weights)
+        x_mat_perm_corr <- weighted_cor_fbm(x_mat_perm, cell_weights)
+    } else {
+        x_mat_corr <- extract_angles(x_mat, method = method)
+        x_mat_perm_corr <- extract_angles(x_mat_perm, method = method)
+    }
 
-    # Transform original correlation matrix into z-scores.
+    # Transform original correlation matrix into z-scores
     dstat <- get_dstat(x_mat_perm_corr)
     bigstatsr::big_apply(
         x_mat_corr,
         a.FUN = function(X, ind) {
             zscores <- (X[, ind, drop = FALSE] - dstat$mean[ind]) /
                 dstat$sd[ind]
-            # this is needed because sometimes all the correlation matrices
-            # are 0, and then the mean is zero
             zscores[is.na(zscores)] <- 0
             X[, ind] <- zscores
             NULL
@@ -190,7 +194,9 @@ factorise <- function(
 #' @export
 permute_nonzero <- function(v) {
     ind <- v > 0
-    v[ind] <- sample(v[ind])
+    if (sum(ind) > 1) {
+        v[ind] <- sample(v[ind])
+    }
     v
 }
 
@@ -205,7 +211,6 @@ permute_nonzero <- function(v) {
 #'
 #' @param x_mat An \code{\link[bigstatsr]{FBM}} object containing raw gene
 #'   expression data, where rows correspond to genes and columns to samples.
-#'   The data will be normalized and scaled within the function.
 #' @param method A character string specifying the method to compute the
 #'   gene-gene relationships. Options are:
 #'   \itemize{
@@ -255,6 +260,7 @@ extract_angles <- function(
 ) {
     checkmate::assertChoice(method, c("cosine", "spearman"))
     checkmate::assertClass(x_mat, "FBM")
+
     # First transpose the matrix because big_cor calculates the covariance
     # (X^T X)
     x_mat <- bigstatsr::big_transpose(x_mat)
@@ -269,14 +275,10 @@ extract_angles <- function(
         })
     }
 
-    # x_mat <- bigstatsr::big_cor(x_mat, block.size = 1000)
     x_mat <- big_cor_no_warning(x_mat, block.size = 1000)
-    # x_mat <- angl_cor(x_mat, block.size = 1000)
-    # The big_cor function from bigstatsr scales and centers the
-    # count matrix and calculates the covariance (cross product X^T X)
     diag(x_mat) <- NA
 
-    # replaces NaN with NA values in the matrix
+    # Replace NaN with NA
     bigstatsr::big_apply(x_mat, a.FUN = function(X, ind) {
         X.sub <- apply(X[, ind, drop = FALSE], 2, function(x) {
             xx <- x

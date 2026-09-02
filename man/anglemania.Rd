@@ -20,7 +20,20 @@ anglemania(
   permutation_function = "sample",
   prefilter_threshold = 0.5,
   normalization_method = "divide_by_total_counts",
-  verbose = TRUE
+  verbose = TRUE,
+  use_simpsons = FALSE,
+  simpsons_n_clusters = 15,
+  simpsons_n_pcs = 20,
+  simpsons_min_cells = 30,
+  simpsons_min_cluster_size = 20,
+  simpsons_min_cells_cor = 20,
+  simpsons_top_quantile = 0.95,
+  simpsons_weight_in_ranking = 0,
+  simpsons_use_binary_pca = FALSE,
+  simpsons_use_density_weights = FALSE,
+  simpsons_density_k = 30,
+  simpsons_use_count_split = FALSE,
+  simpsons_count_split_prop = 0.5
 )
 
 check_params(
@@ -36,7 +49,20 @@ check_params(
   permutation_function,
   prefilter_threshold,
   normalization_method,
-  verbose
+  verbose,
+  use_simpsons = FALSE,
+  simpsons_n_clusters = 15,
+  simpsons_n_pcs = 20,
+  simpsons_min_cells = 30,
+  simpsons_min_cluster_size = 20,
+  simpsons_min_cells_cor = 20,
+  simpsons_top_quantile = 0.95,
+  simpsons_weight_in_ranking = 0,
+  simpsons_use_binary_pca = FALSE,
+  simpsons_use_density_weights = FALSE,
+  simpsons_density_k = 30,
+  simpsons_use_count_split = FALSE,
+  simpsons_count_split_prop = 0.5
 )
 
 add_unique_batch_key(sce, dataset_key = NA_character_, batch_key)
@@ -91,6 +117,73 @@ genes. Speeds up gene selection.}
 
 \item{verbose}{Logical indicating whether to print messages.}
 
+\item{use_simpsons}{Logical indicating whether to apply Simpson's paradox
+correction. When \code{TRUE}, cells are grouped into microclusters within
+each batch and gene-gene correlations are computed with per-cell weights
+\code{1 / |cluster|}, so that each microcluster contributes equally
+regardless of size. This removes correlation signal that is driven purely by
+differing cell type proportions across batches. Default is \code{FALSE}.}
+
+\item{simpsons_n_clusters}{Integer specifying the target number of
+microclusters per batch. Controls the Leiden resolution, which is set to
+\code{max(1, simpsons_n_clusters / 20)}. Benchmarks show 10-20 is optimal;
+outside that range performance degrades. Default is \code{15}.}
+
+\item{simpsons_n_pcs}{Integer specifying the number of principal components
+used for the microclustering embedding. Default is \code{20}.}
+
+\item{simpsons_min_cells}{Integer specifying the minimum number of cells a
+microcluster may contain. Clusters below this size are iteratively merged
+into their nearest neighbour. Default is \code{30}.}
+
+\item{simpsons_min_cluster_size}{Integer specifying the minimum cluster size
+for a cell to receive a non-zero weight. Cells in smaller clusters are
+excluded from the correlation estimate. Default is \code{20}.}
+
+\item{simpsons_min_cells_cor}{Integer specifying the minimum number of cells
+a microcluster must contain to contribute a within-cluster correlation
+during the post-hoc analysis. Only used when
+\code{simpsons_weight_in_ranking > 0}. Default is \code{20}.}
+
+\item{simpsons_top_quantile}{Numeric in \code{[0, 1]} specifying the
+quantile of within-cluster correlations used to summarise a gene pair's
+peak local correlation. Only used when
+\code{simpsons_weight_in_ranking > 0}. Default is \code{0.95}.}
+
+\item{simpsons_weight_in_ranking}{Numeric in \code{[0, 1]} specifying how
+much weight the Simpson's preservation score receives as a third criterion
+in \code{\link{select_genes}}, alongside mean z-score and z-score standard
+deviation. The two base criteria are rescaled to sum to
+\code{1 - simpsons_weight_in_ranking}. Setting this above \code{0} triggers
+the post-hoc local correlation analysis, which is computationally
+expensive. Default is \code{0} (disabled).}
+
+\item{simpsons_use_binary_pca}{Logical indicating whether to build the
+clustering embedding from the binarised detection matrix rather than from
+normalized expression. Benchmarks show this costs 0.4-0.8\\% DE precision;
+retained as an option but not recommended. Default is \code{FALSE}.}
+
+\item{simpsons_use_density_weights}{Logical indicating whether to replace
+the discrete cluster-inverse weights with continuous kNN density-based
+weights. Benchmarks show this costs 3-7\\% DE precision; retained as an
+option but not recommended. Default is \code{FALSE}.}
+
+\item{simpsons_density_k}{Integer specifying the number of nearest
+neighbours for density estimation. Only used when
+\code{simpsons_use_density_weights = TRUE}. Default is \code{30}.}
+
+\item{simpsons_use_count_split}{Logical indicating whether to use count
+splitting (Neufeld et al., \url{https://arxiv.org/abs/2307.12985}) so that
+clustering and correlation estimation use independent Poisson folds of the
+counts. This avoids double-dipping and is recommended on real data, where
+uncorrected Simpson's weighting tends to overcorrect. Requires the
+\pkg{countsplit} package. Default is \code{FALSE}.}
+
+\item{simpsons_count_split_prop}{Numeric in \code{[0.1, 0.9]} specifying the
+proportion of counts allocated to the first fold (used for PCA and
+clustering); the remainder is used for correlations. Only used when
+\code{simpsons_use_count_split = TRUE}. Default is \code{0.5}.}
+
 \item{matrix_list}{A list of \code{bigstatsr::FBM} objects.}
 }
 \value{
@@ -123,6 +216,9 @@ analysis.
 \details{
 This function performs the following steps:
 \enumerate{
+\item Optionally, when \code{use_simpsons = TRUE}, groups cells into
+microclusters within each batch and derives per-cell weights so that
+each microcluster contributes equally to the correlation estimate.
 \item Computes angles between genes for each batch in the
 \code{SingleCellExperiment} using the specified \code{method}, via
 \code{\link{factorise}}.

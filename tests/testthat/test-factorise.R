@@ -242,3 +242,51 @@ check dimensions", {
     expect_equal(nrow(result_fbm), nrow(mat))
     expect_equal(ncol(result_fbm), nrow(mat))
 })
+
+# --- Permutation with cell_weights (Simpson's) tests ---
+
+test_that("factorise with cell_weights produces valid z-scores", {
+    set.seed(42)
+    mat <- matrix(rpois(60, lambda = 3), nrow = 6, ncol = 10)
+    fbm <- bigstatsr::FBM(6, 10, init = mat)
+    w <- rep(1, 10)
+    w[1:3] <- 2  # give some cells more weight
+
+    res <- factorise(fbm, method = "cosine", seed = 1, cell_weights = w)
+    expect_equal(nrow(res), 6)
+    expect_equal(ncol(res), 6)
+})
+
+test_that("cell_weights change the result vs unweighted", {
+    set.seed(42)
+    mat <- matrix(rpois(60, lambda = 3), nrow = 6, ncol = 10)
+    fbm1 <- bigstatsr::FBM(6, 10, init = mat)
+    fbm2 <- bigstatsr::FBM(6, 10, init = mat)
+    w <- rep(1, 10)
+    w[1:3] <- 5
+
+    res_unw <- factorise(fbm1, method = "cosine", seed = 1)
+    res_w   <- factorise(fbm2, method = "cosine", seed = 1, cell_weights = w)
+    expect_false(identical(res_unw[], res_w[]))
+})
+
+test_that("factorise produces z-scores with both signs", {
+    set.seed(42)
+    mat <- matrix(rpois(200, lambda = 3), nrow = 10, ncol = 20)
+    fbm <- bigstatsr::FBM(10, 20, init = mat)
+
+    res <- factorise(fbm, method = "cosine", seed = 1)
+    vals <- res[][!is.na(res[])]
+    expect_true(any(vals > 0))
+    expect_true(any(vals < 0))
+})
+
+test_that("spearman method produces valid z-scores", {
+    set.seed(42)
+    mat <- matrix(rpois(60, lambda = 3), nrow = 6, ncol = 10)
+    fbm <- bigstatsr::FBM(6, 10, init = mat)
+
+    res <- factorise(fbm, method = "spearman", seed = 1)
+    expect_equal(nrow(res), 6)
+    expect_equal(ncol(res), 6)
+})

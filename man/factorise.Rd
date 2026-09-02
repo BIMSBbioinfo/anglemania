@@ -10,31 +10,35 @@ factorise(
   seed = 1,
   permute_row_or_column = "column",
   permutation_function = "sample",
-  normalization_method = "divide_by_total_counts"
+  normalization_method = "divide_by_total_counts",
+  cell_weights = NULL
 )
 }
 \arguments{
 \item{x_mat}{A \code{\link[bigstatsr]{FBM}} object representing the
-normalized and scaled gene expression matrix.}
+gene expression matrix (genes x cells).}
 
 \item{method}{A character string specifying the method for calculating the
-relationship between gene pairs. Default is \code{"cosine"}. Other options
-include \code{"spearman"}}
+relationship between gene pairs. Default is \code{"cosine"}. Other option
+is \code{"spearman"}.}
 
 \item{seed}{An integer value for setting the seed for reproducibility during
 permutation. Default is \code{1}.}
 
 \item{permute_row_or_column}{Character "row" or "column", whether
 permutations should be executed row-wise or column wise.
-Default is \code{"column"}}
+Default is \code{"column"}.}
 
 \item{permutation_function}{Character "sample" or "permute_nonzero".
-If sample, then sample is used for constructing background distributions.
-If permute_nonzero, then only non-zero values are permuted.
-Default is \code{"sample"}}
+Default is \code{"sample"}.}
 
 \item{normalization_method}{Character "divide_by_total_counts" or
-"scale_by_total_counts". Default is \code{"divide_by_total_counts"}}
+"scale_by_total_counts". Default is \code{"divide_by_total_counts"}.}
+
+\item{cell_weights}{Optional numeric vector of per-cell weights from
+Simpson's correction. When provided, \code{weighted_cor_fbm()}
+is used instead of \code{\link{extract_angles}} for both original and
+permuted matrices.}
 }
 \value{
 An \code{\link[bigstatsr]{FBM}} object containing the
@@ -43,8 +47,9 @@ z-score-transformed angle matrix.
 \description{
 \code{factorise} computes the angle matrix of the input gene expression
 matrix using the specified method, performs permutation to create a null
-distribution, and transforms the correlations into z-scores. This function
-is optimized for large datasets using the \pkg{bigstatsr} package.
+distribution, and transforms the correlations into z-scores. When
+Simpson's correction weights are provided, cluster-reweighted correlations
+are used instead of standard correlations.
 }
 \details{
 The function performs the following steps:
@@ -52,20 +57,13 @@ The function performs the following steps:
 \item \strong{Permutation}: The input matrix is permuted column-wise to disrupt
 existing angles, creating a null distribution.
 \item \strong{Angle Computation}: Computes the angle matrix for both the
-original and permuted matrices using \code{\link{extract_angles}}.
-\item \strong{Method-Specific Processing}:
-\itemize{
-\item For other methods (\code{"cosine"}, \code{"spearman"}),
-statistical measures are computed from the permuted data.
-}
+original and permuted matrices using \code{\link{extract_angles}}
+(or \code{weighted_cor_fbm()} when Simpson's weights are provided).
 \item \strong{Statistical Measures}: Calculates mean, variance, and standard
-deviation using \code{\link{get_dstat}}.
+deviation of the permuted null using \code{\link{get_dstat}}.
 \item \strong{Z-Score Transformation}: Transforms the original angle matrix into
-z-scores.
+z-scores relative to the permuted null.
 }
-This process allows for the identification of invariant gene-gene
-relationships by comparing them to a null distribution derived from the
-permuted data.
 }
 \examples{
 mat <- matrix(

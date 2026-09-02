@@ -35,7 +35,20 @@ check_params <- function(
     permutation_function,
     prefilter_threshold,
     normalization_method,
-    verbose
+    verbose,
+    use_simpsons = FALSE,
+    simpsons_n_clusters = 15,
+    simpsons_n_pcs = 20,
+    simpsons_min_cells = 30,
+    simpsons_min_cluster_size = 20,
+    simpsons_min_cells_cor = 20,
+    simpsons_top_quantile = 0.95,
+    simpsons_weight_in_ranking = 0.0,
+    simpsons_use_binary_pca = FALSE,
+    simpsons_use_density_weights = FALSE,
+    simpsons_density_k = 30,
+    simpsons_use_count_split = FALSE,
+    simpsons_count_split_prop = 0.5
 ) {
     # Validate inputs
     # sce
@@ -144,6 +157,37 @@ check_params <- function(
         verbose,
         len = 1
     )
+    # Simpson's paradox parameters
+    checkmate::assert_logical(use_simpsons, len = 1)
+    if (use_simpsons) {
+        checkmate::assert_integerish(
+            simpsons_n_clusters, lower = 2, len = 1
+        )
+        checkmate::assert_integerish(
+            simpsons_n_pcs, lower = 1, len = 1
+        )
+        checkmate::assert_integerish(
+            simpsons_min_cells, lower = 1, len = 1
+        )
+        checkmate::assert_integerish(
+            simpsons_min_cluster_size, lower = 1, len = 1
+        )
+        checkmate::assert_integerish(
+            simpsons_min_cells_cor, lower = 2, len = 1
+        )
+        checkmate::assert_numeric(
+            simpsons_top_quantile, lower = 0, upper = 1, len = 1
+        )
+        checkmate::assert_numeric(
+            simpsons_weight_in_ranking, lower = 0, upper = 1, len = 1
+        )
+        checkmate::assert_logical(simpsons_use_binary_pca, len = 1)
+        checkmate::assert_logical(simpsons_use_density_weights, len = 1)
+        checkmate::assert_integerish(simpsons_density_k, lower = 2, len = 1)
+        checkmate::assert_logical(simpsons_use_count_split, len = 1)
+        checkmate::assert_numeric(simpsons_count_split_prop,
+                                   lower = 0.1, upper = 0.9, len = 1)
+    }
     return(list(
         batch_key = batch_key,
         dataset_key = dataset_key,
@@ -156,7 +200,20 @@ check_params <- function(
         permutation_function = permutation_function,
         prefilter_threshold = prefilter_threshold,
         normalization_method = normalization_method,
-        verbose = verbose
+        verbose = verbose,
+        use_simpsons = use_simpsons,
+        simpsons_n_clusters = simpsons_n_clusters,
+        simpsons_n_pcs = simpsons_n_pcs,
+        simpsons_min_cells = simpsons_min_cells,
+        simpsons_min_cluster_size = simpsons_min_cluster_size,
+        simpsons_min_cells_cor = simpsons_min_cells_cor,
+        simpsons_top_quantile = simpsons_top_quantile,
+        simpsons_weight_in_ranking = simpsons_weight_in_ranking,
+        simpsons_use_binary_pca = simpsons_use_binary_pca,
+        simpsons_use_density_weights = simpsons_use_density_weights,
+        simpsons_density_k = simpsons_density_k,
+        simpsons_use_count_split = simpsons_use_count_split,
+        simpsons_count_split_prop = simpsons_count_split_prop
     ))
 }
 
